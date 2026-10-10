@@ -7,7 +7,7 @@
   "scripts": {
     "build": "node build.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run"
+    "e2e": "playwright test"
   },
   "dependencies": {
     "@webassistant/sdk": "1.0.0-rc.1"

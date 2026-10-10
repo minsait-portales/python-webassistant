@@ -14,7 +14,7 @@
     "lint": "eslint . && prettier --check \"**/*.{ts,mjs,json,css,md}\" --ignore-path .prettierignore",
     "format": "prettier --write \"**/*.{ts,mjs,json,css}\" --ignore-path .prettierignore",
     "test": "npm run test --workspaces --if-present",
-    "e2e": "npm run e2e -w @webassistant/widget",
+    "e2e": "npm run e2e -w @webassistant/widget && npm run e2e -w @webassistant/admin",
     "generate:sdk": "npm run generate -w @webassistant/sdk"
   },
   "devDependencies": {

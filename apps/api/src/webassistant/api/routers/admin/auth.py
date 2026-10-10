@@ -52,7 +52,11 @@ async def login(body: LoginBody, request: Request, services: ServicesDep) -> dic
         ip=ip,
     )
     if snapshot is None:
-        raise AppError(ErrorCode.UNAUTHORIZED, "Credenciales no válidas")
+        raise AppError(
+            ErrorCode.UNAUTHORIZED,
+            "Credenciales no válidas",
+            user_message="Correo o contraseña incorrectos.",
+        )
     token, expires = services.tokens.issue_admin(
         AdminClaims(snapshot[0], snapshot[1], snapshot[2], snapshot[3])
     )
@@ -91,7 +95,11 @@ async def change_password(body: PasswordChange, principal: AdminDep, services: S
     async with UnitOfWork(services.db, platform=True) as uow:
         user = await uow.admin_users.require(principal.user_id)
         if not verify_secret(body.current_password, user.password_hash):
-            raise AppError(ErrorCode.FORBIDDEN, "La contraseña actual no es correcta")
+            raise AppError(
+                ErrorCode.FORBIDDEN,
+                "La contraseña actual no es correcta",
+                user_message="La contraseña actual no es correcta.",
+            )
         user.password_hash = hash_secret(body.new_password)
     await services.audit.record(
         "admin.password_changed",

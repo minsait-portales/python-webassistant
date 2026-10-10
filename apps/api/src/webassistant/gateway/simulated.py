@@ -213,8 +213,13 @@ class SimulatedProvider(ModelProvider):
         weighted += [(0.5, h) for h in item.get("routing_hints", [])]
         seen: dict[str, float] = {}
         for weight, text in weighted:
-            for token in set(tokens(text)) & words:
-                seen[token] = max(seen.get(token, 0.0), weight)
+            for token in set(tokens(text)):
+                for word in words:
+                    # Coincidencia exacta o por raíz (plurales y variantes: pedido/pedidos).
+                    if token == word or (
+                        len(token) >= 5 and len(word) >= 5 and token[:5] == word[:5]
+                    ):
+                        seen[word] = max(seen.get(word, 0.0), weight)
         return sum(seen.values())
 
     # --- Composición ---------------------------------------------------------------
