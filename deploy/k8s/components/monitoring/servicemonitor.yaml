@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: webassistant
+spec:
+  selector:
+    matchExpressions:
+      - { key: app.kubernetes.io/name, operator: In, values: [webassistant-api, webassistant-worker] }
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 30s
+    - port: metrics
+      path: /metrics
+      interval: 30s

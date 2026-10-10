@@ -53,6 +53,8 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 "**/tests/**" = ["S", "PLR", "ARG", "N802", "PT011", "B017", "PT018", "PT022", "RUF059"]
 "apps/api/migrations/**" = ["E501", "N"]
+# Utilidades de operación: aleatoriedad de simulación (no criptográfica) y URLs de servicios internos.
+"scripts/**" = ["S310", "S311"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["webassistant", "webassistant_worker", "webassistant_skill_sdk"]
@@ -97,5 +99,4 @@ source = ["webassistant", "webassistant_worker"]
 omit = ["*/migrations/*"]
 
 [tool.bandit]
-exclude_dirs = ["tests", "apps/widget", "apps/admin", "node_modules"]
-skips = ["B101"]
+exclude_dirs = ["tests", ".venv", "apps/widget", "apps/admin", "node_modules"]

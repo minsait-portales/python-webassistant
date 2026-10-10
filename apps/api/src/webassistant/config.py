@@ -82,7 +82,6 @@ class Settings(BaseSettings):
     default_provider: str = "simulated"
     default_chat_model: str = "gpt-6-luna"
     default_embedding_model: str = "text-embedding-3-small"
-    embedding_dimension: int = 1536
     openai_api_key: SecretStr | None = None
     openai_base_url: str | None = None
     openai_organization: str | None = None
@@ -100,7 +99,7 @@ class Settings(BaseSettings):
     max_request_bytes: int = 1_000_000
     max_ingest_request_bytes: int = 25_000_000
     request_timeout_seconds: float = 120.0
-    rate_limit_site_per_minute: int = 600
+    rate_limit_site_per_minute: int = 1200
     rate_limit_subject_per_minute: int = 30
     rate_limit_ip_per_minute: int = 120
     rate_limit_admin_per_minute: int = 300

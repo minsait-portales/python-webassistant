@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-from webassistant.config import Settings
+from webassistant.config import Environment, Settings
 from webassistant.conversations.service import ConversationService
 from webassistant.db.session import Database
 from webassistant.gateway.gateway import (
@@ -140,6 +140,8 @@ def build_services(settings: Settings, *, overrides: dict[str, Any] | None = Non
             max_bytes=settings.ingest_max_download_bytes,
             timeout=settings.ingest_download_timeout_seconds,
             temp_dir=settings.ingest_temp_dir,
+            require_allowlist=settings.is_production_like,
+            allow_http=settings.environment in {Environment.DEVELOPMENT, Environment.TEST},
         ),
     )
     search = SearchService(db, store, indexes, gateway)

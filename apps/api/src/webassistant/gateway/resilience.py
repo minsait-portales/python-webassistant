@@ -105,7 +105,7 @@ class Resilience:
                 if exc.code not in _RETRYABLE or attempt >= self.policy.max_retries:
                     raise
                 delay = min(self.policy.max_delay, self.policy.base_delay * (2**attempt))
-                await asyncio.sleep(delay * (0.5 + random.random()))  # noqa: S311
+                await asyncio.sleep(delay * (0.5 + random.random()))  # noqa: S311  # jitter, no criptográfico  # nosec B311
                 attempt += 1
                 continue
             breaker.record_success()

@@ -1,0 +1,45 @@
+{
+  "tool": "OWASP ZAP 2.16.1 zap-api-scan",
+  "generated": "Sat, 10 Oct 2026 17:18:29",
+  "mode": "admin",
+  "totals": {
+    "high": 0,
+    "medium": 0,
+    "low": 0,
+    "informational": 3
+  },
+  "alerts": [
+    {
+      "id": "100000",
+      "alert": "A Client Error response code was returned by the server",
+      "risk": "Informational (High)",
+      "count": 6688,
+      "examples": [
+        "DELETE http://api:8000/v1/conversations",
+        "DELETE http://api:8000/v1/conversations/",
+        "DELETE http://api:8000/v1/ingest/documents"
+      ]
+    },
+    {
+      "id": "10111",
+      "alert": "Authentication Request Identified",
+      "risk": "Informational (Low)",
+      "count": 2,
+      "examples": [
+        "POST http://api:8000/v1/admin/tenants//users",
+        "POST http://api:8000/v1/admin/auth/login"
+      ]
+    },
+    {
+      "id": "10104",
+      "alert": "User Agent Fuzzer",
+      "risk": "Informational (Medium)",
+      "count": 1193,
+      "examples": [
+        "DELETE http://api:8000/v1/conversations",
+        "DELETE http://api:8000/v1/conversations",
+        "DELETE http://api:8000/v1/conversations"
+      ]
+    }
+  ]
+}

@@ -1,9 +1,7 @@
 {
   "uid": "webassistant-overview",
   "title": "WebAssistant · Visión general",
-  "tags": [
-    "webassistant"
-  ],
+  "tags": ["webassistant"],
   "timezone": "browser",
   "schemaVersion": 39,
   "version": 1,

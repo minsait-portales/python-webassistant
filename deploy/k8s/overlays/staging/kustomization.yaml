@@ -1,0 +1,33 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: webassistant-staging
+resources:
+  - ../../base
+secretGenerator:
+  - name: webassistant-secrets
+    envs: [secrets.env]
+configMapGenerator:
+  - name: webassistant-config
+    behavior: merge
+    literals:
+      - WEBASSISTANT_ENVIRONMENT=staging
+      - WEBASSISTANT_PUBLIC_BASE_URL=https://assistant-staging.example.com
+patches:
+  - target: { kind: Ingress, name: webassistant }
+    patch: |
+      - op: replace
+        path: /spec/tls/0/hosts/0
+        value: assistant-staging.example.com
+      - op: replace
+        path: /spec/rules/0/host
+        value: assistant-staging.example.com
+  - target: { kind: HorizontalPodAutoscaler, name: webassistant-api }
+    patch: |
+      - op: replace
+        path: /spec/maxReplicas
+        value: 3
+  - target: { kind: Deployment, name: webassistant-worker }
+    patch: |
+      - op: replace
+        path: /spec/replicas
+        value: 1

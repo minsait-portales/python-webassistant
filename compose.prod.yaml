@@ -1,7 +1,7 @@
 # Superposición de producción (CG-13.1):
 #   docker compose -f compose.yaml -f compose.prod.yaml up -d
 # Exige los secretos (falla al arrancar si faltan), desactiva la demo y el proveedor simulado y
-# publica la API solo en localhost para situarla detrás del proxy inverso / balanceador con TLS.
+# publica solo el gateway HTTPS (Caddy, certificado automático); la API queda en la red interna.
 x-prod-environment: &prod-environment
   WEBASSISTANT_ENVIRONMENT: production
   WEBASSISTANT_PUBLIC_BASE_URL: ${WEBASSISTANT_PUBLIC_BASE_URL:?Define la URL pública https del servicio}
@@ -10,7 +10,8 @@ x-prod-environment: &prod-environment
   WEBASSISTANT_DEFAULT_PROVIDER: ${WEBASSISTANT_DEFAULT_PROVIDER:-openai}
   WEBASSISTANT_OPENAI_API_KEY: ${OPENAI_API_KEY:?Define OPENAI_API_KEY}
   WEBASSISTANT_DEMO_ENABLED: "false"
-  WEBASSISTANT_TRUSTED_PROXIES: ${WEBASSISTANT_TRUSTED_PROXIES:-172.16.0.0/12,10.0.0.0/8}
+  # El gateway (red interna de Compose) es el único proxy de confianza para X-Forwarded-For.
+  WEBASSISTANT_TRUSTED_PROXIES: ${WEBASSISTANT_TRUSTED_PROXIES:-172.16.0.0/12,10.0.0.0/8,192.168.0.0/16}
   WEBASSISTANT_METRICS_TOKEN: ${WEBASSISTANT_METRICS_TOKEN:-}
   WEBASSISTANT_BOOTSTRAP_ADMIN_EMAIL: ${WEBASSISTANT_BOOTSTRAP_ADMIN_EMAIL:-}
   WEBASSISTANT_BOOTSTRAP_ADMIN_PASSWORD: ${WEBASSISTANT_BOOTSTRAP_ADMIN_PASSWORD:-}
@@ -32,7 +33,7 @@ services:
   api:
     environment: *prod-environment
     restart: always
-    ports: !override ["127.0.0.1:${WEBASSISTANT_PORT:-8000}:8000"]
+    ports: !reset []
     deploy:
       resources:
         limits: { cpus: "2", memory: 1g }
@@ -42,3 +43,24 @@ services:
     deploy:
       resources:
         limits: { cpus: "2", memory: 1g }
+
+  gateway:
+    image: caddy:2.10.0-alpine
+    restart: always
+    environment:
+      WEBASSISTANT_DOMAIN: ${WEBASSISTANT_DOMAIN:?Define el dominio público (p. ej. asistente.example.com)}
+      WEBASSISTANT_TLS: ${WEBASSISTANT_TLS:-${ACME_EMAIL:?Define ACME_EMAIL (contacto ACME) o WEBASSISTANT_TLS=internal}}
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+      - "${HTTPS_PORT:-443}:443/udp"
+    volumes:
+      - ./docker/gateway/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      api: { condition: service_healthy }
+
+volumes:
+  caddy-data:
+  caddy-config:

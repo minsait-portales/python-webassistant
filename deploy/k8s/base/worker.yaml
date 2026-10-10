@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webassistant-worker
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: webassistant-worker
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: webassistant-worker
+        app.kubernetes.io/component: worker
+    spec:
+      serviceAccountName: webassistant
+      # arq espera a los trabajos en curso al recibir SIGTERM (job_timeout de 15 min).
+      terminationGracePeriodSeconds: 900
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels: { app.kubernetes.io/name: webassistant-worker }
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile: { type: RuntimeDefault }
+      containers:
+        - name: worker
+          image: webassistant
+          command: ["webassistant-worker"]
+          ports:
+            - { name: metrics, containerPort: 9100 }
+          envFrom:
+            - configMapRef: { name: webassistant-config }
+            - secretRef: { name: webassistant-secrets }
+          livenessProbe:
+            exec: { command: ["webassistant-worker", "--check"] }
+            initialDelaySeconds: 60
+            periodSeconds: 60
+            timeoutSeconds: 15
+          resources:
+            requests: { cpu: 250m, memory: 512Mi }
+            limits: { memory: 1536Mi }
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: ["ALL"] }
+          volumeMounts:
+            - { name: tmp, mountPath: /tmp }
+      volumes:
+        - name: tmp
+          emptyDir: { sizeLimit: 2Gi }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webassistant-worker-metrics
+  labels:
+    app.kubernetes.io/name: webassistant-worker
+spec:
+  selector:
+    app.kubernetes.io/name: webassistant-worker
+  ports:
+    - { name: metrics, port: 9100, targetPort: metrics }
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: webassistant-worker
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels: { app.kubernetes.io/name: webassistant-worker }

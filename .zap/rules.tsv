@@ -1,0 +1,3 @@
+# Reglas de ZAP (id\tacción\tmotivo). FAIL en hallazgos altos; IGNORE solo con justificación.
+10049	IGNORE	Caché: las respuestas /v1 ya envían no-store; las de activos inmutables son intencionadas
+10096	IGNORE	Falso positivo: dígitos de importes decimales (coste) en los informes de uso, no marcas de tiempo

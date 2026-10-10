@@ -13,7 +13,7 @@ class Scope(StrEnum):
     KNOWLEDGE_READ = "knowledge:read"
     ACTIONS_EXECUTE = "actions:execute"
     # Server-to-server
-    TOKEN_ISSUE = "token:issue"
+    TOKEN_ISSUE = "token:issue"  # nombre de scope, no un secreto  # nosec B105
     INGEST_WRITE = "ingest:write"
     INGEST_READ = "ingest:read"
     SEARCH_READ = "search:read"

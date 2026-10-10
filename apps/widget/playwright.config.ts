@@ -7,6 +7,7 @@ import { defineConfig, devices } from '@playwright/test';
 
 const PORT = Number(process.env.E2E_PORT || 8765);
 const BASE_URL = process.env.E2E_BASE_URL || `http://localhost:${PORT}`;
+const browsers = (process.env.E2E_BROWSERS || 'chromium').split(',').map((b) => b.trim());
 
 export default defineConfig({
   testDir: './e2e',
@@ -23,14 +24,34 @@ export default defineConfig({
       ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH }
       : {},
   },
-  projects: [
-    {
-      name: 'desktop',
-      use: { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 900 } },
-      testIgnore: /mobile\.spec\.ts/,
-    },
-    { name: 'mobile', use: { ...devices['Pixel 7'] }, testMatch: /mobile\.spec\.ts/ },
-  ],
+  // Matriz de navegadores (CG-15.5): Chromium por defecto; en CI, E2E_BROWSERS=firefox|webkit.
+  projects: browsers.flatMap((browser) => {
+    if (browser === 'firefox')
+      return [
+        {
+          name: 'firefox',
+          use: { ...devices['Desktop Firefox'], viewport: { width: 1280, height: 900 } },
+          testIgnore: /mobile\.spec\.ts/,
+        },
+      ];
+    if (browser === 'webkit')
+      return [
+        {
+          name: 'webkit',
+          use: { ...devices['Desktop Safari'], viewport: { width: 1280, height: 900 } },
+          testIgnore: /mobile\.spec\.ts/,
+        },
+        { name: 'mobile-safari', use: { ...devices['iPhone 13'] }, testMatch: /mobile\.spec\.ts/ },
+      ];
+    return [
+      {
+        name: 'desktop',
+        use: { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 900 } },
+        testIgnore: /mobile\.spec\.ts/,
+      },
+      { name: 'mobile', use: { ...devices['Pixel 7'] }, testMatch: /mobile\.spec\.ts/ },
+    ];
+  }),
   webServer: process.env.E2E_BASE_URL
     ? undefined
     : {

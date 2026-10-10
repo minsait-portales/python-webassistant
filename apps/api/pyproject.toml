@@ -31,6 +31,9 @@ dependencies = [
   "arq>=0.26",
   "typer>=0.13",
   "webassistant-skill-sdk",
+  "opentelemetry-instrumentation-sqlalchemy>=0.66b1",
+  "opentelemetry-instrumentation-redis>=0.66b1",
+  "opentelemetry-instrumentation-httpx>=0.66b1",
 ]
 
 [project.scripts]

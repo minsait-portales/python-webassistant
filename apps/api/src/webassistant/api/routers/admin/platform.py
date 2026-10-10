@@ -20,7 +20,7 @@ from webassistant.api.routers.admin.common import (
 from webassistant.api.routers.admin.schemas import PriceBody, ReindexBody, TenantBody, TenantPatch
 from webassistant.db import models as m
 from webassistant.db.repositories import UnitOfWork
-from webassistant.errors import AppError, ErrorCode
+from webassistant.errors import AppError, ErrorCode, validation
 from webassistant.usage.reports import usage_report
 
 router = APIRouter(prefix="/v1/admin", tags=["admin-platform"])
@@ -228,6 +228,16 @@ async def list_indexes(principal: ConfigReader, services: ServicesDep) -> dict[s
 async def create_index(
     body: ReindexBody, principal: PlatformAdmin, services: ServicesDep, request: Request
 ) -> dict[str, Any]:
+    if body.provider not in services.gateway.providers:
+        raise validation(
+            "Proveedor de embeddings no configurado",
+            [
+                {
+                    "path": "/provider",
+                    "message": f"Disponibles: {', '.join(sorted(services.gateway.providers))}",
+                }
+            ],
+        )
     provider = services.gateway.provider(body.provider)
     index = await services.indexes.create_building(
         body.provider, body.model, provider.embedding_dimension(body.model)

@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: webassistant-config
+data:
+  WEBASSISTANT_ENVIRONMENT: production
+  WEBASSISTANT_PUBLIC_BASE_URL: https://assistant.example.com
+  WEBASSISTANT_LOG_LEVEL: INFO
+  WEBASSISTANT_LOG_JSON: "true"
+  WEBASSISTANT_QUEUE_MODE: redis
+  WEBASSISTANT_DEFAULT_PROVIDER: openai
+  WEBASSISTANT_DEFAULT_CHAT_MODEL: gpt-6-luna
+  WEBASSISTANT_DEFAULT_EMBEDDING_MODEL: text-embedding-3-small
+  WEBASSISTANT_DEMO_ENABLED: "false"
+  # Rango de los pods del ingress controller (para X-Forwarded-For).
+  WEBASSISTANT_TRUSTED_PROXIES: 10.0.0.0/8
+  WEBASSISTANT_OTEL_ENABLED: "false"

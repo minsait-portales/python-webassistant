@@ -188,7 +188,7 @@ async def create_client(
             site_id=site_id,
             name=body.name,
             client_id="wa_" + ids.new_secret(12).replace("-", "").replace("_", "")[:16].lower(),
-            secret_hash="",
+            secret_hash="",  # se rellena con el hash del secreto generado  # nosec B106
             scopes=list(body.scopes),
         )
         secret = await _issue_secret(services, client)

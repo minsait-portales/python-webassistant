@@ -126,6 +126,21 @@ class BodySizeLimitMiddleware(BaseHTTPMiddleware):
                 return problem_response(
                     AppError(ErrorCode.PAYLOAD_TOO_LARGE, f"Máximo {limit} bytes"), request
                 )
+        if request.method in {"POST", "PUT", "PATCH"} and "json" in request.headers.get(
+            "content-type", ""
+        ):
+            # PostgreSQL no admite el carácter NUL en text/jsonb: se rechaza en la entrada en lugar
+            # de fallar al persistir (mensajes, acciones, ingesta y administración).
+            body = await request.body()
+            if b"\x00" in body or b"\\u0000" in body:
+                return problem_response(
+                    AppError(
+                        ErrorCode.VALIDATION_ERROR,
+                        "El contenido no puede incluir el carácter NUL (U+0000)",
+                        user_message="El mensaje contiene caracteres no válidos.",
+                    ),
+                    request,
+                )
         return await call_next(request)
 
 

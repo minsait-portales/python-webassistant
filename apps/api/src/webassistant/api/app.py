@@ -161,7 +161,12 @@ def create_app(
     if settings.otel_enabled:
         from webassistant.observability.tracing import setup_tracing
 
-        setup_tracing(settings.service_name, settings.otel_exporter_endpoint, app)
+        setup_tracing(
+            settings.service_name,
+            settings.otel_exporter_endpoint,
+            app,
+            engines=[services.db.engine.sync_engine],
+        )
     return app
 
 

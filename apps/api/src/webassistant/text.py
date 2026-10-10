@@ -204,7 +204,16 @@ def strip_html(text: str) -> str:
     return html.unescape(text)
 
 
+_CONTROL_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
+
+
+def strip_control_chars(text: str) -> str:
+    """Elimina caracteres de control (incluido NUL) salvo tabulador y saltos de línea."""
+    return _CONTROL_RE.sub("", text)
+
+
 def clean_whitespace(text: str) -> str:
+    text = strip_control_chars(text)
     lines = [_SPACE_RE.sub(" ", line).strip() for line in text.replace("\r", "\n").split("\n")]
     out: list[str] = []
     blank = False

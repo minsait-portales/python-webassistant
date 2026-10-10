@@ -27,6 +27,7 @@ from webassistant.db.repositories import UnitOfWork
 from webassistant.db.session import Database
 from webassistant.errors import AppError, ErrorCode
 from webassistant.observability import metrics
+from webassistant.observability.tracing import traced
 from webassistant.orchestrator.assistants import AssistantService
 from webassistant.security.principal import WidgetPrincipal
 from webassistant.security.scopes import Scope, has_scopes
@@ -194,6 +195,9 @@ class ActionService:
             metrics.ACTIONS.labels(skill.name, action, definition["type"], "proposed").inc()
             return execution_view(execution, **extra)
 
+    @traced(
+        "action.execute", lambda self, principal, execution_id, **_: {"execution_id": execution_id}
+    )
     async def execute(
         self,
         principal: WidgetPrincipal,

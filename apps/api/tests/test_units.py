@@ -298,3 +298,14 @@ def test_theme_contrast_validation() -> None:
         validate_theme({"text": "#eeeeee"}, {"text": "#260717", "surface": "#ffffff"})
     with pytest.raises(AppError):
         validate_theme({"accent": "red; background:url(x)"}, {})
+
+
+def test_control_characters_are_removed_from_extracted_text() -> None:
+    from webassistant.rag.extraction import normalize_inline
+    from webassistant.text import clean_whitespace, strip_control_chars
+
+    raw = "Bater\x00ía\x07 de 5000\tmAh\nLínea 2\x1b"
+    assert strip_control_chars(raw) == "Batería de 5000\tmAh\nLínea 2"
+    assert "\x00" not in clean_whitespace(raw)
+    for content_format in ("text", "markdown", "html"):
+        assert "\x00" not in normalize_inline(raw, content_format).text

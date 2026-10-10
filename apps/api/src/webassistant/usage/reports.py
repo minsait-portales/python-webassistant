@@ -16,6 +16,7 @@ from sqlalchemy import String, func, select
 
 from webassistant.db import models as m
 from webassistant.db.repositories import UnitOfWork
+from webassistant.errors import AppError, ErrorCode
 
 DIMENSIONS = {
     "tenant": m.UsageEvent.tenant_id,
@@ -31,17 +32,27 @@ DIMENSIONS = {
 }
 
 
+def _parse_date(value: str, field: str) -> datetime:
+    try:
+        parsed = datetime.fromisoformat(value)
+    except ValueError as exc:
+        raise AppError(
+            ErrorCode.VALIDATION_ERROR,
+            "Fecha no válida",
+            errors=[{"path": f"/{field}", "message": "Usa el formato ISO 8601 (AAAA-MM-DD)"}],
+        ) from exc
+    return parsed if parsed.tzinfo else parsed.replace(tzinfo=UTC)
+
+
 def period_bounds(date_from: str | None, date_to: str | None) -> tuple[datetime, datetime]:
-    end = (
-        datetime.fromisoformat(date_to).replace(tzinfo=UTC) + timedelta(days=1)
-        if date_to
-        else datetime.now(UTC)
-    )
-    start = (
-        datetime.fromisoformat(date_from).replace(tzinfo=UTC)
-        if date_from
-        else end - timedelta(days=30)
-    )
+    end = _parse_date(date_to, "date_to") + timedelta(days=1) if date_to else datetime.now(UTC)
+    start = _parse_date(date_from, "date_from") if date_from else end - timedelta(days=30)
+    if start >= end:
+        raise AppError(
+            ErrorCode.VALIDATION_ERROR,
+            "Periodo no válido",
+            errors=[{"path": "/date_from", "message": "Debe ser anterior a date_to"}],
+        )
     return start, end
 
 

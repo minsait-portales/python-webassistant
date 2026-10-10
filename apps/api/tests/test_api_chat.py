@@ -147,6 +147,21 @@ async def test_message_limits(client: httpx.AsyncClient) -> None:
         headers={**auth(token), "content-type": "application/json"},
     )
     assert big.status_code == 413
+    for payload in ("hola\u0000mundo", "\u0000"):
+        nul = await client.post(
+            f"/v1/conversations/{conversation}/messages",
+            json={"message": payload},
+            headers=auth(token),
+        )
+        assert nul.status_code == 422, nul.text
+        assert nul.json()["code"] == "validation_error"
+    # La conexión sigue sana y el siguiente mensaje se procesa con normalidad.
+    ok = await client.post(
+        f"/v1/conversations/{conversation}/messages",
+        json={"message": "¿Cómo puedo devolver un pedido?"},
+        headers=auth(token),
+    )
+    assert ok.status_code == 200
 
 
 async def _read_sse(response: httpx.Response) -> list[dict]:

@@ -1,0 +1,25 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: webassistant
+resources:
+  - ../../base
+components:
+  - ../../components/monitoring
+secretGenerator:
+  - name: webassistant-secrets
+    envs: [secrets.env]
+configMapGenerator:
+  - name: webassistant-config
+    behavior: merge
+    literals:
+      - WEBASSISTANT_PUBLIC_BASE_URL=https://assistant.example.com
+images:
+  - name: webassistant
+    newName: ghcr.io/minsait-portales/python-webassistant
+    newTag: 1.0.0-rc.1
+patches:
+  - target: { kind: HorizontalPodAutoscaler, name: webassistant-api }
+    patch: |
+      - op: replace
+        path: /spec/minReplicas
+        value: 3

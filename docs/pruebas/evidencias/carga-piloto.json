@@ -1,0 +1,144 @@
+{
+  "generated_at": "2026-10-10T16:33:38.438917+00:00",
+  "base_url": "http://localhost:8000",
+  "profile": {
+    "users": 20,
+    "duration_s": 1800,
+    "elapsed_s": 1805.6,
+    "think_time_s": [
+      3.0,
+      6.0
+    ],
+    "provider": "simulado (sin latencia de OpenAI ni del portal)",
+    "distinct_ips": true
+  },
+  "totals": {
+    "requests": 19870,
+    "throughput_rps": 11.0,
+    "server_errors": 0,
+    "transport_errors": 0,
+    "rate_limited_429": 0,
+    "error_rate": 0.0,
+    "worst_p95_s": 0.2991,
+    "isolation_checks": 1540,
+    "leaks": 0
+  },
+  "skills": {
+    "None": 789,
+    "content_answer": 2301,
+    "document_lookup": 724,
+    "event_product_selection": 863,
+    "product_comparison": 596,
+    "product_recommendations": 758,
+    "product_results": 815,
+    "shopping_cart_view": 738
+  },
+  "endpoints": {
+    "action.execute": {
+      "requests": 673,
+      "statuses": {
+        "200": 673
+      },
+      "p50_s": 0.0234,
+      "p95_s": 0.0509,
+      "p99_s": 0.0819,
+      "mean_s": 0.0283,
+      "max_s": 0.5332
+    },
+    "action.prepare": {
+      "requests": 673,
+      "statuses": {
+        "200": 673
+      },
+      "p50_s": 0.0223,
+      "p95_s": 0.0439,
+      "p99_s": 0.0653,
+      "mean_s": 0.0264,
+      "max_s": 0.6118
+    },
+    "action.result": {
+      "requests": 673,
+      "statuses": {
+        "200": 673
+      },
+      "p50_s": 0.0169,
+      "p95_s": 0.0423,
+      "p99_s": 0.0719,
+      "mean_s": 0.021,
+      "max_s": 0.1078
+    },
+    "bootstrap": {
+      "requests": 381,
+      "statuses": {
+        "200": 381
+      },
+      "p50_s": 0.0061,
+      "p95_s": 0.02,
+      "p99_s": 0.0325,
+      "mean_s": 0.0085,
+      "max_s": 0.0629
+    },
+    "conversation.create": {
+      "requests": 381,
+      "statuses": {
+        "201": 381
+      },
+      "p50_s": 0.0138,
+      "p95_s": 0.0382,
+      "p99_s": 0.0638,
+      "mean_s": 0.0168,
+      "max_s": 0.0733
+    },
+    "history": {
+      "requests": 7584,
+      "statuses": {
+        "200": 7584
+      },
+      "p50_s": 0.017,
+      "p95_s": 0.0389,
+      "p99_s": 0.0637,
+      "mean_s": 0.0211,
+      "max_s": 0.6062
+    },
+    "isolation.probe": {
+      "requests": 1540,
+      "statuses": {
+        "404": 1540
+      },
+      "p50_s": 0.0116,
+      "p95_s": 0.0312,
+      "p99_s": 0.05,
+      "mean_s": 0.0147,
+      "max_s": 0.3343
+    },
+    "message": {
+      "requests": 7584,
+      "statuses": {
+        "200": 7584
+      },
+      "p50_s": 0.1991,
+      "p95_s": 0.2991,
+      "p99_s": 0.4877,
+      "mean_s": 0.2021,
+      "max_s": 1.529
+    },
+    "session": {
+      "requests": 381,
+      "statuses": {
+        "200": 381
+      },
+      "p50_s": 0.0067,
+      "p95_s": 0.021,
+      "p99_s": 0.0809,
+      "mean_s": 0.0113,
+      "max_s": 0.4501
+    }
+  },
+  "criteria": {
+    "p95_locales_max_2s": true,
+    "errores_5xx_menos_1pct": true,
+    "cero_fugas_entre_usuarios": true
+  },
+  "passed": true,
+  "sample_errors": []
+}

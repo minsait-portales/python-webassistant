@@ -1,0 +1,33 @@
+# Ganchos locales (sin descargas): `uv run pre-commit install --hook-type pre-commit --hook-type commit-msg`
+repos:
+  - repo: local
+    hooks:
+      - id: ruff
+        name: ruff (lint)
+        entry: uv run ruff check --fix
+        language: system
+        types: [python]
+      - id: ruff-format
+        name: ruff (formato)
+        entry: uv run ruff format
+        language: system
+        types: [python]
+      - id: eslint
+        name: eslint
+        entry: npx eslint --fix
+        language: system
+        files: \.(ts|mjs|js)$
+      - id: prettier
+        name: prettier
+        entry: npx prettier --write --ignore-unknown --ignore-path .prettierignore
+        language: system
+        files: \.(ts|mjs|js|json|css)$
+      - id: no-private-keys
+        name: sin claves privadas
+        entry: '-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----'
+        language: pygrep
+      - id: conventional-commits
+        name: Conventional Commits
+        entry: python3 scripts/check_commit_msg.py
+        language: system
+        stages: [commit-msg]

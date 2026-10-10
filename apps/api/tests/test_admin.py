@@ -484,3 +484,29 @@ async def test_bootstrap_admin_is_created_once_and_requires_strong_password(
         assert await ensure_bootstrap_admin(built) is False
     finally:
         await built.shutdown()
+
+
+async def test_invalid_admin_inputs_return_validation_errors(client: httpx.AsyncClient) -> None:
+    """Regresión del DAST: entradas manipuladas devuelven 422, nunca 5xx."""
+    token = await admin_token(client)
+    tenant = await _tenant_id(client, token)
+    for path in (
+        "/v1/admin/usage?date_from=%3Cscript%3E",
+        "/v1/admin/usage?date_to=%3Fname%3Dabc",
+        f"/v1/admin/tenants/{tenant}/usage?date_from=2026-13-45",
+        f"/v1/admin/tenants/{tenant}/usage.csv?date_from=2026-10-10&date_to=2026-01-01",
+    ):
+        response = await client.get(path, headers=auth(token))
+        assert response.status_code == 422, (path, response.text)
+        assert response.json()["code"] == "validation_error"
+    ok = await client.get(
+        "/v1/admin/usage?date_from=2026-01-01&date_to=2026-12-31", headers=auth(token)
+    )
+    assert ok.status_code == 200
+    unknown = await client.post(
+        "/v1/admin/embedding-indexes",
+        json={"provider": "cat /etc/passwd", "model": "x", "activate": False},
+        headers=auth(token),
+    )
+    assert unknown.status_code == 422
+    assert unknown.json()["errors"][0]["path"] == "/provider"

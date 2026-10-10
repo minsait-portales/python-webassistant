@@ -11,6 +11,7 @@ from collections.abc import Awaitable, Callable
 from typing import Any
 
 from webassistant.observability.logging import get_logger
+from webassistant.observability.tracing import inject_context
 
 logger = get_logger("webassistant.queue")
 
@@ -107,6 +108,9 @@ class ArqQueue(JobQueue):
         **kwargs: Any,
     ) -> str | None:
         pool = await self._get_pool()
+        carrier = inject_context()
+        if carrier:
+            kwargs["_trace"] = carrier  # contexto W3C para enlazar la traza en el worker
         result = await pool.enqueue_job(job, _job_id=job_id, _defer_by=defer_seconds, **kwargs)
         return result.job_id if result else job_id
 

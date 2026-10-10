@@ -23,6 +23,7 @@ from webassistant.errors import AppError, ErrorCode
 from webassistant.gateway.gateway import ModelGateway
 from webassistant.observability import metrics
 from webassistant.observability.logging import get_logger
+from webassistant.observability.tracing import traced
 from webassistant.rag.chunking import ChunkingConfig, chunk_document
 from webassistant.rag.extraction import (
     ExtractedText,
@@ -47,6 +48,8 @@ class DownloadSettings:
     max_bytes: int
     timeout: float
     temp_dir: Path | None = None
+    require_allowlist: bool = False
+    allow_http: bool = False
 
 
 def _anchor_url(base: str | None, anchor: str | None) -> str | None:
@@ -87,9 +90,18 @@ class IndexingPipeline:
             max_bytes=self.downloads.max_bytes,
             timeout=self.downloads.timeout,
             temp_dir=self.downloads.temp_dir,
+            require_allowlist=self.downloads.require_allowlist,
+            allow_http=self.downloads.allow_http,
         ) as path:
             return extract_file(path, reference["media_type"])
 
+    @traced(
+        "ingest.process_document",
+        lambda self, tenant_id, document_id, *_, **__: {
+            "tenant_id": tenant_id,
+            "document_id": document_id,
+        },
+    )
     async def process(
         self, tenant_id: str, document_id: str, access_token: str | None = None
     ) -> str:

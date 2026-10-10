@@ -1,0 +1,33 @@
+# Gateway HTTPS del piloto (único servicio expuesto a Internet).
+# Caddy obtiene y renueva el certificado TLS de WEBASSISTANT_DOMAIN automáticamente (ACME).
+# WEBASSISTANT_TLS: correo de contacto ACME, o "internal" para una CA local (pruebas sin dominio público).
+{
+	servers {
+		trusted_proxies static private_ranges
+	}
+}
+
+{$WEBASSISTANT_DOMAIN:localhost} {
+	# Correo ACME (certificado público) o "internal" (CA local).
+	tls {$WEBASSISTANT_TLS}
+	encode zstd gzip
+
+	# Las métricas no se publican: Prometheus las lee por la red interna.
+	@metrics path /metrics
+	respond @metrics 404
+
+	reverse_proxy api:8000 {
+		# SSE: sin buffer y con tiempos de lectura largos para los runs en streaming.
+		flush_interval -1
+		transport http {
+			read_timeout 180s
+		}
+		health_uri /health/ready
+		health_interval 15s
+	}
+
+	log {
+		output stdout
+		format json
+	}
+}

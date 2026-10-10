@@ -27,9 +27,9 @@ logger = get_logger("webassistant.seeds")
 HERE = Path(__file__).resolve().parent
 
 DEV_ADMIN_EMAIL = "admin@demo.local"
-DEV_ADMIN_PASSWORD = "Demo-Admin-2026"  # solo desarrollo local
+DEV_ADMIN_PASSWORD = "Demo-Admin-2026"  # solo desarrollo; prohibido en producción  # nosec B105
 DEV_CLIENT_ID = "wa_demo_portal"
-DEV_CLIENT_SECRET = "demo-portal-secret-change-me"  # solo desarrollo local
+DEV_CLIENT_SECRET = "demo-portal-secret-change-me"  # solo desarrollo; prohibido en producción  # nosec B105
 
 
 def load_package(extra_origins: list[str] | None = None) -> dict[str, Any]:

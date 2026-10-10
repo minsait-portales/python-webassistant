@@ -90,3 +90,16 @@ def test_demo_static_assets_are_in_sync_with_seeds() -> None:
         assert path.read_bytes() == content, (
             f"{path} desactualizado: ejecuta python scripts/generate_demo_site.py"
         )
+
+
+def test_settings_are_documented() -> None:
+    """Toda variable WEBASSISTANT_* de la configuración aparece en docs/configuracion.md."""
+    from webassistant.config import Settings
+
+    documented = (REPO / "docs" / "configuracion.md").read_text(encoding="utf-8")
+    missing = [
+        f"WEBASSISTANT_{name.upper()}"
+        for name in Settings.model_fields
+        if f"`WEBASSISTANT_{name.upper()}`" not in documented
+    ]
+    assert not missing, f"Variables sin documentar: {missing}"

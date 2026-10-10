@@ -29,7 +29,6 @@ const child = spawn(
       WEBASSISTANT_DEMO_ENABLED: 'true',
       WEBASSISTANT_PUBLIC_BASE_URL: `http://localhost:${port}`,
       WEBASSISTANT_DATABASE_URL: `sqlite+aiosqlite:///${path.join(dir, 'e2e.sqlite3')}`,
-      WEBASSISTANT_EMBEDDING_DIMENSION: '384',
       WEBASSISTANT_LOG_LEVEL: 'WARNING',
       WEBASSISTANT_RATE_LIMIT_SUBJECT_PER_MINUTE: '600',
       WEBASSISTANT_RATE_LIMIT_IP_PER_MINUTE: '1200',

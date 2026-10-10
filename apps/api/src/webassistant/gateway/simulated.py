@@ -143,7 +143,7 @@ class SimulatedProvider(ModelProvider):
         if (routed.get("requires_rag") or hints.get("force_rag")) and has_rag_tool:
             query = " ".join(tokens(user_message, keep_stopwords=False)) or user_message
             call = ToolCallRequest(
-                id="call_" + hashlib.sha1(f"{routed['skill']}:{query}".encode()).hexdigest()[:12],  # noqa: S324
+                id="call_" + hashlib.sha256(f"{routed['skill']}:{query}".encode()).hexdigest()[:12],
                 name=rag_tool,
                 arguments={
                     "skill": routed["skill"],

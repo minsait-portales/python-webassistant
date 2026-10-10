@@ -1,0 +1,153 @@
+{
+  "generated_at": "2026-10-10T15:59:54.306030+00:00",
+  "base_url": "http://localhost:8000",
+  "profile": {
+    "users": 20,
+    "duration_s": 1800,
+    "elapsed_s": 1804.9,
+    "think_time_s": [
+      3.0,
+      6.0
+    ],
+    "provider": "simulado (sin latencia de OpenAI ni del portal)",
+    "distinct_ips": true
+  },
+  "totals": {
+    "requests": 19857,
+    "throughput_rps": 11.0,
+    "server_errors": 1,
+    "error_rate": 5e-05,
+    "worst_p95_s": 0.2603,
+    "isolation_checks": 1556,
+    "leaks": 0
+  },
+  "skills": {
+    "None": 700,
+    "content_answer": 2079,
+    "document_lookup": 665,
+    "event_product_selection": 801,
+    "product_comparison": 532,
+    "product_recommendations": 697,
+    "product_results": 705,
+    "shopping_cart_view": 690
+  },
+  "endpoints": {
+    "action.execute": {
+      "requests": 615,
+      "statuses": {
+        "200": 614,
+        "429": 1
+      },
+      "p50_s": 0.0239,
+      "p95_s": 0.0491,
+      "p99_s": 0.0859,
+      "mean_s": 0.0276,
+      "max_s": 0.0982
+    },
+    "action.prepare": {
+      "requests": 616,
+      "statuses": {
+        "200": 615,
+        "429": 1
+      },
+      "p50_s": 0.0225,
+      "p95_s": 0.0579,
+      "p99_s": 0.0888,
+      "mean_s": 0.0274,
+      "max_s": 0.2375
+    },
+    "action.result": {
+      "requests": 614,
+      "statuses": {
+        "200": 614
+      },
+      "p50_s": 0.0175,
+      "p95_s": 0.0436,
+      "p99_s": 0.0575,
+      "mean_s": 0.0213,
+      "max_s": 0.17
+    },
+    "bootstrap": {
+      "requests": 396,
+      "statuses": {
+        "200": 396
+      },
+      "p50_s": 0.0065,
+      "p95_s": 0.0232,
+      "p99_s": 0.04,
+      "mean_s": 0.0097,
+      "max_s": 0.1879
+    },
+    "conversation.create": {
+      "requests": 396,
+      "statuses": {
+        "201": 378,
+        "429": 18
+      },
+      "p50_s": 0.0127,
+      "p95_s": 0.031,
+      "p99_s": 0.0651,
+      "mean_s": 0.017,
+      "max_s": 0.48
+    },
+    "history": {
+      "requests": 7634,
+      "statuses": {
+        "200": 6840,
+        "404": 288,
+        "429": 506
+      },
+      "p50_s": 0.0165,
+      "p95_s": 0.0387,
+      "p99_s": 0.0618,
+      "mean_s": 0.0198,
+      "max_s": 0.7259
+    },
+    "isolation.probe": {
+      "requests": 1556,
+      "statuses": {
+        "404": 1444,
+        "429": 112
+      },
+      "p50_s": 0.0115,
+      "p95_s": 0.031,
+      "p99_s": 0.0479,
+      "mean_s": 0.0145,
+      "max_s": 0.3494
+    },
+    "message": {
+      "requests": 7634,
+      "statuses": {
+        "200": 6869,
+        "404": 287,
+        "429": 477,
+        "599": 1
+      },
+      "p50_s": 0.1649,
+      "p95_s": 0.2603,
+      "p99_s": 0.4466,
+      "mean_s": 0.1559,
+      "max_s": 1.5654
+    },
+    "session": {
+      "requests": 396,
+      "statuses": {
+        "200": 396
+      },
+      "p50_s": 0.0065,
+      "p95_s": 0.0204,
+      "p99_s": 0.0568,
+      "mean_s": 0.0092,
+      "max_s": 0.0849
+    }
+  },
+  "criteria": {
+    "p95_locales_max_2s": true,
+    "errores_5xx_menos_1pct": true,
+    "cero_fugas_entre_usuarios": true
+  },
+  "passed": true,
+  "sample_errors": [
+    "message: RemoteProtocolError"
+  ]
+}

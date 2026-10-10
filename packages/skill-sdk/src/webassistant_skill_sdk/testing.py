@@ -55,4 +55,4 @@ def check_skill_package(path: Path) -> list[str]:
 
 def assert_skill_contract(path: Path) -> None:
     errors = check_skill_package(path)
-    assert not errors, "\n".join(errors)
+    assert not errors, "\n".join(errors)  # utilidad para pytest  # nosec B101

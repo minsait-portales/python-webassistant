@@ -20,6 +20,7 @@ from webassistant.gateway.openai_provider import OpenAIProvider
 from webassistant.gateway.resilience import Resilience, RetryPolicy
 from webassistant.gateway.simulated import SIMULATED_EMBEDDING_MODEL, SimulatedProvider
 from webassistant.observability import metrics
+from webassistant.observability.tracing import traced
 from webassistant.usage.recorder import UsageRecorder, UsageScope, UsageSummary
 
 
@@ -65,6 +66,13 @@ class ModelGateway:
 
         return hook
 
+    @traced(
+        "model.chat",
+        lambda self, provider_name, request, **_: {
+            "provider": provider_name,
+            "model": request.model,
+        },
+    )
     async def chat(
         self,
         provider_name: str,
@@ -125,6 +133,14 @@ class ModelGateway:
             await hook(exc, 0)  # type: ignore[misc]
             raise
 
+    @traced(
+        "model.embedding",
+        lambda self, provider_name, model, texts, **_: {
+            "provider": provider_name,
+            "model": model,
+            "inputs": len(texts),
+        },
+    )
     async def embed(
         self,
         provider_name: str,

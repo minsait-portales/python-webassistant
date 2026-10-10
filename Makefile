@@ -16,7 +16,7 @@ build: ## Compila SDK, widget y consola
 up: ## Levanta la plataforma completa con Docker Compose (demo en http://localhost:8000/demo/)
 	$(COMPOSE) up -d --build
 
-up-observability: ## Igual que up, con Prometheus (9090) y Grafana (3000)
+up-observability: ## Igual que up, con Prometheus (9090), Grafana (3000) y Jaeger (16686)
 	$(COMPOSE) --profile observability up -d --build
 
 up-prod: ## Producción con compose.prod.yaml (requiere .env con secretos)

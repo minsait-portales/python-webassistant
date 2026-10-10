@@ -17,6 +17,7 @@ from webassistant.db.repositories import UnitOfWork
 from webassistant.db.session import Database
 from webassistant.gateway.gateway import ModelGateway
 from webassistant.observability import metrics
+from webassistant.observability.tracing import traced
 from webassistant.rag.indexes import EmbeddingIndexManager
 from webassistant.rag.vector_store import SearchScope, VectorStore
 from webassistant.usage.recorder import UsageScope, UsageSummary
@@ -62,6 +63,7 @@ class SearchService:
         self.indexes = indexes
         self.gateway = gateway
 
+    @traced("rag.search", lambda self, request, **_: {"limit": request.limit})
     async def search(
         self,
         request: SearchRequest,

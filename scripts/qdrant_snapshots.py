@@ -22,7 +22,9 @@ BASE = os.environ.get("WEBASSISTANT_QDRANT_URL", "http://qdrant:6333").rstrip("/
 KEY = os.environ.get("WEBASSISTANT_QDRANT_API_KEY", "")
 
 
-def request(method: str, path: str, body: bytes | None = None, headers: dict[str, str] | None = None):
+def request(
+    method: str, path: str, body: bytes | None = None, headers: dict[str, str] | None = None
+):
     req = urllib.request.Request(f"{BASE}{path}", data=body, method=method, headers=headers or {})
     if KEY:
         req.add_header("api-key", KEY)
@@ -46,9 +48,13 @@ def restore(source: Path) -> None:
         name = file.stem
         boundary = uuid.uuid4().hex
         payload = (
-            f'--{boundary}\r\nContent-Disposition: form-data; name="snapshot"; filename="{file.name}"\r\n'
-            "Content-Type: application/octet-stream\r\n\r\n"
-        ).encode() + file.read_bytes() + f"\r\n--{boundary}--\r\n".encode()
+            (
+                f'--{boundary}\r\nContent-Disposition: form-data; name="snapshot"; filename="{file.name}"\r\n'
+                "Content-Type: application/octet-stream\r\n\r\n"
+            ).encode()
+            + file.read_bytes()
+            + f"\r\n--{boundary}--\r\n".encode()
+        )
         request(
             "POST",
             f"/collections/{name}/snapshots/upload?wait=true&priority=snapshot",

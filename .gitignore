@@ -38,3 +38,7 @@ backups/
 .idea/
 .vscode/
 .DS_Store
+
+# Informes completos de ZAP (se publican como artefactos del CI)
+docs/pruebas/evidencias/zap/
+dast/

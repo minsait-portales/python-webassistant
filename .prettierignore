@@ -14,3 +14,5 @@ packages/contracts
 examples
 demo/*.json
 package-lock.json
+# Evidencias generadas por herramientas (se conservan tal cual)
+docs/pruebas/evidencias

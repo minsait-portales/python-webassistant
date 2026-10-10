@@ -25,6 +25,7 @@ from webassistant.db.repositories import UnitOfWork
 from webassistant.errors import AppError, ErrorCode
 from webassistant.jobs import JOBS
 from webassistant.observability.logging import configure_logging, get_logger
+from webassistant.observability.tracing import job_span, setup_tracing
 from webassistant.services.container import Services, build_services
 
 logger = get_logger("webassistant.worker")
@@ -44,6 +45,10 @@ async def startup(ctx: dict[str, Any]) -> None:
         settings.log_level, json_output=settings.log_json, service_name="webassistant-worker"
     )
     services = build_services(settings)
+    if settings.otel_enabled:
+        from webassistant.observability.tracing import instrument_engine
+
+        instrument_engine(services.db.engine.sync_engine)
     await services.startup(create_schema=services.db.is_sqlite)
     ctx["services"] = services
     logger.info("Worker iniciado (cola %s)", settings.queue_name)
@@ -59,8 +64,10 @@ def _wrap(name: str) -> Any:
     function = JOBS[name]
 
     async def task(ctx: dict[str, Any], **kwargs: Any) -> Any:
+        carrier = kwargs.pop("_trace", None)
         try:
-            return await function(ctx["services"], **kwargs)
+            with job_span(name, carrier):
+                return await function(ctx["services"], **kwargs)
         except AppError as exc:
             if exc.code in _NON_RETRYABLE or ctx.get("job_try", 1) >= MAX_TRIES:
                 logger.error("Trabajo %s fallido sin reintento: %s", name, exc.code.value)
@@ -127,9 +134,7 @@ def check() -> int:
     """Comprobación de salud para contenedores: el worker publica una marca en Redis."""
     from arq.worker import async_check_health
 
-    return asyncio.run(
-        async_check_health(_redis_settings(), queue_name=get_settings().queue_name)
-    )
+    return asyncio.run(async_check_health(_redis_settings(), queue_name=get_settings().queue_name))
 
 
 def main() -> None:
@@ -139,6 +144,8 @@ def main() -> None:
     configure_logging(
         settings.log_level, json_output=settings.log_json, service_name="webassistant-worker"
     )
+    if settings.otel_enabled:
+        setup_tracing("webassistant-worker", settings.otel_exporter_endpoint)
     if settings.metrics_enabled and settings.worker_metrics_port:
         # Métricas de ingesta, reindexado y proveedores del worker (Prometheus).
         from prometheus_client import start_http_server

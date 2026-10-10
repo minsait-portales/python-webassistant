@@ -1,0 +1,224 @@
+# Integración continua (CG-01.2, CG-15): calidad, pruebas, contratos, seguridad, imagen y E2E.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  UV_VERSION: "0.11.32"
+  PYTHON_VERSION: "3.12"
+  NODE_VERSION: "22"
+
+jobs:
+  python:
+    name: Python (${{ matrix.database }})
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        database: [sqlite, postgres]
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: ${{ env.UV_VERSION }}
+          python-version: ${{ env.PYTHON_VERSION }}
+          enable-cache: true
+      - run: uv sync --all-packages --frozen
+      - name: Ruff
+        run: uv run ruff check . && uv run ruff format --check .
+      - name: mypy
+        run: uv run mypy apps/api/src apps/worker/src packages/skill-sdk/src
+      - name: Rol de aplicación sin BYPASSRLS (como en producción)
+        if: matrix.database == 'postgres'
+        env:
+          PGPASSWORD: postgres
+        run: |
+          psql -h localhost -U postgres -c "CREATE ROLE webassistant LOGIN PASSWORD 'webassistant' CREATEDB NOSUPERUSER NOBYPASSRLS"
+          psql -h localhost -U postgres -c "CREATE DATABASE webassistant_test OWNER webassistant"
+          echo "WEBASSISTANT_TEST_PG_ADMIN_URL=postgresql+asyncpg://webassistant:webassistant@localhost:5432/postgres" >> "$GITHUB_ENV"
+          echo "WEBASSISTANT_TEST_DATABASE_URL=postgresql+asyncpg://webassistant:webassistant@localhost:5432/webassistant_test" >> "$GITHUB_ENV"
+      - name: Pruebas (unitarias, integración, contrato, aislamiento)
+        run: uv run pytest -q --cov=webassistant --cov=webassistant_worker --cov=webassistant_skill_sdk --cov-report=term-missing:skip-covered --cov-report=xml
+      - name: Contrato OpenAPI sin deriva
+        if: matrix.database == 'sqlite'
+        run: |
+          uv run --project apps/api webassistant export-openapi
+          git diff --exit-code packages/contracts/openapi/openapi.json
+      - uses: actions/upload-artifact@v4
+        if: matrix.database == 'postgres'
+        with:
+          name: coverage-python
+          path: coverage.xml
+
+  node:
+    name: TypeScript (SDK, widget y consola)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - name: Tipos del SDK sincronizados con OpenAPI
+        run: npm run generate:sdk && git diff --exit-code packages/sdk-js/src/openapi.d.ts
+      - run: npx eslint .
+      - run: npx prettier --check "**/*.{ts,mjs,json,css,js}" --ignore-path .prettierignore
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build -w @webassistant/widget && npm run build -w @webassistant/admin
+      - name: Tamaño del widget
+        run: |
+          node -e "const m=require('./apps/widget/dist/manifest.json'); console.log(m.sizes); if (m.sizes.widget_bytes > 120000 || m.sizes.loader_bytes > 8000) process.exit(1)"
+
+  e2e:
+    name: E2E y accesibilidad (${{ matrix.browser }})
+    runs-on: ubuntu-24.04
+    needs: [python, node]
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: ${{ env.UV_VERSION }}
+          python-version: ${{ env.PYTHON_VERSION }}
+          enable-cache: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: uv sync --all-packages --frozen
+      - run: npm ci
+      - run: npx playwright install --with-deps ${{ matrix.browser }}
+      - run: npm run build -w @webassistant/widget && npm run build -w @webassistant/admin
+      - name: Widget (Playwright + axe)
+        run: npm run e2e -w @webassistant/widget
+        env:
+          E2E_BROWSERS: ${{ matrix.browser }}
+      - name: Consola (Playwright + axe)
+        if: matrix.browser == 'chromium'
+        run: npm run e2e -w @webassistant/admin
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-${{ matrix.browser }}
+          path: |
+            apps/*/test-results
+            apps/*/playwright-report
+
+  security:
+    name: Seguridad (SAST y dependencias)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: ${{ env.UV_VERSION }}
+          python-version: ${{ env.PYTHON_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: SAST Python (bandit)
+        run: uvx bandit@1.8.6 -c pyproject.toml -r apps/api/src apps/worker/src packages/skill-sdk/src
+      - name: Dependencias Python (pip-audit)
+        run: |
+          uv export --frozen --all-packages --no-dev --no-emit-workspace --format requirements-txt > requirements-audit.txt
+          uvx pip-audit@2.9.0 -r requirements-audit.txt --strict --disable-pip
+      - name: Dependencias Node (npm audit, producción)
+        run: npm audit --omit=dev --audit-level=high
+      - name: Secretos en el repositorio (gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  k8s:
+    name: Manifiestos Kubernetes
+    runs-on: ubuntu-24.04
+    container: alpine/k8s:1.33.4
+    steps:
+      - uses: actions/checkout@v4
+      - name: kustomize + kubeconform (staging y producción)
+        run: |
+          for env in staging production; do
+            cp deploy/k8s/overlays/$env/secrets.env.example deploy/k8s/overlays/$env/secrets.env
+            kustomize build deploy/k8s/overlays/$env > /tmp/$env.yaml
+            kubeconform -summary -strict -kubernetes-version 1.33.0 \
+              -schema-location default \
+              -schema-location 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json' \
+              /tmp/$env.yaml
+          done
+
+  docker:
+    name: Imagen y stack Docker Compose
+    runs-on: ubuntu-24.04
+    needs: [python, node]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Construir y levantar la plataforma
+        run: docker compose up -d --build --wait --wait-timeout 300
+        env:
+          # La red de Docker actúa como gateway: permite simular IPs de usuario en la carga.
+          WEBASSISTANT_TRUSTED_PROXIES: 172.16.0.0/12,192.168.0.0/16,10.0.0.0/8
+      - name: Humo extremo a extremo
+        run: |
+          set -e
+          curl -fsS http://localhost:8000/health/ready
+          curl -fsS http://localhost:8000/widget/v1/loader.js > /dev/null
+          curl -fsS http://localhost:8000/admin/ > /dev/null
+          O='Origin: http://localhost:8000'
+          TOKEN=$(curl -fsS -X POST http://localhost:8000/v1/sessions -H "$O" -H 'Content-Type: application/json' -d '{"site_id":"site_demo"}' | jq -r .access_token)
+          CONV=$(curl -fsS -X POST http://localhost:8000/v1/conversations -H "$O" -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' -d '{}' | jq -r .conversation_id)
+          for i in $(seq 1 30); do
+            SKILL=$(curl -fsS -X POST "http://localhost:8000/v1/conversations/$CONV/messages" -H "$O" -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' -d '{"message":"¿Qué dice el manual sobre la batería?"}' | jq -r '.citations | length')
+            [ "$SKILL" -gt 0 ] && break; sleep 2
+          done
+          [ "$SKILL" -gt 0 ]
+      - name: Copia de seguridad y restauración
+        run: ./scripts/backup.sh backups/ci && ./scripts/restore.sh backups/ci && docker compose up -d --wait
+        env:
+          WEBASSISTANT_TRUSTED_PROXIES: 172.16.0.0/12,192.168.0.0/16,10.0.0.0/8
+      - name: Carga breve (perfil reducido de CG-15.10)
+        run: |
+          pip install httpx==0.28.1
+          python scripts/loadtest.py --users 10 --duration 120 --report loadtest-ci.json > /dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: loadtest-ci
+          path: loadtest-ci.json
+      - name: DAST (OWASP ZAP sobre la API v1 desde OpenAPI, sin credenciales y como portal)
+        run: |
+          ./scripts/dast.sh anon dast
+          ./scripts/dast.sh server dast
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dast-zap
+          path: dast
+      - name: Logs si falla
+        if: failure()
+        run: docker compose logs --no-color | tail -300
+      - run: docker compose down -v

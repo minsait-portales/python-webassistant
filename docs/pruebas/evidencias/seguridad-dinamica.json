@@ -1,0 +1,67 @@
+{
+  "generated_at": "2026-10-10T16:36:31.269388+00:00",
+  "base_url": "http://localhost:8000",
+  "checks": [
+    {
+      "check": "endpoints protegidos exigen autenticación",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "token de widget rechazado en administración e ingesta",
+      "passed": true,
+      "detail": "admin=401 ingest=401"
+    },
+    {
+      "check": "token sin firma (alg none) rechazado",
+      "passed": true,
+      "detail": "401"
+    },
+    {
+      "check": "token de widget no válido desde otro origen",
+      "passed": true,
+      "detail": "403"
+    },
+    {
+      "check": "CORS no autoriza orígenes no registrados",
+      "passed": true,
+      "detail": "403 None"
+    },
+    {
+      "check": "bootstrap rechaza orígenes no registrados",
+      "passed": true,
+      "detail": "403"
+    },
+    {
+      "check": "cabeceras de seguridad en /admin/",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "cabeceras de seguridad en /demo/",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "nosniff y política de referer en la API",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "respuestas /v1 sin caché",
+      "passed": true,
+      "detail": "no-store"
+    },
+    {
+      "check": "entradas hostiles sin 5xx ni trazas internas",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "sin path traversal en activos estáticos",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "passed": true
+}

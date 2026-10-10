@@ -33,6 +33,7 @@ from webassistant.gateway.base import (
 from webassistant.gateway.gateway import ModelGateway
 from webassistant.observability import context as obs_context
 from webassistant.observability.logging import get_logger
+from webassistant.observability.tracing import traced
 from webassistant.orchestrator.assistants import PublishedAssistant
 from webassistant.orchestrator.events import ReplyExtractor
 from webassistant.rag.search import SearchRequest, SearchService
@@ -228,6 +229,7 @@ class AgentRunner:
 
     # --- Bucle principal ------------------------------------------------------------
 
+    @traced("agent.run", lambda self, data, **_: {"assistant": data.assistant.assistant_id})
     async def run(
         self,
         data: AgentInput,
@@ -519,7 +521,8 @@ class AgentRunner:
                     repaired,
                     list(sources.values()),
                 )
-            assert parsed is not None
+            if parsed is None:  # inalcanzable: la rama anterior ya devuelve el error
+                raise RuntimeError("Salida del modelo sin analizar")
 
             if is_out_of_scope(parsed):
                 return AgentOutcome(
