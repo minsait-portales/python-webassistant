@@ -1,0 +1,44 @@
+# Superposición de producción (CG-13.1):
+#   docker compose -f compose.yaml -f compose.prod.yaml up -d
+# Exige los secretos (falla al arrancar si faltan), desactiva la demo y el proveedor simulado y
+# publica la API solo en localhost para situarla detrás del proxy inverso / balanceador con TLS.
+x-prod-environment: &prod-environment
+  WEBASSISTANT_ENVIRONMENT: production
+  WEBASSISTANT_PUBLIC_BASE_URL: ${WEBASSISTANT_PUBLIC_BASE_URL:?Define la URL pública https del servicio}
+  WEBASSISTANT_JWT_SECRET: ${WEBASSISTANT_JWT_SECRET:?Define WEBASSISTANT_JWT_SECRET (>= 32 caracteres aleatorios)}
+  WEBASSISTANT_ENCRYPTION_KEY: ${WEBASSISTANT_ENCRYPTION_KEY:?Define WEBASSISTANT_ENCRYPTION_KEY (webassistant generate-key)}
+  WEBASSISTANT_DEFAULT_PROVIDER: ${WEBASSISTANT_DEFAULT_PROVIDER:-openai}
+  WEBASSISTANT_OPENAI_API_KEY: ${OPENAI_API_KEY:?Define OPENAI_API_KEY}
+  WEBASSISTANT_DEMO_ENABLED: "false"
+  WEBASSISTANT_TRUSTED_PROXIES: ${WEBASSISTANT_TRUSTED_PROXIES:-172.16.0.0/12,10.0.0.0/8}
+  WEBASSISTANT_METRICS_TOKEN: ${WEBASSISTANT_METRICS_TOKEN:-}
+  WEBASSISTANT_BOOTSTRAP_ADMIN_EMAIL: ${WEBASSISTANT_BOOTSTRAP_ADMIN_EMAIL:-}
+  WEBASSISTANT_BOOTSTRAP_ADMIN_PASSWORD: ${WEBASSISTANT_BOOTSTRAP_ADMIN_PASSWORD:-}
+
+services:
+  postgres:
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Define POSTGRES_PASSWORD}
+      WEBASSISTANT_DB_PASSWORD: ${WEBASSISTANT_DB_PASSWORD:?Define WEBASSISTANT_DB_PASSWORD}
+    restart: always
+  redis:
+    restart: always
+  qdrant:
+    environment:
+      QDRANT__SERVICE__API_KEY: ${QDRANT_API_KEY:?Define QDRANT_API_KEY}
+    restart: always
+  migrate:
+    environment: *prod-environment
+  api:
+    environment: *prod-environment
+    restart: always
+    ports: !override ["127.0.0.1:${WEBASSISTANT_PORT:-8000}:8000"]
+    deploy:
+      resources:
+        limits: { cpus: "2", memory: 1g }
+  worker:
+    environment: *prod-environment
+    restart: always
+    deploy:
+      resources:
+        limits: { cpus: "2", memory: 1g }

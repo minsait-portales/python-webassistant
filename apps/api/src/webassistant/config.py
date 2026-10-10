@@ -37,6 +37,8 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         extra="ignore",
         case_sensitive=False,
+        # Variables vacías (p. ej. ``${VAR:-}`` en docker compose) equivalen a no definidas.
+        env_ignore_empty=True,
     )
 
     environment: Environment = Environment.DEVELOPMENT
@@ -121,6 +123,7 @@ class Settings(BaseSettings):
     # Observabilidad.
     metrics_enabled: bool = True
     metrics_token: SecretStr | None = None
+    worker_metrics_port: int | None = 9100
     otel_enabled: bool = False
     otel_exporter_endpoint: str | None = None
 

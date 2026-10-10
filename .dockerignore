@@ -1,0 +1,22 @@
+# Contexto mínimo para la imagen: fuentes, contratos, lockfiles y la web de demo.
+.git
+.github
+**/node_modules
+**/.venv
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+**/.mypy_cache
+**/.ruff_cache
+**/dist
+**/test-results
+**/playwright-report
+data
+backups
+docs
+deploy
+*.sqlite3
+*.db
+.env
+.env.*
+!.env.example

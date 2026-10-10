@@ -37,6 +37,7 @@ from webassistant.api.routers.admin import tenant as admin_tenant
 from webassistant.config import Settings, get_settings
 from webassistant.errors import AppError, ErrorCode
 from webassistant.observability.logging import configure_logging, get_logger
+from webassistant.services.bootstrap import ensure_bootstrap_admin
 from webassistant.services.container import Services, build_services
 
 logger = get_logger("webassistant.api")
@@ -68,6 +69,7 @@ def create_app(
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         await services.startup(create_schema=auto_schema)
+        await ensure_bootstrap_admin(services)
         if settings.demo_enabled:
             from webassistant.seeds.demo import ensure_demo
 

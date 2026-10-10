@@ -1,0 +1,173 @@
+# WebAssistant con Docker Compose: levanta la plataforma completa en cualquier entorno.
+#
+#   docker compose up -d --build          # demo local lista en http://localhost:8000/demo/
+#   docker compose --profile observability up -d   # + Prometheus y Grafana
+#   docker compose -f compose.yaml -f compose.prod.yaml up -d   # producción (ver docs/despliegue.md)
+#
+# Todo es configurable con variables de entorno o un fichero .env (ver .env.example).
+# Sin .env arranca en modo desarrollo con proveedor simulado y datos de demostración.
+
+name: webassistant
+
+x-app-environment: &app-environment
+  WEBASSISTANT_ENVIRONMENT: ${WEBASSISTANT_ENVIRONMENT:-development}
+  WEBASSISTANT_PUBLIC_BASE_URL: ${WEBASSISTANT_PUBLIC_BASE_URL:-http://localhost:8000}
+  WEBASSISTANT_LOG_LEVEL: ${WEBASSISTANT_LOG_LEVEL:-INFO}
+  WEBASSISTANT_LOG_JSON: ${WEBASSISTANT_LOG_JSON:-true}
+  # Datos: PostgreSQL con un rol sin BYPASSRLS, Redis (cola y límites) y Qdrant (vectores).
+  WEBASSISTANT_DATABASE_URL: postgresql+asyncpg://${WEBASSISTANT_DB_USER:-webassistant}:${WEBASSISTANT_DB_PASSWORD:-webassistant-dev-password}@postgres:5432/${WEBASSISTANT_DB_NAME:-webassistant}
+  WEBASSISTANT_REDIS_URL: redis://redis:6379/0
+  WEBASSISTANT_QUEUE_MODE: redis
+  WEBASSISTANT_QDRANT_URL: http://qdrant:6333
+  WEBASSISTANT_QDRANT_API_KEY: ${QDRANT_API_KEY:-}
+  # Seguridad (obligatorias en staging/producción; en desarrollo hay valores de prueba).
+  WEBASSISTANT_JWT_SECRET: ${WEBASSISTANT_JWT_SECRET:-}
+  WEBASSISTANT_JWT_PREVIOUS_SECRETS: ${WEBASSISTANT_JWT_PREVIOUS_SECRETS:-}
+  WEBASSISTANT_ENCRYPTION_KEY: ${WEBASSISTANT_ENCRYPTION_KEY:-}
+  WEBASSISTANT_TRUSTED_PROXIES: ${WEBASSISTANT_TRUSTED_PROXIES:-}
+  WEBASSISTANT_METRICS_TOKEN: ${WEBASSISTANT_METRICS_TOKEN:-}
+  # Modelos: "simulated" (sin coste ni claves) u "openai" (gpt-6-luna por defecto).
+  WEBASSISTANT_DEFAULT_PROVIDER: ${WEBASSISTANT_DEFAULT_PROVIDER:-simulated}
+  WEBASSISTANT_DEFAULT_CHAT_MODEL: ${WEBASSISTANT_DEFAULT_CHAT_MODEL:-gpt-6-luna}
+  WEBASSISTANT_DEFAULT_EMBEDDING_MODEL: ${WEBASSISTANT_DEFAULT_EMBEDDING_MODEL:-text-embedding-3-small}
+  WEBASSISTANT_OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+  WEBASSISTANT_OPENAI_BASE_URL: ${OPENAI_BASE_URL:-}
+  # Demo autónoma (tenant, site, assistant, documentos y web /demo/). Prohibida en producción.
+  WEBASSISTANT_DEMO_ENABLED: ${WEBASSISTANT_DEMO_ENABLED:-true}
+  WEBASSISTANT_DEMO_ORIGINS: ${WEBASSISTANT_DEMO_ORIGINS:-}
+  WEBASSISTANT_BOOTSTRAP_ADMIN_EMAIL: ${WEBASSISTANT_BOOTSTRAP_ADMIN_EMAIL:-}
+  WEBASSISTANT_BOOTSTRAP_ADMIN_PASSWORD: ${WEBASSISTANT_BOOTSTRAP_ADMIN_PASSWORD:-}
+  WEBASSISTANT_DEMO_CLIENT_SECRET: ${WEBASSISTANT_DEMO_CLIENT_SECRET:-}
+  # Trazas OpenTelemetry (perfil observability o colector propio).
+  WEBASSISTANT_OTEL_ENABLED: ${WEBASSISTANT_OTEL_ENABLED:-false}
+  WEBASSISTANT_OTEL_EXPORTER_ENDPOINT: ${WEBASSISTANT_OTEL_EXPORTER_ENDPOINT:-}
+
+x-app: &app
+  image: ${WEBASSISTANT_IMAGE:-webassistant:local}
+  build:
+    context: .
+    dockerfile: docker/Dockerfile
+    secrets: [extra_ca]
+  environment: *app-environment
+  restart: unless-stopped
+  security_opt: ["no-new-privileges:true"]
+  read_only: true
+  tmpfs: ["/tmp"]
+  logging:
+    driver: json-file
+    options: { max-size: "20m", max-file: "5" }
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres-dev-password}
+      WEBASSISTANT_DB_NAME: ${WEBASSISTANT_DB_NAME:-webassistant}
+      WEBASSISTANT_DB_USER: ${WEBASSISTANT_DB_USER:-webassistant}
+      WEBASSISTANT_DB_PASSWORD: ${WEBASSISTANT_DB_PASSWORD:-webassistant-dev-password}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ${WEBASSISTANT_DB_NAME:-webassistant}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    volumes: [redis-data:/data]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  qdrant:
+    image: qdrant/qdrant:v1.19.1
+    restart: unless-stopped
+    environment:
+      # La API key se activa en compose.prod.yaml (una variable vacía exigiría clave igualmente).
+      QDRANT__TELEMETRY_DISABLED: "true"
+    volumes: [qdrant-data:/qdrant/storage]
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/127.0.0.1/6333 && printf \"GET /readyz HTTP/1.0\\r\\n\\r\\n\" >&3 && grep -q \"200 OK\" <&3'"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  # Migraciones de esquema (Alembic) antes de arrancar API y worker.
+  migrate:
+    <<: *app
+    restart: "no"
+    command: ["webassistant", "migrate"]
+    depends_on:
+      postgres: { condition: service_healthy }
+    healthcheck: { disable: true }
+
+  api:
+    <<: *app
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+      redis: { condition: service_healthy }
+      qdrant: { condition: service_healthy }
+    ports: ["${WEBASSISTANT_PORT:-8000}:8000"]
+
+  worker:
+    <<: *app
+    command: ["webassistant-worker"]
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+      redis: { condition: service_healthy }
+      qdrant: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "webassistant-worker", "--check"]
+      interval: 30s
+      timeout: 10s
+      start_period: 40s
+      retries: 3
+
+  # --- Perfil "observability": métricas, alertas y cuadros de mando ---------------------------
+  prometheus:
+    image: prom/prometheus:v3.5.0
+    profiles: [observability]
+    restart: unless-stopped
+    command: ["--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.retention.time=15d"]
+    volumes:
+      - ./deploy/observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./deploy/observability/alerts.yml:/etc/prometheus/alerts.yml:ro
+      - prometheus-data:/prometheus
+    ports: ["127.0.0.1:${PROMETHEUS_PORT:-9090}:9090"]
+    depends_on: [api]
+
+  grafana:
+    image: grafana/grafana:12.1.1
+    profiles: [observability]
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin-dev-password}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+    volumes:
+      - ./deploy/observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./deploy/observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    ports: ["127.0.0.1:${GRAFANA_PORT:-3000}:3000"]
+    depends_on: [prometheus]
+
+secrets:
+  # CA opcional de un proxy corporativo con inspección TLS, solo para el build.
+  extra_ca:
+    file: ${EXTRA_CA_CERTS:-/dev/null}
+
+volumes:
+  postgres-data:
+  redis-data:
+  qdrant-data:
+  prometheus-data:
+  grafana-data:

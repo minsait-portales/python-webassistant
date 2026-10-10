@@ -1,0 +1,69 @@
+# Alertas operativas (CG-13.3, runbooks en docs/runbooks.md).
+groups:
+  - name: webassistant
+    rules:
+      - alert: WebAssistantApiDown
+        expr: up{job="webassistant-api"} == 0
+        for: 2m
+        labels: { severity: critical }
+        annotations:
+          summary: La API de WebAssistant no responde
+          runbook: docs/runbooks.md#api-caida
+      - alert: WebAssistantWorkerDown
+        expr: up{job="webassistant-worker"} == 0
+        for: 5m
+        labels: { severity: critical }
+        annotations:
+          summary: El worker no responde (ingesta, reindexado y retención detenidos)
+          runbook: docs/runbooks.md#worker-caido
+      - alert: WebAssistantHighErrorRate
+        expr: |
+          sum(rate(webassistant_http_requests_total{status=~"5.."}[5m]))
+            / clamp_min(sum(rate(webassistant_http_requests_total[5m])), 1e-9) > 0.05
+        for: 10m
+        labels: { severity: critical }
+        annotations:
+          summary: Más del 5 % de respuestas 5xx
+          runbook: docs/runbooks.md#errores-5xx
+      - alert: WebAssistantSlowRuns
+        expr: histogram_quantile(0.95, sum by (le) (rate(webassistant_run_duration_seconds_bucket[10m]))) > 20
+        for: 15m
+        labels: { severity: warning }
+        annotations:
+          summary: El p95 de duración de los runs supera 20 s
+          runbook: docs/runbooks.md#latencia
+      - alert: WebAssistantProviderErrors
+        expr: |
+          sum by (provider, model) (rate(webassistant_provider_calls_total{status!="ok"}[5m]))
+            / clamp_min(sum by (provider, model) (rate(webassistant_provider_calls_total[5m])), 1e-9) > 0.2
+        for: 10m
+        labels: { severity: warning }
+        annotations:
+          summary: "Errores del proveedor {{ $labels.provider }}/{{ $labels.model }} por encima del 20 %"
+          runbook: docs/runbooks.md#proveedor
+      - alert: WebAssistantCircuitOpen
+        expr: max by (key) (webassistant_circuit_open) == 1
+        for: 1m
+        labels: { severity: warning }
+        annotations:
+          summary: "Circuit breaker abierto: {{ $labels.key }}"
+          runbook: docs/runbooks.md#proveedor
+      - alert: WebAssistantQueueBacklog
+        expr: max(webassistant_queue_depth) > 500
+        for: 15m
+        labels: { severity: warning }
+        annotations:
+          summary: La cola de trabajos acumula más de 500 elementos
+          runbook: docs/runbooks.md#cola
+      - alert: WebAssistantIngestFailures
+        expr: sum(increase(webassistant_ingest_documents_total{outcome="failed"}[30m])) > 10
+        labels: { severity: warning }
+        annotations:
+          summary: Más de 10 documentos fallidos en la ingesta en 30 minutos
+          runbook: docs/runbooks.md#ingesta
+      - alert: WebAssistantBudgetRejections
+        expr: sum by (tenant, reason) (increase(webassistant_policy_rejections_total[15m])) > 0
+        labels: { severity: info }
+        annotations:
+          summary: "Rechazos por política en {{ $labels.tenant }}: {{ $labels.reason }}"
+          runbook: docs/runbooks.md#presupuesto

@@ -12,7 +12,7 @@ Uso: ``webassistant-worker`` (equivale a ``arq webassistant_worker.main.WorkerSe
 from __future__ import annotations
 
 import asyncio
-import signal
+import sys
 from typing import Any
 
 from arq import Retry
@@ -123,11 +123,31 @@ class WorkerSettings:
         return _redis_settings()
 
 
+def check() -> int:
+    """Comprobación de salud para contenedores: el worker publica una marca en Redis."""
+    from arq.worker import async_check_health
+
+    return asyncio.run(
+        async_check_health(_redis_settings(), queue_name=get_settings().queue_name)
+    )
+
+
 def main() -> None:
+    if "--check" in sys.argv[1:]:
+        raise SystemExit(check())
     settings = get_settings()
     configure_logging(
         settings.log_level, json_output=settings.log_json, service_name="webassistant-worker"
     )
+    if settings.metrics_enabled and settings.worker_metrics_port:
+        # Métricas de ingesta, reindexado y proveedores del worker (Prometheus).
+        from prometheus_client import start_http_server
+
+        from webassistant.observability.metrics import REGISTRY
+
+        start_http_server(settings.worker_metrics_port, registry=REGISTRY)
+    # arq gestiona su propio bucle de eventos y las señales (SIGTERM espera a los trabajos en
+    # curso). El Worker debe crearse en el mismo bucle en el que se ejecuta.
     worker = Worker(
         functions=WorkerSettings.functions,
         cron_jobs=WorkerSettings.cron_jobs,
@@ -140,17 +160,9 @@ def main() -> None:
         keep_result=WorkerSettings.keep_result,
         max_jobs=WorkerSettings.max_jobs,
         health_check_interval=WorkerSettings.health_check_interval,
-        handle_signals=False,
+        handle_signals=True,
     )
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    for sig in (signal.SIGINT, signal.SIGTERM):
-        loop.add_signal_handler(sig, lambda: asyncio.ensure_future(worker.close()))
-    try:
-        loop.run_until_complete(worker.async_run())
-    finally:
-        loop.run_until_complete(worker.close())
-        loop.close()
+    worker.run()
 
 
 if __name__ == "__main__":

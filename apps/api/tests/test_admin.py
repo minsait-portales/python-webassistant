@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 from decimal import Decimal
+from pathlib import Path
 
 import httpx
 
-from tests.conftest import admin_token, auth, new_conversation, widget_token
+from tests.conftest import admin_token, auth, make_settings, new_conversation, widget_token
 from webassistant.db import models as m
 from webassistant.db.repositories import UnitOfWork
+from webassistant.gateway.simulated import SimulatedProvider
+from webassistant.services.container import build_services
 
 
 async def _tenant_id(client: httpx.AsyncClient, token: str) -> str:
@@ -453,3 +456,31 @@ async def test_retention_anonymizes_old_conversations(app, client: httpx.AsyncCl
             )
         ).all()
     assert row.status == "deleted" and messages == [] and audit
+
+
+async def test_bootstrap_admin_is_created_once_and_requires_strong_password(
+    tmp_path: Path,
+) -> None:
+    from webassistant.services.bootstrap import ensure_bootstrap_admin
+
+    settings = make_settings(
+        tmp_path,
+        bootstrap_admin_email="Ops@Example.com",
+        bootstrap_admin_password="Ops-Seguro-2026-x",
+    )
+    built = build_services(settings, overrides={"providers": {"simulated": SimulatedProvider()}})
+    await built.startup(create_schema=True)
+    try:
+        assert await ensure_bootstrap_admin(built) is True
+        assert await ensure_bootstrap_admin(built) is False
+        async with UnitOfWork(built.db, platform=True) as uow:
+            user = await uow.admin_users.by_email("ops@example.com")
+            assert user is not None
+            assert user.role == "platform_admin"
+        weak = make_settings(
+            tmp_path, bootstrap_admin_email="weak@example.com", bootstrap_admin_password="corta"
+        )
+        built.settings = weak
+        assert await ensure_bootstrap_admin(built) is False
+    finally:
+        await built.shutdown()
