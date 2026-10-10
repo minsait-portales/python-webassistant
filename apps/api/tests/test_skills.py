@@ -226,6 +226,27 @@ def test_actions_hidden_without_permission(registry: SkillRegistry) -> None:
     assert built.actions == []
 
 
+def test_selection_action_receives_projected_items(registry: SkillRegistry) -> None:
+    skill = (
+        SkillMatcher(registry)
+        .match([{"name": "event_product_selection"}], scopes={"catalog:read", "cart:write"})
+        .get("event_product_selection")
+    )
+    assert skill is not None
+    runtime = SkillRuntime()
+    result = {
+        "event_name": "Barbacoa",
+        "categories": [
+            {"name": "Carnes", "items": [{"product_id": "p-1", "title": "Producto", "quantity": 2}]}
+        ],
+    }
+    actions = runtime.actions_for(skill, result, frozenset({"catalog:read", "cart:write"}))
+    bulk = next(a for a in actions if a["name"] == "add_selection_to_cart")
+    assert bulk["params"] == {"items": [{"product_id": "p-1", "quantity": 2}]}
+    item_action = next(a for a in actions if a["name"] == "add_to_cart")
+    assert item_action["params"] == {}
+
+
 def test_document_citations_are_verified(registry: SkillRegistry) -> None:
     skill = (
         SkillMatcher(registry)

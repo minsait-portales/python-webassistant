@@ -1,0 +1,51 @@
+/*
+ * CSS agresivo de prueba (CG-10.2, CG-15.6): reglas globales con !important que romperían
+ * cualquier widget sin encapsulación. El chat debe seguir siendo usable y legible.
+ */
+* {
+  font-family: 'Comic Sans MS', 'Courier New', cursive !important;
+  color: #00ff00 !important;
+  background-color: #000000 !important;
+  box-sizing: content-box !important;
+  letter-spacing: 3px !important;
+}
+div,
+section,
+button,
+textarea,
+ol,
+ul,
+li,
+form,
+header,
+p {
+  display: block !important;
+  position: static !important;
+  margin: 30px !important;
+  padding: 0 !important;
+  border: 4px dashed #ff0000 !important;
+  font-size: 28px !important;
+  line-height: 3 !important;
+  width: 60% !important;
+  opacity: 0.9 !important;
+}
+button,
+textarea {
+  display: none !important;
+}
+[hidden] {
+  display: block !important;
+}
+body * {
+  transform: rotate(1deg) !important;
+  z-index: 1 !important;
+  filter: blur(0.3px) !important;
+}
+:root {
+  --wa-accent: #00ff00;
+  --wa-font: cursive;
+}
+img {
+  width: 900px !important;
+  height: 900px !important;
+}

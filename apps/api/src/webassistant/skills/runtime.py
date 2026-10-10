@@ -97,6 +97,26 @@ def _renderer_properties(renderer: str) -> set[str]:
     return set((schema.get("properties") or {}).keys())
 
 
+def _selection_items(result: dict[str, Any], schema: dict[str, Any]) -> list[dict[str, Any]]:
+    """Productos de la presentación (``items`` o ``categories[].items``) proyectados al
+    esquema de la acción, para acciones sobre toda la selección (p. ej. ``cart.add_many``)."""
+    item_schema = schema.get("items") if isinstance(schema.get("items"), dict) else {}
+    allowed = set((item_schema or {}).get("properties") or {})
+    if not allowed:
+        return []
+    products: list[Any] = list(result.get("items") or [])
+    for category in result.get("categories") or []:
+        if isinstance(category, dict):
+            products.extend(category.get("items") or [])
+    selection = []
+    for product in products:
+        if not isinstance(product, dict) or not product.get("product_id"):
+            continue
+        selection.append({k: v for k, v in product.items() if k in allowed and v not in (None, "")})
+    max_items = schema.get("maxItems")
+    return selection[: int(max_items)] if isinstance(max_items, int) else selection
+
+
 def _clean_none(
     value: Any,
     keep: frozenset[str] = frozenset(
@@ -194,9 +214,16 @@ class SkillRuntime:
             schema = package.action_schemas.get(name, {}) if package else {}
             params: dict[str, Any] = {}
             if action.get("target", "presentation") == "presentation":
-                for key in schema.get("properties") or {}:
+                properties = schema.get("properties") or {}
+                for key in properties:
                     if key in result and result[key] not in (None, ""):
                         params[key] = result[key]
+                if isinstance(properties.get("items"), dict):
+                    selection = _selection_items(result, properties["items"])
+                    if selection:
+                        params["items"] = selection
+                    else:
+                        params.pop("items", None)
             actions.append(
                 {
                     "name": name,

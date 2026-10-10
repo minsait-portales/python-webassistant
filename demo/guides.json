@@ -1,0 +1,84 @@
+[
+  {
+    "id": "guia-pagos",
+    "title": "Guía de pagos y facturación",
+    "sections": [
+      {
+        "heading": "Métodos de pago",
+        "body": "Aceptamos tarjeta de crédito o débito, transferencia bancaria y pago con móvil. El cargo se realiza al confirmar el pedido."
+      },
+      {
+        "heading": "Pedidos con varios vendedores",
+        "body": "Puedes pagar un pedido con productos de varios vendedores en un único checkout. El importe se reparte automáticamente entre los vendedores."
+      },
+      {
+        "heading": "Facturas",
+        "body": "Si necesitas factura con datos fiscales, introduce tu NIF o CIF antes de finalizar la compra. La factura se envía por correo y queda disponible en tu cuenta."
+      }
+    ]
+  },
+  {
+    "id": "guia-envios",
+    "title": "Envíos y plazos de entrega",
+    "sections": [
+      {
+        "heading": "Plazos de entrega",
+        "body": "Los pedidos se entregan en un plazo de 24 a 72 horas laborables en península. Baleares y Canarias pueden tardar hasta 5 días."
+      },
+      {
+        "heading": "Coste del envío",
+        "body": "El envío es gratuito a partir de 49 euros. Por debajo de ese importe el coste es de 3,95 euros."
+      },
+      {
+        "heading": "Seguimiento",
+        "body": "Recibirás un correo con el número de seguimiento cuando el pedido salga del almacén."
+      }
+    ]
+  },
+  {
+    "id": "guia-devoluciones",
+    "title": "Devoluciones y reembolsos",
+    "sections": [
+      {
+        "heading": "Plazo de devolución",
+        "body": "Tienes 30 días naturales desde la entrega para devolver un producto sin dar explicaciones."
+      },
+      {
+        "heading": "Cómo devolver un pedido",
+        "body": "Entra en Mis pedidos, elige el pedido y pulsa Solicitar devolución. Imprime la etiqueta y entrega el paquete en cualquier punto de recogida."
+      },
+      {
+        "heading": "Reembolso",
+        "body": "El reembolso se realiza en el mismo método de pago en un máximo de 14 días desde que recibimos el producto. Los productos frescos no admiten devolución salvo defecto."
+      }
+    ]
+  },
+  {
+    "id": "guia-garantia",
+    "title": "Garantía de los productos",
+    "sections": [
+      {
+        "heading": "Garantía legal",
+        "body": "Todos los productos tienen tres años de garantía legal frente a defectos de fabricación."
+      },
+      {
+        "heading": "Cómo reclamar la garantía",
+        "body": "Contacta con atención al cliente indicando el número de pedido y una descripción del problema. Te indicaremos si procede reparación, sustitución o reembolso."
+      }
+    ]
+  },
+  {
+    "id": "guia-cuenta",
+    "title": "Tu cuenta y datos personales",
+    "sections": [
+      {
+        "heading": "Cambiar datos de la cuenta",
+        "body": "Desde Mi perfil puedes cambiar tu nombre, correo electrónico y contraseña."
+      },
+      {
+        "heading": "Privacidad",
+        "body": "Puedes descargar o eliminar tus datos personales desde la sección Privacidad de tu perfil."
+      }
+    ]
+  }
+]

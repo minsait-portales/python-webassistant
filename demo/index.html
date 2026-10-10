@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tienda de demostración · WebAssistant</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/demo/demo.css">
+  <!-- 1) Integración del portal: host actions, eventos y login (antes del loader). -->
+  <script src="/demo/demo.js"></script>
+  <!-- 2) Instalación del widget: una única etiqueta. -->
+  <script async src="/widget/v1/loader.js" data-site-id="site_demo" data-assistant-id="catalogo"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Saltar al contenido</a>
+  <header class="site-header">
+    <a class="brand" href="/demo/">Tienda Demo</a>
+    <nav aria-label="Principal">
+      <ul>
+        <li><a href="/demo/" aria-current="page">Inicio</a></li>
+        <li><a href="/demo/ayuda.html">Ayuda</a></li>
+        <li><a href="/demo/contenedor.html">Resultados en la página</a></li>
+        <li><a href="/demo/css-agresivo.html">CSS agresivo</a></li>
+      </ul>
+    </nav>
+    <div class="session">
+      <label for="demo-profile">Sesión del portal</label>
+      <select id="demo-profile">
+        <option value="">Anónima</option>
+        <option value="cliente">Cliente (login)</option>
+        <option value="editor">Editora (login)</option>
+      </select>
+      <a class="cart-link" href="/demo/carrito.html">Carrito (<span data-cart-count>0</span>)</a>
+    </div>
+  </header>
+  <main id="main">
+    <h1>Tienda de demostración</h1>
+    <p class="lead">Esta web simula un portal cualquiera que integra <strong>WebAssistant</strong> con una sola
+      etiqueta <code>&lt;script&gt;</code>. Abre el asistente con la pestaña lateral y prueba, por ejemplo:
+      «Organiza una barbacoa para 10 personas», «¿Cómo puedo devolver un pedido?», «¿Qué dice el manual sobre
+      la batería?» o «Enséñame el carrito».</p>
+    <p><button type="button" class="button" data-open-assistant>Abrir el asistente</button></p>
+    <section aria-labelledby="destacados">
+      <h2 id="destacados">Productos destacados</h2>
+      <ul class="products" data-products data-limit="12"></ul>
+    </section>
+    <section class="panel" aria-labelledby="eventos">
+      <h2 id="eventos">Eventos del widget</h2>
+      <p>La página anfitriona recibe los eventos del contrato <code>widget-events v1</code> (sin datos personales).</p>
+      <ol class="event-log" data-event-log></ol>
+    </section>
+  </main>
+  <footer>
+    <p>Demo autónoma de WebAssistant (capa genérica). Los datos, el carrito y el login son simulados.
+      <a href="/docs">API (OpenAPI)</a> · <a href="/admin/">Consola de administración</a></p>
+  </footer>
+</body>
+</html>

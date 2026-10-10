@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" role="img" aria-label="Carnes">
+  <rect width="320" height="200" rx="16" fill="#8c2d1d"/>
+  <circle cx="160" cy="82" r="44" fill="#ffffff" opacity=".18"/>
+  <circle cx="160" cy="82" r="26" fill="#ffffff" opacity=".35"/>
+  <text x="160" y="164" fill="#ffffff" font-family="Arial, sans-serif" font-size="26" font-weight="700" text-anchor="middle">Carnes</text>
+</svg>

@@ -20,7 +20,15 @@ from webassistant.api.middleware import (
     TimeoutMiddleware,
     problem_response,
 )
-from webassistant.api.routers import actions, conversations, health, ingest, public, static
+from webassistant.api.routers import (
+    actions,
+    conversations,
+    demo_portal,
+    health,
+    ingest,
+    public,
+    static,
+)
 from webassistant.api.routers.admin import assistants as admin_assistants
 from webassistant.api.routers.admin import auth as admin_auth
 from webassistant.api.routers.admin import governance as admin_governance
@@ -143,6 +151,7 @@ def create_app(
         admin_tenant.router,
         admin_assistants.router,
         admin_governance.router,
+        demo_portal.router,
         static.router,
     ):
         app.include_router(router)

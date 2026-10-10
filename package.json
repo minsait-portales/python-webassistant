@@ -1,0 +1,37 @@
+{
+  "name": "webassistant-monorepo",
+  "private": true,
+  "version": "1.0.0-rc.1",
+  "description": "WebAssistant AI: widget, consola de administración y SDK TypeScript.",
+  "workspaces": [
+    "packages/sdk-js",
+    "apps/widget",
+    "apps/admin"
+  ],
+  "scripts": {
+    "build": "npm run build -w @webassistant/sdk && npm run build -w @webassistant/widget && npm run build -w @webassistant/admin",
+    "typecheck": "npm run typecheck --workspaces",
+    "lint": "eslint . && prettier --check \"**/*.{ts,mjs,json,css,md}\" --ignore-path .prettierignore",
+    "format": "prettier --write \"**/*.{ts,mjs,json,css}\" --ignore-path .prettierignore",
+    "test": "npm run test --workspaces --if-present",
+    "e2e": "npm run e2e -w @webassistant/widget",
+    "generate:sdk": "npm run generate -w @webassistant/sdk"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "1.56.1",
+    "esbuild": "0.28.2",
+    "eslint": "10.12.0",
+    "globals": "^16.4.0",
+    "jsdom": "26.1.0",
+    "openapi-typescript": "7.13.0",
+    "prettier": "3.8.1",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.71.1",
+    "vitest": "4.1.11"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

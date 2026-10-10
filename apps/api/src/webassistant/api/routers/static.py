@@ -59,9 +59,15 @@ def demo_dir() -> Path | None:
 
 
 def _serve(base: Path | None, name: str, cache: str) -> Response:
-    if base is None or not _SAFE_NAME.match(name):
+    """Sirve ``name`` (ruta relativa con segmentos seguros) sin salir de ``base``."""
+    parts = name.split("/")
+    if (
+        base is None
+        or len(parts) > 4
+        or not all(_SAFE_NAME.match(part) and part not in {".", ".."} for part in parts)
+    ):
         raise AppError(ErrorCode.NOT_FOUND, "Recurso no encontrado")
-    path = (base / name).resolve()
+    path = base.joinpath(*parts).resolve()
     if base.resolve() not in path.parents or not path.is_file():
         raise AppError(ErrorCode.NOT_FOUND, "Recurso no encontrado")
     media_type = mimetypes.guess_type(path.name)[0] or "application/octet-stream"
@@ -70,17 +76,17 @@ def _serve(base: Path | None, name: str, cache: str) -> Response:
     return FileResponse(path, media_type=media_type, headers={"Cache-Control": cache})
 
 
-@router.get("/widget/v1/loader.js")
+@router.api_route("/widget/v1/loader.js", methods=["GET", "HEAD"])
 async def loader(request: Request) -> Response:
     return _serve(widget_dir(request), "loader.js", "public, max-age=300, must-revalidate")
 
 
-@router.get("/widget/v1/manifest.json")
+@router.api_route("/widget/v1/manifest.json", methods=["GET", "HEAD"])
 async def manifest(request: Request) -> Response:
     return _serve(widget_dir(request), "manifest.json", "public, max-age=60, must-revalidate")
 
 
-@router.get("/widget/v1/assets/{name}")
+@router.api_route("/widget/v1/assets/{name}", methods=["GET", "HEAD"])
 async def widget_asset(name: str, request: Request) -> Response:
     base = widget_dir(request)
     return _serve(base / "assets" if base else None, name, "public, max-age=31536000, immutable")
@@ -91,7 +97,7 @@ async def admin_redirect() -> RedirectResponse:
     return RedirectResponse("/admin/", status_code=308)
 
 
-@router.get("/admin/{name:path}")
+@router.api_route("/admin/{name:path}", methods=["GET", "HEAD"])
 async def admin_console(name: str, request: Request) -> Response:
     base = admin_dir(request)
     if base is None:
@@ -99,9 +105,9 @@ async def admin_console(name: str, request: Request) -> Response:
             "<!doctype html><title>WebAssistant</title><p>Consola no compilada (apps/admin).</p>",
             status_code=404,
         )
-    if name and _SAFE_NAME.match(name.rsplit("/", maxsplit=1)[-1]) and (base / name).is_file():
+    if name and ".." not in name.split("/") and (base / name).is_file():
         cache = "public, max-age=31536000, immutable" if name.startswith("assets/") else "no-cache"
-        return _serve(base / Path(name).parent if "/" in name else base, Path(name).name, cache)
+        return _serve(base, name, cache)
     return _serve(base, "index.html", "no-cache")
 
 
@@ -110,7 +116,7 @@ async def demo_redirect() -> RedirectResponse:
     return RedirectResponse("/demo/", status_code=308)
 
 
-@router.get("/demo/{name:path}")
+@router.api_route("/demo/{name:path}", methods=["GET", "HEAD"])
 async def demo(name: str, request: Request) -> Response:
     if not request.app.state.services.settings.demo_enabled:
         raise AppError(ErrorCode.NOT_FOUND, "Demo deshabilitada")

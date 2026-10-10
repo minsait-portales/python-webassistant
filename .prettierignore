@@ -1,0 +1,16 @@
+node_modules
+dist
+.venv
+apps/api
+apps/worker
+packages/skill-sdk
+packages/contracts/openapi/openapi.json
+packages/sdk-js/src/openapi.d.ts
+**/*.md
+playwright-report
+test-results
+# Contratos y ejemplos de skills: JSON consumido por Python y comparado byte a byte.
+packages/contracts
+examples
+demo/*.json
+package-lock.json

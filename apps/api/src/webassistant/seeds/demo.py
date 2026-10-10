@@ -42,8 +42,21 @@ def load_package(extra_origins: list[str] | None = None) -> dict[str, Any]:
     return package
 
 
-def load_documents() -> list[dict[str, Any]]:
-    return json.loads((HERE / "demo_documents.json").read_text(encoding="utf-8"))
+DEMO_BASE_URL = "http://localhost:8000"
+
+
+def load_documents(base_url: str = DEMO_BASE_URL) -> list[dict[str, Any]]:
+    """Documentos de la demo con las URLs (fichas, guías, PDFs e imágenes) apuntando a la
+    URL pública del despliegue, para que los enlaces funcionen en cualquier entorno."""
+    base = base_url.rstrip("/") if base_url.startswith(("http://", "https://")) else DEMO_BASE_URL
+    raw = (HERE / "demo_documents.json").read_text(encoding="utf-8")
+    documents: list[dict[str, Any]] = json.loads(raw.replace(DEMO_BASE_URL, base))
+    for document in documents:
+        metadata = document.get("metadata") or {}
+        image = metadata.get("image_url")
+        if isinstance(image, str) and image.startswith("/"):
+            metadata["image_url"] = f"{base}{image}"
+    return documents
 
 
 async def ensure_demo(services: Any, *, ingest: bool = True) -> dict[str, Any]:
@@ -77,7 +90,9 @@ async def ensure_demo(services: Any, *, ingest: bool = True) -> dict[str, Any]:
     client_secret = os.environ.get("WEBASSISTANT_DEMO_CLIENT_SECRET") or (
         None if production else DEV_CLIENT_SECRET
     )
-    async with UnitOfWork(services.db, tenant_id) as uow:
+    # El administrador de plataforma no pertenece a ningún tenant: se busca sin filtro de
+    # tenant para que la semilla sea idempotente entre reinicios.
+    async with UnitOfWork(services.db, platform=True) as uow:
         if admin_email and admin_password and await uow.admin_users.by_email(admin_email) is None:
             await uow.admin_users.add(
                 m.AdminUser(
@@ -90,6 +105,7 @@ async def ensure_demo(services: Any, *, ingest: bool = True) -> dict[str, Any]:
                 )
             )
             logger.info("Usuario platform_admin de demo creado: %s", admin_email)
+    async with UnitOfWork(services.db, tenant_id) as uow:
         site = await uow.sites.by_public_id("site_demo")
         if (
             client_secret
@@ -113,7 +129,7 @@ async def ensure_demo(services: Any, *, ingest: bool = True) -> dict[str, Any]:
     services.assistants.invalidate(tenant_id)
     ingested = 0
     if ingest and documents_count == 0:
-        documents = load_documents()
+        documents = load_documents(base)
         for start in range(0, len(documents), 50):
             outcomes = await services.ingestion.upsert_many(
                 tenant_id, documents[start : start + 50]

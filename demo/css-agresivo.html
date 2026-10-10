@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CSS agresivo · Tienda de demostración</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/demo/demo.css">
+  <link rel="stylesheet" href="/demo/aggressive.css">
+  <!-- 1) Integración del portal: host actions, eventos y login (antes del loader). -->
+  <script src="/demo/demo.js"></script>
+  <!-- 2) Instalación del widget: una única etiqueta. -->
+  <script async src="/widget/v1/loader.js" data-site-id="site_demo" data-assistant-id="catalogo"></script>
+</head>
+<body>
+  <a class="skip" href="#main">Saltar al contenido</a>
+  <header class="site-header">
+    <a class="brand" href="/demo/">Tienda Demo</a>
+    <nav aria-label="Principal">
+      <ul>
+        <li><a href="/demo/">Inicio</a></li>
+        <li><a href="/demo/ayuda.html">Ayuda</a></li>
+        <li><a href="/demo/contenedor.html">Resultados en la página</a></li>
+        <li><a href="/demo/css-agresivo.html" aria-current="page">CSS agresivo</a></li>
+      </ul>
+    </nav>
+    <div class="session">
+      <label for="demo-profile">Sesión del portal</label>
+      <select id="demo-profile">
+        <option value="">Anónima</option>
+        <option value="cliente">Cliente (login)</option>
+        <option value="editor">Editora (login)</option>
+      </select>
+      <a class="cart-link" href="/demo/carrito.html">Carrito (<span data-cart-count>0</span>)</a>
+    </div>
+  </header>
+  <main id="main">
+    <h1>Página con CSS agresivo</h1>
+    <p>Esta página aplica reglas globales con <code>!important</code> (fuentes, colores, display, transformaciones).
+      El widget, encapsulado en Shadow DOM, debe seguir siendo legible, accesible y usable.</p>
+    <div><p>Contenido del portal deliberadamente roto.</p></div>
+  </main>
+  <footer>
+    <p>Demo autónoma de WebAssistant (capa genérica). Los datos, el carrito y el login son simulados.
+      <a href="/docs">API (OpenAPI)</a> · <a href="/admin/">Consola de administración</a></p>
+  </footer>
+</body>
+</html>

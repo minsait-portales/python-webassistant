@@ -1,0 +1,23 @@
+{
+  "name": "@webassistant/sdk",
+  "version": "1.0.0-rc.1",
+  "description": "Cliente TypeScript de la API v1 de WebAssistant (tipos generados desde OpenAPI).",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "generate": "openapi-typescript ../contracts/openapi/openapi.json -o src/openapi.d.ts",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "@webassistant/widget",
+  "version": "1.0.0-rc.1",
+  "private": true,
+  "description": "Widget embebible de WebAssistant: loader.js + chat montado en la página anfitriona.",
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "e2e": "playwright test"
+  },
+  "dependencies": {
+    "@webassistant/sdk": "1.0.0-rc.1"
+  }
+}
