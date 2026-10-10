@@ -80,6 +80,21 @@ describe('loader.js', () => {
     expect(api.send).toHaveBeenCalledWith('hola');
   });
 
+  it('mantiene push() tras cargar para integraciones que usan la cola', async () => {
+    addScript({ 'data-site-id': 'site_demo' });
+    await loadLoader();
+    const global = (window as TestWindow).WebAssistant as WebAssistantGlobal;
+    const handler = vi.fn();
+    const token = vi.fn(async () => 'jwt');
+    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    expect(global.push(['registerHostAction', 'cart.add', handler], ['setToken', token], ['__proto__'])).toBe(
+      3,
+    );
+    expect(global.hostActions.get('cart.add')).toBe(handler);
+    expect(api.setToken).toHaveBeenCalledWith(token);
+    expect(error).toHaveBeenCalledTimes(1);
+  });
+
   it('permite varias instancias con distinto contenedor de resultados', async () => {
     addScript({ 'data-site-id': 'site_demo' });
     await loadLoader();

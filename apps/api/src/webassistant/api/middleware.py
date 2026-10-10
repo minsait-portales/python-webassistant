@@ -76,7 +76,10 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         )
         path = request.url.path
         if path.startswith("/widget/"):
+            # Recursos públicos e inmutables que cargan páginas de otros orígenes (el bundle usa
+            # crossorigin="anonymous" por SRI): CORS abierto y sin credenciales.
             headers["Cross-Origin-Resource-Policy"] = "cross-origin"
+            headers["Access-Control-Allow-Origin"] = "*"
         else:
             headers.setdefault("X-Frame-Options", "DENY")
             headers.setdefault("Cross-Origin-Resource-Policy", "same-site")

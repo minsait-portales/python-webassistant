@@ -103,3 +103,22 @@ def test_settings_are_documented() -> None:
         if f"`WEBASSISTANT_{name.upper()}`" not in documented
     ]
     assert not missing, f"Variables sin documentar: {missing}"
+
+
+async def test_widget_assets_load_from_other_origins(tmp_path: Path) -> None:
+    """El loader y el bundle (SRI con crossorigin="anonymous") se cargan desde otros dominios."""
+    from webassistant.api.app import create_app
+
+    dist = tmp_path / "widget"
+    (dist / "assets").mkdir(parents=True)
+    (dist / "loader.js").write_text("/* loader */", encoding="utf-8")
+    (dist / "assets" / "widget.abc123.js").write_text("/* bundle */", encoding="utf-8")
+    app = create_app(make_settings(tmp_path, widget_dist_dir=dist))
+    transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://test") as http:
+        for path in ("/widget/v1/loader.js", "/widget/v1/assets/widget.abc123.js"):
+            response = await http.get(path, headers={"Origin": "https://portal.example"})
+            assert response.status_code == 200
+            assert response.headers["access-control-allow-origin"] == "*"
+            assert response.headers["cross-origin-resource-policy"] == "cross-origin"
+            assert "access-control-allow-credentials" not in response.headers

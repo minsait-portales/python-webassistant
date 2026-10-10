@@ -53,4 +53,6 @@ export interface WebAssistantGlobal {
   open(instanceId?: string): void;
   close(instanceId?: string): void;
   send(text: string, instanceId?: string): void;
+  /** Compatibilidad con la cola previa: `WebAssistant.push(['método', ...args])` sigue funcionando. */
+  push(...calls: QueuedCall[]): number;
 }

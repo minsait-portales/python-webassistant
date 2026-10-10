@@ -49,6 +49,9 @@ function readOptions(script: HTMLScriptElement): LoaderOptions | null {
   };
 }
 
+type Pushable = 'on' | 'registerHostAction' | 'setToken' | 'open' | 'close' | 'send';
+const PUSHABLE = new Set<string>(['on', 'registerHostAction', 'setToken', 'open', 'close', 'send']);
+
 function createGlobal(): WebAssistantGlobal {
   const existing = (window as unknown as { WebAssistant?: WebAssistantGlobal | QueuedCall[] }).WebAssistant;
   const queued: QueuedCall[] = Array.isArray(existing) ? existing : [];
@@ -90,6 +93,13 @@ function createGlobal(): WebAssistantGlobal {
       const target = instanceId ? instances.get(instanceId) : instances.values().next().value;
       if (target) void target.send(text);
       else pending.push(['send', text, instanceId]);
+    },
+    push(...calls) {
+      for (const [method, ...args] of calls) {
+        if (PUSHABLE.has(method)) (global[method as Pushable] as (...a: unknown[]) => unknown)(...args);
+        else console.error(`[WebAssistant] Método desconocido: ${String(method)}`);
+      }
+      return calls.length;
     },
   };
   for (const call of queued) {

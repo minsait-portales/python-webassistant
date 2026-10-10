@@ -57,14 +57,17 @@ Content-Type: application/json
   "client_secret": "<secreto del cliente API>",
   "site_id": "portal_publico",
   "user": { "id": "u-123", "roles": ["editor"], "groups": ["marketing"], "locale": "es" },
-  "scopes": ["catalog:read", "cart:read", "cart:write", "content:write"],
+  "scopes": ["knowledge:read", "documents:read", "actions:execute", "catalog:read", "cart:read", "cart:write"],
   "origin": "https://www.portal.example",
   "ttl_seconds": 900
 }
 ```
 
 `user.id` es un identificador opaco (sin datos personales). Los scopes efectivos son la intersección
-con `settings.allowed_widget_scopes` del site. La página entrega el token al widget:
+de los pedidos con los permitidos (`chat:use`, `knowledge:read`, `documents:read`, `actions:execute` y
+`settings.allowed_widget_scopes` del site); los no permitidos se descartan sin error y `chat:use` se
+añade siempre. Una lista vacía concede todos los permitidos. Sin `knowledge:read` no hay respuestas desde
+contenidos y sin `actions:execute` no se ejecuta ninguna acción. La página entrega el token al widget:
 
 ```html
 <script>

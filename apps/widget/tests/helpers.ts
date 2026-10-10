@@ -28,6 +28,7 @@ export function testGlobal(): WebAssistantGlobal & {
     setToken: () => undefined,
     open: () => undefined,
     close: () => undefined,
+    push: (...calls: QueuedCall[]) => calls.length,
     send: () => undefined,
   };
 }
