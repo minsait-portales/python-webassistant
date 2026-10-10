@@ -1,0 +1,48 @@
+# Skill product_summary: migrada desde el módulo Drupal webassistant_ai (CG-06.6).
+api_version: webassistant.ai/v1
+name: product_summary
+version: 1.0.0
+title: Resumir una ficha de producto
+group: ecommerce
+description: Responde detalles, atributos e información principal de un producto concreto en puntos claros.
+intent: Usar cuando el usuario pregunte por detalles, atributos, características o resumen de un producto específico.
+when_to_use:
+- El usuario pregunta por las características de un producto.
+- El usuario pide un resumen, pros, contras o datos clave de una ficha.
+examples:
+- ¿Qué características tiene este portátil?
+- Resúmeme la ficha del producto
+- ¿De qué material está hecho?
+keywords:
+- caracteristicas
+- ficha
+- resumen
+- resume
+- detalles
+- especificaciones
+- material
+- talla
+- color
+requires_rag: true
+permissions:
+- catalog:read
+input_schema: schemas/input.json
+response_example: examples/response.json
+renderer: product_summary@1
+processors:
+- catalog_items
+chat_reply_fallback: Te resumo la ficha en el panel.
+responsive_button_label: Ver resumen
+actions:
+  add_to_cart:
+    type: host
+    label: Añadir al carrito
+    host_action: cart.add
+    permission: cart:write
+    confirmation: required
+    effects: true
+    target: item
+    input_schema: schemas/actions/add_to_cart.json
+    description: Añade el producto al carrito del portal tras confirmación explícita.
+dependencies:
+  platform: '>=1.0,<2.0'

@@ -1,0 +1,32 @@
+# Skill default: migrada desde el módulo Drupal webassistant_ai (CG-06.6).
+api_version: webassistant.ai/v1
+name: default
+version: 1.0.0
+title: Respuesta general
+group: general
+description: Respuesta de reserva para consultas del sitio que no encajan en una skill especializada.
+intent: 'Usar solo cuando ninguna otra skill activa represente mejor la intención del usuario. No usar para preguntas
+  sobre un producto concreto ni para consultas ajenas al sitio: esas se devuelven con `out_of_scope` y `result`
+  vacío.'
+when_to_use:
+- La pregunta trata del sitio, es informativa, general y no trata sobre un producto concreto.
+- La respuesta no necesita comparación, recomendación, búsqueda, resumen ni alternativas.
+- 'No usar si la consulta no trata del sitio (hora, tiempo, deportes, cultura general): en ese caso devuelve `out_of_scope`
+  con `result` vacío.'
+examples:
+- ¿Qué puedo hacer en esta web?
+- ¿Me ayudas?
+keywords:
+- ayuda
+- web
+- sitio
+- asistente
+requires_rag: false
+input_schema: schemas/input.json
+response_example: examples/response.json
+renderer: text@1
+chat_reply_fallback: He preparado la respuesta en el panel.
+responsive_button_label: Ver respuesta completa
+out_of_scope_allowed: true
+dependencies:
+  platform: '>=1.0,<2.0'

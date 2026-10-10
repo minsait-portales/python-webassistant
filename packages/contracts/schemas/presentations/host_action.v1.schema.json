@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://webassistant.ai/schemas/presentations/host_action.v1.schema.json",
+  "title": "Presentación host_action@1 (tarjeta que propone una acción en la página anfitriona)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["title", "action"],
+  "properties": {
+    "title": { "$ref": "_common.v1.schema.json#/$defs/short_text" },
+    "description": { "$ref": "_common.v1.schema.json#/$defs/text" },
+    "action": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+    "details": {
+      "type": "array",
+      "maxItems": 10,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["label", "value"],
+        "properties": {
+          "label": { "$ref": "_common.v1.schema.json#/$defs/short_text" },
+          "value": { "$ref": "_common.v1.schema.json#/$defs/short_text" }
+        }
+      }
+    }
+  }
+}

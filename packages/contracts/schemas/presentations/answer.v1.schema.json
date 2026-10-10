@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://webassistant.ai/schemas/presentations/answer.v1.schema.json",
+  "title": "Presentación answer@1 (respuesta basada en contenidos con pasos y fuentes)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["answer"],
+  "properties": {
+    "found": { "type": "boolean" },
+    "answer": { "$ref": "_common.v1.schema.json#/$defs/text" },
+    "steps": { "type": "array", "items": { "$ref": "_common.v1.schema.json#/$defs/step" }, "maxItems": 20 },
+    "outro": { "$ref": "_common.v1.schema.json#/$defs/text" },
+    "sources": { "type": "array", "items": { "$ref": "_common.v1.schema.json#/$defs/source_link" }, "maxItems": 10 }
+  }
+}

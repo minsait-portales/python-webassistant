@@ -1,0 +1,15 @@
+{
+  "chat_reply": "Te dejo recomendaciones en el panel.",
+  "result": {
+    "intro": "Estas opciones encajan con lo que buscas.",
+    "items": [
+      {
+        "product_id": "123",
+        "variation_id": "456",
+        "title": "Producto recomendado",
+        "body": "Motivo breve de la recomendación basado en el contenido recuperado."
+      }
+    ],
+    "outro": "Puedes pedirme que compare dos opciones."
+  }
+}

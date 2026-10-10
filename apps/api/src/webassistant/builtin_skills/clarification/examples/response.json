@@ -1,0 +1,11 @@
+{
+  "chat_reply": "Necesito algún dato más para afinar.",
+  "result": {
+    "question": "¿Qué producto o categoría te interesa?",
+    "options": [
+      "Portátiles",
+      "Móviles",
+      "Accesorios"
+    ]
+  }
+}

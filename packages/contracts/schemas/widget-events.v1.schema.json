@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://webassistant.ai/schemas/widget-events.v1.schema.json",
+  "title": "Eventos del widget en la página anfitriona v1",
+  "description": "El widget emite CustomEvent `webassistant:<type>` sobre document con este detail. La API JavaScript `window.WebAssistant.on(type, handler)` recibe el mismo objeto.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "type", "instance_id", "timestamp"],
+  "properties": {
+    "version": { "const": "1" },
+    "type": { "enum": ["ready", "open", "close", "message_sent", "response", "presentation", "action_requested", "host_action", "action_result", "error", "reset"] },
+    "instance_id": { "type": "string" },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "conversation_id": { "type": ["string", "null"] },
+    "run_id": { "type": ["string", "null"] },
+    "correlation_id": { "type": ["string", "null"] },
+    "payload": { "type": "object" }
+  }
+}

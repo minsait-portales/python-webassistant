@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "content_type"
+  ],
+  "properties": {
+    "content_type": {
+      "type": "string",
+      "maxLength": 128
+    },
+    "content_title": {
+      "type": "string",
+      "maxLength": 300
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 4000
+    }
+  }
+}

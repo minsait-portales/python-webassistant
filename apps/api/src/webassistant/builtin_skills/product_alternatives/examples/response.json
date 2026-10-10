@@ -1,0 +1,15 @@
+{
+  "chat_reply": "Te muestro alternativas en el panel.",
+  "result": {
+    "intro": "Estas alternativas pueden encajar como sustitutas.",
+    "items": [
+      {
+        "product_id": "123",
+        "variation_id": "456",
+        "title": "Alternativa recuperada",
+        "body": "Por qué puede ser una alternativa válida."
+      }
+    ],
+    "outro": "Puedo compararlas si eliges dos opciones."
+  }
+}

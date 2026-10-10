@@ -1,0 +1,58 @@
+# Skill product_recommendations: migrada desde el módulo Drupal webassistant_ai (CG-06.6).
+api_version: webassistant.ai/v1
+name: product_recommendations
+version: 1.0.0
+title: Recomendar productos
+group: ecommerce
+description: Recomienda productos según necesidades, presupuesto o contexto. En seguimientos trata los productos
+  anteriores como colección activa.
+intent: Usar cuando el usuario pida consejo o recomendaciones sin buscar una lista literal.
+when_to_use:
+- El usuario pide qué comprar o describe necesidades y espera una selección razonada.
+- 'No usar si el usuario describe un evento con número de asistentes o presupuesto global: usa `event_product_selection`.'
+examples:
+- ¿Qué me recomiendas para regalar a un ciclista?
+- Recomiéndame un móvil con buena batería
+- ¿Qué compro para empezar a correr?
+keywords:
+- producto
+- productos
+- comprar
+- precio
+- barato
+- buscar
+- catalogo
+- modelo
+- marca
+- recomienda
+- recomiendas
+- recomendacion
+- aconsejas
+- consejo
+- regalo
+- regalar
+- mejor
+- ideal
+requires_rag: true
+permissions:
+- catalog:read
+input_schema: schemas/input.json
+response_example: examples/response.json
+renderer: product_grid@1
+processors:
+- catalog_items
+chat_reply_fallback: Te dejo recomendaciones en el panel.
+responsive_button_label: Ver recomendaciones
+actions:
+  add_to_cart:
+    type: host
+    label: Añadir al carrito
+    host_action: cart.add
+    permission: cart:write
+    confirmation: required
+    effects: true
+    target: item
+    input_schema: schemas/actions/add_to_cart.json
+    description: Añade el producto al carrito del portal tras confirmación explícita.
+dependencies:
+  platform: '>=1.0,<2.0'

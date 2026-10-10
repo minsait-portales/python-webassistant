@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+dist/
+build/
+
+# Node
+node_modules/
+apps/widget/dist/
+apps/admin/dist/
+packages/sdk-js/dist/
+playwright-report/
+test-results/
+
+# Entorno y secretos
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+
+# Datos locales
+data/
+backups/
+*.sqlite3
+*.db
+
+# Editores
+.idea/
+.vscode/
+.DS_Store

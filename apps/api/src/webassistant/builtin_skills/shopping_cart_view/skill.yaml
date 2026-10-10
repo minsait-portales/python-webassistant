@@ -1,0 +1,60 @@
+# Skill shopping_cart_view: migrada desde el módulo Drupal webassistant_ai (CG-06.6).
+api_version: webassistant.ai/v1
+name: shopping_cart_view
+version: 1.0.0
+title: Ver carrito
+group: ecommerce
+description: Muestra el carrito actual del portal y permite actualizar o eliminar productos.
+intent: Usar cuando el usuario quiera ver, revisar, editar o eliminar productos que ya están en el carrito.
+when_to_use:
+- El usuario pide ver el carrito actual o pregunta qué tiene en la cesta.
+- El usuario quiere editar o eliminar productos del carrito.
+examples:
+- Enséñame el carrito
+- ¿Qué tengo en la cesta?
+- Quita el segundo producto del carrito
+keywords:
+- carrito
+- cesta
+- tengo
+- ver
+- quitar
+- eliminar
+requires_rag: false
+permissions:
+- cart:read
+input_schema: schemas/input.json
+response_example: examples/response.json
+renderer: cart@1
+chat_reply_fallback: Te muestro el carrito en el panel.
+responsive_button_label: Ver carrito completo
+actions:
+  get_cart:
+    type: host
+    label: Cargar carrito
+    host_action: cart.get
+    permission: cart:read
+    auto: true
+    description: El portal devuelve el contenido actual del carrito.
+    input_schema: schemas/actions/get_cart.json
+  update_item:
+    type: host
+    label: Actualizar cantidad
+    host_action: cart.update
+    permission: cart:write
+    effects: true
+    target: item
+    input_schema: schemas/actions/update_item.json
+  remove_item:
+    type: host
+    label: Eliminar
+    host_action: cart.remove
+    permission: cart:write
+    effects: true
+    confirmation: required
+    target: item
+    input_schema: schemas/actions/remove_item.json
+dependencies:
+  platform: '>=1.0,<2.0'
+  capabilities:
+  - cart

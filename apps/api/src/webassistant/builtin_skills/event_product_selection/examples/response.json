@@ -1,0 +1,30 @@
+{
+  "chat_reply": "He preparado una selección para tu barbacoa.",
+  "result": {
+    "intro": "Selección completa para una barbacoa de verano.",
+    "event_name": "Barbacoa de verano",
+    "people": 10,
+    "vegetarian_people": 2,
+    "dietary_restrictions": [
+      "2 personas vegetarianas"
+    ],
+    "budget": "150 € aproximadamente",
+    "notes": "Las cantidades son orientativas.",
+    "categories": [
+      {
+        "name": "Proteínas y alternativas",
+        "description": "Opciones para todas las personas asistentes.",
+        "items": [
+          {
+            "product_id": "123",
+            "variation_id": "456",
+            "title": "Producto de catálogo",
+            "body": "Cantidad recomendada.",
+            "quantity": 3
+          }
+        ]
+      }
+    ],
+    "outro": "Puedo ajustar cantidades, presupuesto o restricciones."
+  }
+}

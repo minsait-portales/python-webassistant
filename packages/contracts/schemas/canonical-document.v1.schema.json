@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://webassistant.ai/schemas/canonical-document.v1.schema.json",
+  "title": "Documento canónico de ingesta v1",
+  "description": "Contrato común para todas las fuentes. El fichero original permanece en el portal anfitrión; WebAssistant solo guarda derivados (texto normalizado, chunks, embeddings y metadatos).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["source_id", "knowledge_base", "type", "title", "version"],
+  "properties": {
+    "source_id": { "type": "string", "minLength": 1, "maxLength": 256, "pattern": "^[A-Za-z0-9_.:/@-]+$" },
+    "knowledge_base": { "type": "string", "pattern": "^[a-z][a-z0-9_-]{1,62}$" },
+    "site_id": { "type": ["string", "null"], "description": "Site público al que se limita el documento; null lo comparte con todos los sites del tenant." },
+    "type": { "type": "string", "pattern": "^[a-z][a-z0-9_]{1,40}$", "description": "page, faq, product, document, guide..." },
+    "locale": { "type": "string", "pattern": "^[a-z]{2}(-[A-Z]{2})?$", "default": "es" },
+    "title": { "type": "string", "minLength": 1, "maxLength": 500 },
+    "text": { "type": "string", "maxLength": 2000000, "description": "Texto autorizado ya normalizado o en HTML/Markdown." },
+    "content_format": { "enum": ["text", "markdown", "html"], "default": "text" },
+    "reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Referencia al original del portal cuando no se envía texto. Las credenciales temporales no se persisten ni aparecen en citas.",
+      "required": ["download_url", "media_type"],
+      "properties": {
+        "download_url": { "type": "string", "format": "uri", "pattern": "^https?://" },
+        "media_type": { "enum": ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "text/html", "text/plain", "text/markdown"] },
+        "access_token": { "type": "string", "maxLength": 4096, "writeOnly": true },
+        "expires_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "canonical_url": { "type": "string", "format": "uri", "pattern": "^https?://" },
+    "acl": {
+      "type": "array",
+      "description": "Principales con acceso: public, authenticated, role:<rol>, user:<id>, group:<id>.",
+      "items": { "type": "string", "pattern": "^(public|authenticated|(role|user|group):[A-Za-z0-9_.@-]+)$" },
+      "minItems": 1,
+      "default": ["public"]
+    },
+    "version": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "content_hash": { "type": "string", "pattern": "^(sha256:)?[a-f0-9]{64}$" },
+    "metadata": {
+      "type": "object",
+      "description": "Metadatos filtrables o de presentación (sku, price, currency, image_url, category, brand, availability...).",
+      "maxProperties": 60
+    },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" }
+  },
+  "oneOf": [
+    { "required": ["text"], "not": { "required": ["reference"] } },
+    { "required": ["reference"], "not": { "required": ["text"] } }
+  ]
+}

@@ -1,0 +1,48 @@
+# Skill product_alternatives: migrada desde el módulo Drupal webassistant_ai (CG-06.6).
+api_version: webassistant.ai/v1
+name: product_alternatives
+version: 1.0.0
+title: Mostrar alternativas
+group: ecommerce
+description: Muestra productos sustitutos o similares a una opción mencionada por el usuario.
+intent: Usar cuando el usuario quiera alternativas, equivalentes o productos parecidos.
+when_to_use:
+- El usuario pregunta por opciones similares a un producto.
+- El producto buscado no encaja y conviene proponer sustitutos.
+examples:
+- ¿Hay alguna alternativa más barata?
+- Busco algo parecido a este modelo
+- ¿Qué otros productos similares hay?
+keywords:
+- alternativa
+- alternativas
+- parecido
+- similar
+- similares
+- sustituto
+- equivalente
+- otro
+- otros
+requires_rag: true
+permissions:
+- catalog:read
+input_schema: schemas/input.json
+response_example: examples/response.json
+renderer: product_grid@1
+processors:
+- catalog_items
+chat_reply_fallback: Te muestro alternativas en el panel.
+responsive_button_label: Ver alternativas
+actions:
+  add_to_cart:
+    type: host
+    label: Añadir al carrito
+    host_action: cart.add
+    permission: cart:write
+    confirmation: required
+    effects: true
+    target: item
+    input_schema: schemas/actions/add_to_cart.json
+    description: Añade el producto al carrito del portal tras confirmación explícita.
+dependencies:
+  platform: '>=1.0,<2.0'

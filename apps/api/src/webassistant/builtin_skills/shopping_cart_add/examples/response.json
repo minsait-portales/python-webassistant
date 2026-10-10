@@ -1,0 +1,16 @@
+{
+  "chat_reply": "Te preparo la confirmación para añadirlo al carrito.",
+  "result": {
+    "intro": "Confirma los productos que quieres añadir al carrito.",
+    "items": [
+      {
+        "product_id": "123",
+        "variation_id": "456",
+        "quantity": 1,
+        "title": "Producto para carrito",
+        "body": "Motivo breve."
+      }
+    ],
+    "outro": "El producto solo se añadirá cuando confirmes."
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://webassistant.ai/schemas/problem.schema.json",
+  "title": "Error problem+json (RFC 9457) con código propio",
+  "type": "object",
+  "required": ["type", "title", "status", "code"],
+  "properties": {
+    "type": { "type": "string" },
+    "title": { "type": "string" },
+    "status": { "type": "integer" },
+    "detail": { "type": "string" },
+    "instance": { "type": "string" },
+    "code": {
+      "enum": [
+        "validation_error", "unauthorized", "forbidden", "not_found", "conflict", "origin_not_allowed",
+        "site_disabled", "rate_limited", "payload_too_large", "idempotency_conflict", "idempotency_key_required",
+        "confirmation_required", "confirmation_invalid", "provider_unavailable", "provider_timeout",
+        "provider_quota", "provider_rate_limited", "provider_bad_request", "invalid_model_output",
+        "tool_failed", "tool_not_allowed", "iteration_limit", "budget_exceeded", "policy_violation",
+        "concurrency_limit", "run_cancelled", "message_too_long", "skill_unavailable", "action_unavailable",
+        "internal_error", "service_unavailable"
+      ]
+    },
+    "retryable": { "type": "boolean" },
+    "user_message": { "type": "string", "description": "Mensaje seguro para mostrar al usuario final." },
+    "correlation_id": { "type": "string" },
+    "errors": { "type": "array", "items": { "type": "object" } }
+  }
+}

@@ -1,0 +1,8 @@
+"""Handler opcional de la skill store_hours."""
+
+from webassistant_skill_sdk import SkillContext, SkillHandler
+
+
+class Handler(SkillHandler):
+    def build_chat_reply(self, ctx: SkillContext, result: dict, chat_reply: str) -> str:
+        return chat_reply

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://webassistant.ai/schemas/presentations/document_citations.v1.schema.json",
+  "title": "Presentación document_citations@1 (respuesta documental con citas verificadas)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["answer", "citations"],
+  "properties": {
+    "answer": { "$ref": "_common.v1.schema.json#/$defs/text" },
+    "summary": { "$ref": "_common.v1.schema.json#/$defs/text" },
+    "citations": {
+      "type": "array",
+      "maxItems": 10,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["document_title", "quote"],
+        "properties": {
+          "document_title": { "$ref": "_common.v1.schema.json#/$defs/short_text" },
+          "quote": { "$ref": "_common.v1.schema.json#/$defs/text" },
+          "location": { "$ref": "_common.v1.schema.json#/$defs/short_text" },
+          "page": { "type": ["integer", "null"], "minimum": 1 },
+          "document_url": { "$ref": "_common.v1.schema.json#/$defs/url" },
+          "source_id": { "type": "string", "maxLength": 256 },
+          "verified": { "type": "boolean" }
+        }
+      }
+    },
+    "documents": { "type": "array", "items": { "$ref": "_common.v1.schema.json#/$defs/source_link" }, "maxItems": 10 }
+  }
+}

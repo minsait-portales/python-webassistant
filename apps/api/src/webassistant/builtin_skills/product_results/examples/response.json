@@ -1,0 +1,15 @@
+{
+  "chat_reply": "He preparado los resultados en el panel.",
+  "result": {
+    "intro": "He encontrado estos productos relacionados.",
+    "items": [
+      {
+        "product_id": "123",
+        "variation_id": "456",
+        "title": "Producto encontrado",
+        "body": "Descripción breve con la información relevante."
+      }
+    ],
+    "outro": "Si quieres, puedo filtrar mejor los resultados."
+  }
+}

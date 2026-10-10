@@ -1,0 +1,39 @@
+# Skill content_edit: migrada desde el módulo Drupal webassistant_ai (CG-06.6).
+api_version: webassistant.ai/v1
+name: content_edit
+version: 1.0.0
+title: Editar contenido
+group: content
+description: Propone abrir en el portal el formulario de edición de un contenido por título o identificador.
+intent: Usar cuando el usuario pida editar, modificar o actualizar un contenido concreto del portal.
+when_to_use:
+- El usuario quiere editar un contenido, producto o página con un nombre concreto.
+- Si conoces el identificador, devuélvelo como `content_id`; si no, devuelve `content_title` con el nombre pedido.
+examples:
+- Quiero editar la página de contacto
+- Modifica el artículo de bienvenida
+keywords:
+- editar
+- modificar
+- actualizar
+- cambiar
+- corregir
+requires_rag: false
+permissions:
+- content:write
+input_schema: schemas/input.json
+response_example: examples/response.json
+renderer: host_action@1
+chat_reply_fallback: Te propongo abrir el formulario de edición.
+responsive_button_label: Abrir formulario de edición
+actions:
+  open_edit_form:
+    type: host
+    label: Abrir edición
+    host_action: content.edit
+    description: El portal localiza el contenido y abre su edición si tienes permisos.
+    input_schema: schemas/actions/open_edit_form.json
+dependencies:
+  platform: '>=1.0,<2.0'
+  capabilities:
+  - content_forms

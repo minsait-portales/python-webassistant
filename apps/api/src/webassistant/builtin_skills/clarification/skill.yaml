@@ -1,0 +1,33 @@
+# Skill clarification: migrada desde el módulo Drupal webassistant_ai (CG-06.6).
+api_version: webassistant.ai/v1
+name: clarification
+version: 1.0.0
+title: Pedir una aclaración
+group: ecommerce
+description: Solicita al usuario un dato adicional cuando la petición sobre un producto es ambigua.
+intent: Usar solo cuando el usuario pida información sobre un producto del catálogo pero no haya datos suficientes
+  para identificarlo o responder con seguridad.
+when_to_use:
+- El usuario pregunta por un producto sin indicar nombre, modelo, categoría, marca u otro criterio suficiente.
+- Hay varias fichas o variantes posibles y conviene preguntar antes de mostrar resultados.
+- Propón hasta 4 respuestas rápidas en `options` cuando sea útil.
+examples:
+- ¿Cuánto cuesta?
+- ¿Lo tenéis?
+- Quiero ese
+keywords:
+- cuanto
+- cuesta
+- ese
+- eso
+- lo
+requires_rag: false
+input_schema: schemas/input.json
+response_example: examples/response.json
+renderer: clarification@1
+processors:
+- clarification_options
+chat_reply_fallback: Necesito algún dato más para afinar.
+responsive_button_label: Ver aclaración
+dependencies:
+  platform: '>=1.0,<2.0'

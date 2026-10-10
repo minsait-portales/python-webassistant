@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://webassistant.ai/schemas/chat-response.v1.schema.json",
+  "title": "Respuesta de conversación v1",
+  "description": "Respuesta visual mínima: el modelo devuelve datos; la aplicación decide cómo representarlos y qué acciones permite.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["api_version", "conversation_id", "run_id", "reply", "presentation", "actions", "citations"],
+  "properties": {
+    "api_version": { "const": "1" },
+    "conversation_id": { "type": "string", "pattern": "^conv_[A-Za-z0-9]+$" },
+    "run_id": { "type": "string", "pattern": "^run_[A-Za-z0-9]+$" },
+    "message_id": { "type": "string" },
+    "skill": { "type": ["string", "null"] },
+    "reply": { "type": "string", "maxLength": 2000 },
+    "presentation": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "version", "data"],
+          "properties": {
+            "type": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+            "version": { "type": "string", "pattern": "^[0-9]+$" },
+            "data": { "type": "object" }
+          }
+        }
+      ]
+    },
+    "keep_presentation": { "type": "boolean", "description": "true si la respuesta es solo de chat y el panel conserva el resultado anterior." },
+    "actions": { "type": "array", "items": { "$ref": "#/$defs/action" } },
+    "citations": { "type": "array", "items": { "$ref": "#/$defs/citation" } },
+    "responsive_button_label": { "type": "string" },
+    "usage": { "$ref": "#/$defs/usage" }
+  },
+  "$defs": {
+    "action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "skill", "type", "label", "confirmation"],
+      "properties": {
+        "name": { "type": "string" },
+        "skill": { "type": "string" },
+        "type": { "enum": ["internal", "host"] },
+        "label": { "type": "string" },
+        "description": { "type": "string" },
+        "confirmation": { "enum": ["required", "none"] },
+        "effects": { "type": "boolean" },
+        "auto": { "type": "boolean" },
+        "target": { "enum": ["presentation", "item"] },
+        "params": { "type": "object" }
+      }
+    },
+    "citation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_id", "title"],
+      "properties": {
+        "source_id": { "type": "string" },
+        "title": { "type": "string" },
+        "url": { "type": ["string", "null"] },
+        "snippet": { "type": "string" },
+        "locale": { "type": "string" },
+        "document_type": { "type": "string" },
+        "knowledge_base": { "type": "string" },
+        "score": { "type": "number" }
+      }
+    },
+    "usage": {
+      "type": "object",
+      "properties": {
+        "provider_calls": { "type": "integer" },
+        "input_tokens": { "type": "integer" },
+        "cached_tokens": { "type": "integer" },
+        "output_tokens": { "type": "integer" },
+        "reasoning_tokens": { "type": "integer" },
+        "total_tokens": { "type": "integer" },
+        "total_cost": { "type": "string" },
+        "currency": { "type": "string" }
+      }
+    }
+  }
+}

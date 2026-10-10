@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "answer",
+    "citations"
+  ],
+  "properties": {
+    "answer": {
+      "type": "string",
+      "maxLength": 4000
+    },
+    "summary": {
+      "type": "string",
+      "maxLength": 4000
+    },
+    "citations": {
+      "type": "array",
+      "maxItems": 10,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "document_title",
+          "quote"
+        ],
+        "properties": {
+          "document_title": {
+            "type": "string",
+            "maxLength": 300
+          },
+          "quote": {
+            "type": "string",
+            "maxLength": 4000
+          },
+          "location": {
+            "type": "string",
+            "maxLength": 300
+          },
+          "page": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "source_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 256
+          }
+        }
+      }
+    }
+  }
+}

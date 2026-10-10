@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "categories"
+  ],
+  "properties": {
+    "intro": {
+      "type": "string",
+      "maxLength": 4000
+    },
+    "event_name": {
+      "type": "string",
+      "maxLength": 300
+    },
+    "people": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "vegetarian_people": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "dietary_restrictions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "maxLength": 300
+      },
+      "maxItems": 20
+    },
+    "budget": {
+      "type": "string",
+      "maxLength": 80
+    },
+    "notes": {
+      "type": "string",
+      "maxLength": 4000
+    },
+    "categories": {
+      "type": "array",
+      "maxItems": 15,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "items"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 300
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 4000
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "product_id"
+              ],
+              "properties": {
+                "product_id": {
+                  "type": [
+                    "string",
+                    "integer"
+                  ],
+                  "description": "Identificador presente en los resultados RAG o en la colección activa."
+                },
+                "variation_id": {
+                  "type": [
+                    "string",
+                    "integer",
+                    "null"
+                  ]
+                },
+                "title": {
+                  "type": "string",
+                  "maxLength": 300
+                },
+                "body": {
+                  "type": "string",
+                  "maxLength": 4000
+                },
+                "quantity": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 999
+                }
+              }
+            },
+            "maxItems": 20
+          }
+        }
+      }
+    },
+    "outro": {
+      "type": "string",
+      "maxLength": 4000
+    }
+  }
+}

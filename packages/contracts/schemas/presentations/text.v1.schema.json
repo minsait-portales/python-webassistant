@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://webassistant.ai/schemas/presentations/text.v1.schema.json",
+  "title": "Presentación text@1 (respuesta general y fallback seguro)",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "title": { "$ref": "_common.v1.schema.json#/$defs/short_text" },
+    "description": { "$ref": "_common.v1.schema.json#/$defs/text" },
+    "paragraphs": { "type": "array", "items": { "$ref": "_common.v1.schema.json#/$defs/text" }, "maxItems": 30 },
+    "items": { "type": "array", "items": { "$ref": "_common.v1.schema.json#/$defs/step" }, "maxItems": 30 }
+  }
+}

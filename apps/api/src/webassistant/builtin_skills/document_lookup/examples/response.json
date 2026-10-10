@@ -1,0 +1,15 @@
+{
+  "chat_reply": "He encontrado la respuesta en la ficha técnica y dejo las fuentes en el panel.",
+  "result": {
+    "answer": "La batería indicada para el producto es de 5000 mAh.",
+    "summary": "La información aparece en la ficha técnica.",
+    "citations": [
+      {
+        "document_title": "Ficha técnica del producto",
+        "quote": "Batería: 5000 mAh",
+        "location": "Especificaciones técnicas",
+        "page": 2
+      }
+    ]
+  }
+}

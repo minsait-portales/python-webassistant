@@ -1,0 +1,10 @@
+{
+  "chat_reply": "Te muestro la facturación de este mes.",
+  "result": {
+    "intro": "Facturación del mes en curso.",
+    "range": "month",
+    "focus": "revenue",
+    "from": "",
+    "to": ""
+  }
+}

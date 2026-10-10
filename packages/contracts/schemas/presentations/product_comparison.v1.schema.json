@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://webassistant.ai/schemas/presentations/product_comparison.v1.schema.json",
+  "title": "Presentación product_comparison@1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["items", "rows"],
+  "properties": {
+    "description": { "$ref": "_common.v1.schema.json#/$defs/text" },
+    "items": { "type": "array", "items": { "$ref": "_common.v1.schema.json#/$defs/product_item" }, "maxItems": 6 },
+    "rows": {
+      "type": "array",
+      "maxItems": 30,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["label", "value"],
+        "properties": {
+          "product_id": { "type": ["string", "null"], "maxLength": 128 },
+          "variation_id": { "type": ["string", "null"], "maxLength": 128 },
+          "label": { "$ref": "_common.v1.schema.json#/$defs/short_text" },
+          "value": { "$ref": "_common.v1.schema.json#/$defs/text" }
+        }
+      }
+    },
+    "outro": { "$ref": "_common.v1.schema.json#/$defs/text" }
+  }
+}

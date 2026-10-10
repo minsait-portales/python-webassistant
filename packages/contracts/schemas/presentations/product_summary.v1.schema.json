@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://webassistant.ai/schemas/presentations/product_summary.v1.schema.json",
+  "title": "Presentación product_summary@1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["items"],
+  "properties": {
+    "description": { "$ref": "_common.v1.schema.json#/$defs/text" },
+    "items": { "type": "array", "items": { "$ref": "_common.v1.schema.json#/$defs/product_item" }, "maxItems": 3 },
+    "points": { "type": "array", "items": { "$ref": "_common.v1.schema.json#/$defs/step" }, "maxItems": 20 },
+    "outro": { "$ref": "_common.v1.schema.json#/$defs/text" }
+  }
+}

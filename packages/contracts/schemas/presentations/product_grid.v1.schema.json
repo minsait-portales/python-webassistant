@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://webassistant.ai/schemas/presentations/product_grid.v1.schema.json",
+  "title": "Presentación product_grid@1 (resultados, recomendaciones, alternativas, confirmación de carrito)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["items"],
+  "properties": {
+    "heading": { "$ref": "_common.v1.schema.json#/$defs/short_text" },
+    "intro": { "$ref": "_common.v1.schema.json#/$defs/text" },
+    "items": { "type": "array", "items": { "$ref": "_common.v1.schema.json#/$defs/product_item" }, "maxItems": 40 },
+    "outro": { "$ref": "_common.v1.schema.json#/$defs/text" },
+    "empty_message": { "$ref": "_common.v1.schema.json#/$defs/short_text" }
+  }
+}

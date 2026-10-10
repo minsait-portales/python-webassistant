@@ -1,0 +1,63 @@
+# Skill event_product_selection: migrada desde el módulo Drupal webassistant_ai (CG-06.6).
+api_version: webassistant.ai/v1
+name: event_product_selection
+version: 1.0.0
+title: Selección para evento
+group: ecommerce
+description: Crea una selección completa de productos para un evento según asistentes, preferencias alimentarias,
+  presupuesto y categorías necesarias. Lanza una búsqueda por cada categoría necesaria. En seguimientos amplía o
+  reduce la selección ya mostrada.
+intent: Usar cuando el usuario quiera preparar una compra completa para un evento, celebración o reunión.
+when_to_use:
+- El usuario pide productos para una barbacoa, cumpleaños, fiesta, picnic o reunión.
+- El usuario indica cuántas personas asistirán y espera una lista completa de compra.
+- El usuario aporta vegetarianos, alergias, restricciones o presupuesto.
+- El usuario añade, quita o cambia productos de una selección de evento ya mostrada.
+examples:
+- Organiza una barbacoa para 10 personas
+- Prepara una fiesta de cumpleaños para 20 niños
+- Compra para un picnic con 4 amigos
+keywords:
+- barbacoa
+- fiesta
+- cumpleanos
+- evento
+- picnic
+- reunion
+- celebracion
+- personas
+- invitados
+- organiza
+requires_rag: true
+permissions:
+- catalog:read
+input_schema: schemas/input.json
+response_example: examples/response.json
+renderer: event_selection@1
+processors:
+- catalog_items
+- event_totals
+chat_reply_fallback: Te preparo una selección de productos para el evento.
+responsive_button_label: Ver selección del evento
+actions:
+  add_to_cart:
+    type: host
+    label: Añadir al carrito
+    host_action: cart.add
+    permission: cart:write
+    confirmation: required
+    effects: true
+    target: item
+    input_schema: schemas/actions/add_to_cart.json
+    description: Añade el producto al carrito del portal tras confirmación explícita.
+  add_selection_to_cart:
+    type: host
+    label: Añadir toda la selección
+    host_action: cart.add_many
+    permission: cart:write
+    confirmation: required
+    effects: true
+    description: Añade todos los productos de la selección al carrito.
+    input_schema: schemas/actions/add_selection_to_cart.json
+dependencies:
+  platform: '>=1.0,<2.0'

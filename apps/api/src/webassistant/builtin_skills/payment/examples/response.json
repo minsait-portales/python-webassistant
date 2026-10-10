@@ -1,0 +1,18 @@
+{
+  "chat_reply": "Te preparo el acceso al pago en el panel.",
+  "result": {
+    "intro": "Puedes revisar tu compra y continuar al pago.",
+    "items": [],
+    "steps": [
+      {
+        "title": "Revisar carrito",
+        "body": "Comprueba cantidades, precios y productos antes de continuar."
+      },
+      {
+        "title": "Continuar al pago",
+        "body": "El checkout del portal recoge dirección, método de pago y confirmación."
+      }
+    ],
+    "outro": "El pago se completa en el checkout seguro de la tienda."
+  }
+}

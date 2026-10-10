@@ -1,0 +1,48 @@
+# Skill content_answer: migrada desde el módulo Drupal webassistant_ai (CG-06.6).
+api_version: webassistant.ai/v1
+name: content_answer
+version: 1.0.0
+title: Buscar desde contenidos
+group: content
+description: Busca en los contenidos publicados del portal y responde citando los contenidos encontrados.
+intent: Usar cuando el usuario haga una pregunta cuya respuesta esté en el contenido publicado del sitio (guías,
+  ayudas, artículos), no en conocimiento general.
+when_to_use:
+- El usuario pregunta cómo, qué, dónde, cuándo o cuál sobre temas cubiertos por guías o ayudas del sitio (compra,
+  pagos, garantía, devoluciones, envíos).
+- La respuesta debe basarse en el contenido publicado del sitio, no en conocimiento general del modelo.
+- Deja `answer` como párrafo introductorio breve (1-2 frases). NUNCA metas enumeraciones dentro de `answer`.
+- Cuando la respuesta sea una secuencia de pasos o puntos clave, devuélvelos en `steps` como objetos `{title, body}`.
+  Si no procede, deja `steps` vacío.
+- Usa `outro` solo para un matiz o aviso final; déjalo vacío si no aporta.
+- Devuelve en `sources` los títulos EXACTOS de los contenidos usados como fuente. Si no hay ninguno, deja `sources`
+  vacío.
+examples:
+- ¿Cómo puedo devolver un pedido?
+- ¿Cuánto tarda el envío?
+- ¿Qué métodos de pago aceptáis?
+- ¿Cómo funciona la garantía?
+keywords:
+- como
+- devolucion
+- devolver
+- envio
+- pago
+- pagar
+- garantia
+- factura
+- guia
+- ayuda
+- plazo
+- politica
+- cuenta
+requires_rag: true
+input_schema: schemas/input.json
+response_example: examples/response.json
+renderer: answer@1
+processors:
+- content_sources
+chat_reply_fallback: He revisado los contenidos publicados y te respondo con lo que he encontrado.
+responsive_button_label: Ver contenidos consultados
+dependencies:
+  platform: '>=1.0,<2.0'

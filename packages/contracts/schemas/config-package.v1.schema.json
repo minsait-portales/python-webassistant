@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://webassistant.ai/schemas/config-package.v1.schema.json",
+  "title": "Paquete de configuración exportable v1",
+  "description": "Importa/exporta assistants, agentes, skills activas, precios, mensajes y límites. Nunca incluye secretos.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "version", "tenant"],
+  "properties": {
+    "format": { "const": "webassistant.config-package" },
+    "version": { "const": "1" },
+    "exported_at": { "type": "string", "format": "date-time" },
+    "tenant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["slug", "name"],
+      "properties": {
+        "slug": { "type": "string", "pattern": "^[a-z][a-z0-9-]{1,62}$" },
+        "name": { "type": "string" },
+        "settings": { "type": "object" }
+      }
+    },
+    "sites": { "type": "array", "items": { "type": "object", "required": ["public_id", "name", "allowed_origins"] } },
+    "agent_configs": { "type": "array", "items": { "type": "object", "required": ["key", "policy"] } },
+    "assistants": { "type": "array", "items": { "type": "object", "required": ["key", "name", "config"] } },
+    "knowledge_bases": { "type": "array", "items": { "type": "object", "required": ["key", "name"] } },
+    "policies": { "type": "array", "items": { "type": "object" } },
+    "retention": { "type": "object" },
+    "model_prices": { "type": "array", "items": { "type": "object", "required": ["provider", "model", "input_per_million", "output_per_million", "valid_from"] } }
+  }
+}

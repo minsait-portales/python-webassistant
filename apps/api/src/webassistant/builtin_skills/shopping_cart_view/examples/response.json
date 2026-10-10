@@ -1,0 +1,7 @@
+{
+  "chat_reply": "Te muestro el carrito en el panel.",
+  "result": {
+    "intro": "Estos son los productos que tienes ahora mismo en el carrito.",
+    "outro": "Puedes editar o eliminar productos."
+  }
+}

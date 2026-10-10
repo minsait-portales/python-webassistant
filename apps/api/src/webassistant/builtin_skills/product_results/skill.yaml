@@ -1,0 +1,55 @@
+# Skill product_results: migrada desde el módulo Drupal webassistant_ai (CG-06.6).
+api_version: webassistant.ai/v1
+name: product_results
+version: 1.0.0
+title: Buscar productos
+group: ecommerce
+description: Lista productos del catálogo que cumplen una búsqueda o filtro. En peticiones de seguimiento conserva
+  la colección activa y añade los nuevos.
+intent: Usar cuando el usuario quiera encontrar productos que cumplan una búsqueda concreta.
+when_to_use:
+- El usuario busca productos por categoría, marca, precio o característica.
+- El usuario amplía, reduce o modifica una lista de productos mostrada antes.
+examples:
+- Busco zapatillas de running
+- Muéstrame portátiles de menos de 800 euros
+- ¿Qué televisores tenéis?
+keywords:
+- producto
+- productos
+- comprar
+- precio
+- barato
+- buscar
+- catalogo
+- modelo
+- marca
+- busco
+- muestrame
+- tienes
+- teneis
+- lista
+- ver
+requires_rag: true
+permissions:
+- catalog:read
+input_schema: schemas/input.json
+response_example: examples/response.json
+renderer: product_grid@1
+processors:
+- catalog_items
+chat_reply_fallback: He preparado los resultados en el panel.
+responsive_button_label: Ver resultados
+actions:
+  add_to_cart:
+    type: host
+    label: Añadir al carrito
+    host_action: cart.add
+    permission: cart:write
+    confirmation: required
+    effects: true
+    target: item
+    input_schema: schemas/actions/add_to_cart.json
+    description: Añade el producto al carrito del portal tras confirmación explícita.
+dependencies:
+  platform: '>=1.0,<2.0'

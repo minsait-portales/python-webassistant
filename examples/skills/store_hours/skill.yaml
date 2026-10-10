@@ -1,0 +1,26 @@
+# Skill store_hours: ejemplo de skill de terceros creada con webassistant-skill-sdk
+# sin modificar el núcleo (CG-06.7). Se activa con WEBASSISTANT_SKILL_PATHS=examples/skills.
+api_version: webassistant.ai/v1
+name: store_hours
+version: 0.1.0
+title: Horarios y tiendas
+group: custom
+description: Responde sobre horarios, direcciones y servicios de las tiendas físicas citando la página del portal.
+intent: Usar cuando el usuario pregunte por horarios de apertura, direcciones o servicios de tiendas físicas.
+when_to_use:
+  - El usuario pregunta a qué hora abre o cierra una tienda.
+  - El usuario pregunta dónde está la tienda más cercana o qué servicios ofrece.
+examples:
+  - ¿A qué hora abre la tienda del centro?
+  - ¿Dónde tenéis tienda física?
+keywords: [horario, horarios, abre, cierra, tienda, tiendas, direccion, fisica]
+requires_rag: true
+permissions: []
+input_schema: schemas/input.json
+response_example: examples/response.json
+renderer: answer@1
+processors: [content_sources]
+chat_reply_fallback: Te dejo los horarios en el panel.
+responsive_button_label: Ver horarios
+dependencies:
+  platform: ">=1.0,<2.0"

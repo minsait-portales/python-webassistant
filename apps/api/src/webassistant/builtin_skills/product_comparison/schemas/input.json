@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "items",
+    "rows"
+  ],
+  "properties": {
+    "description": {
+      "type": "string",
+      "maxLength": 4000
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "product_id"
+        ],
+        "properties": {
+          "product_id": {
+            "type": [
+              "string",
+              "integer"
+            ],
+            "description": "Identificador presente en los resultados RAG o en la colección activa."
+          },
+          "variation_id": {
+            "type": [
+              "string",
+              "integer",
+              "null"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 300
+          },
+          "body": {
+            "type": "string",
+            "maxLength": 4000
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 999
+          }
+        }
+      },
+      "maxItems": 6
+    },
+    "rows": {
+      "type": "array",
+      "maxItems": 30,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "label",
+          "value"
+        ],
+        "properties": {
+          "product_id": {
+            "type": [
+              "string",
+              "integer",
+              "null"
+            ]
+          },
+          "variation_id": {
+            "type": [
+              "string",
+              "integer",
+              "null"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 300
+          },
+          "value": {
+            "type": "string",
+            "maxLength": 4000
+          }
+        }
+      }
+    },
+    "outro": {
+      "type": "string",
+      "maxLength": 4000
+    }
+  }
+}

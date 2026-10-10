@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://webassistant.ai/schemas/assistant-config.v1.schema.json",
+  "title": "Configuración versionable de un Assistant v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["instructions", "model"],
+  "properties": {
+    "instructions": { "type": "string", "maxLength": 20000 },
+    "scope_description": { "type": "string", "maxLength": 1000, "description": "Ámbito temático permitido; fuera de él la respuesta es out_of_scope." },
+    "default_locale": { "type": "string", "pattern": "^[a-z]{2}(-[A-Z]{2})?$" },
+    "locales": { "type": "array", "items": { "type": "string" } },
+    "model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider", "model_id"],
+      "properties": {
+        "provider": { "type": "string" },
+        "model_id": { "type": "string" },
+        "embedding_model_id": { "type": "string" },
+        "params": { "type": "object" }
+      }
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "max_message_length": { "type": "integer", "minimum": 1, "maximum": 20000 },
+        "max_history_messages": { "type": "integer", "minimum": 0, "maximum": 200 },
+        "max_context_tokens": { "type": "integer", "minimum": 500, "maximum": 400000 },
+        "max_output_tokens": { "type": "integer", "minimum": 64, "maximum": 64000 }
+      }
+    },
+    "messages": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "welcome": { "type": "string", "maxLength": 1000 },
+        "input_placeholder": { "type": "string", "maxLength": 200 },
+        "privacy_notice": { "type": "string", "maxLength": 1000 },
+        "login_required": { "type": "string", "maxLength": 500 },
+        "access_denied": { "type": "string", "maxLength": 500 },
+        "fallback": { "type": "string", "maxLength": 500 },
+        "errors": { "type": "object", "additionalProperties": { "type": "string", "maxLength": 500 } }
+      }
+    },
+    "skills": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string" },
+          "enabled": { "type": "boolean", "default": true },
+          "config": { "type": "object" }
+        }
+      }
+    },
+    "knowledge_bases": { "type": "array", "items": { "type": "string" } },
+    "suggestions": { "type": "array", "items": { "type": "string", "maxLength": 200 }, "maxItems": 8 },
+    "history": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "strategy": { "enum": ["window", "summary"] },
+        "window_messages": { "type": "integer", "minimum": 0, "maximum": 100 }
+      }
+    }
+  }
+}

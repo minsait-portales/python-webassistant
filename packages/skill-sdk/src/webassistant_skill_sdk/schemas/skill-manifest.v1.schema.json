@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://webassistant.ai/schemas/skill-manifest.v1.schema.json",
+  "title": "Manifiesto de skill WebAssistant v1",
+  "description": "Declara una capacidad portable: intención, ejemplos, esquemas de entrada/salida, renderer, permisos y acciones. No depende del canal que consume el producto.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["api_version", "name", "version", "title", "description", "intent", "requires_rag", "renderer", "response_example"],
+  "properties": {
+    "api_version": { "const": "webassistant.ai/v1" },
+    "name": { "type": "string", "pattern": "^[a-z][a-z0-9_]{1,62}$" },
+    "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+(?:[-+][0-9A-Za-z.-]+)?$" },
+    "title": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "description": { "type": "string", "minLength": 1, "maxLength": 2000 },
+    "group": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$", "default": "general" },
+    "intent": { "type": "string", "minLength": 1, "maxLength": 2000 },
+    "when_to_use": { "type": "array", "items": { "type": "string", "maxLength": 600 }, "maxItems": 20, "default": [] },
+    "examples": {
+      "description": "Frases de usuario que deberían enrutar a esta skill. Se usan en el enrutado y en la evaluación.",
+      "type": "array", "items": { "type": "string", "maxLength": 300 }, "maxItems": 20, "default": []
+    },
+    "keywords": { "type": "array", "items": { "type": "string", "maxLength": 60 }, "maxItems": 40, "default": [] },
+    "requires_rag": { "type": "boolean" },
+    "permissions": {
+      "description": "Scopes que el usuario debe tener para que la skill se ofrezca al modelo.",
+      "type": "array", "items": { "$ref": "#/$defs/scope" }, "uniqueItems": true, "default": []
+    },
+    "input_schema": {
+      "description": "Ruta relativa al JSON Schema del objeto `result` que produce el modelo.",
+      "type": "string", "pattern": "^[A-Za-z0-9_./-]+\\.json$"
+    },
+    "output_schema": {
+      "description": "Ruta relativa al JSON Schema adicional de la presentación final (además del schema del renderer).",
+      "type": "string", "pattern": "^[A-Za-z0-9_./-]+\\.json$"
+    },
+    "response_example": {
+      "description": "Ruta relativa al ejemplo de respuesta estructurada (chat_reply + result).",
+      "type": "string", "pattern": "^[A-Za-z0-9_./-]+\\.json$"
+    },
+    "renderer": { "type": "string", "pattern": "^[a-z][a-z0-9_]*@[0-9]+$" },
+    "processors": {
+      "description": "Post-procesadores del núcleo aplicados al resultado antes del renderer.",
+      "type": "array",
+      "items": { "enum": ["catalog_items", "source_citations", "content_sources", "document_citations", "event_totals", "clarification_options"] },
+      "uniqueItems": true,
+      "default": []
+    },
+    "handler": {
+      "description": "Handler Python opcional `modulo:Clase` que implementa webassistant_skill_sdk.SkillHandler.",
+      "type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_.]*:[A-Za-z_][A-Za-z0-9_]*$"
+    },
+    "chat_reply_fallback": { "type": "string", "maxLength": 300, "default": "" },
+    "responsive_button_label": { "type": "string", "maxLength": 80, "default": "" },
+    "out_of_scope_allowed": { "type": "boolean", "default": false },
+    "actions": {
+      "type": "object",
+      "propertyNames": { "pattern": "^[a-z][a-z0-9_]{1,62}$" },
+      "additionalProperties": { "$ref": "#/$defs/action" },
+      "default": {}
+    },
+    "dependencies": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "platform": { "type": "string", "description": "Rango SemVer de la plataforma, p. ej. >=1.0,<2.0" },
+        "skills": { "type": "array", "items": { "type": "string" }, "default": [] },
+        "capabilities": {
+          "description": "Capacidades que el canal anfitrión debe declarar (p. ej. cart, content_forms).",
+          "type": "array", "items": { "type": "string" }, "default": []
+        }
+      },
+      "default": {}
+    }
+  },
+  "$defs": {
+    "scope": { "type": "string", "pattern": "^[a-z][a-z0-9_]*:[a-z][a-z0-9_*]*$" },
+    "action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "label"],
+      "properties": {
+        "type": { "enum": ["internal", "host"] },
+        "label": { "type": "string", "maxLength": 80 },
+        "description": { "type": "string", "maxLength": 500 },
+        "permission": { "$ref": "#/$defs/scope" },
+        "confirmation": { "enum": ["required", "none"], "default": "none" },
+        "effects": { "type": "boolean", "description": "La acción modifica estado. Si es true exige idempotency key.", "default": false },
+        "auto": { "type": "boolean", "description": "La acción se ejecuta al renderizar (solo lectura, sin efectos).", "default": false },
+        "target": { "enum": ["presentation", "item"], "default": "presentation" },
+        "input_schema": { "type": "string", "pattern": "^[A-Za-z0-9_./-]+\\.json$" },
+        "handler": { "type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_.]*:[A-Za-z_][A-Za-z0-9_]*$" },
+        "host_action": { "type": "string", "pattern": "^[a-z][a-z0-9_.]*$", "description": "Nombre de la host action que ejecutará el widget." }
+      },
+      "allOf": [
+        { "if": { "required": ["type"], "properties": { "type": { "const": "host" } } }, "then": { "required": ["host_action"] } },
+        { "if": { "required": ["effects"], "properties": { "effects": { "const": true } } }, "then": { "required": ["permission"] } }
+      ]
+    }
+  }
+}

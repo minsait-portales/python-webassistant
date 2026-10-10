@@ -1,0 +1,42 @@
+# Skill document_lookup: migrada desde el módulo Drupal webassistant_ai (CG-06.6).
+api_version: webassistant.ai/v1
+name: document_lookup
+version: 1.0.0
+title: Buscar en documentos
+group: documents
+description: Responde usando el texto extraído de documentos del portal, citando el fragmento utilizado y enlazando
+  el original, que permanece en el portal.
+intent: Usar cuando el usuario pida buscar, comprobar o responder algo dentro de un documento, PDF, ficha técnica,
+  manual, contrato o adjunto.
+when_to_use:
+- El usuario pregunta por información contenida en un documento o PDF.
+- 'La respuesta debe incluir evidencia: cita literal (`quote`) copiada del fragmento recuperado, su ubicación y
+  el documento.'
+- Copia en `quote` texto LITERAL del fragmento; las citas que no aparezcan en los fragmentos se descartan.
+examples:
+- ¿Qué dice el manual sobre la batería?
+- Busca en la ficha técnica el consumo
+- ¿Qué pone el contrato sobre la cancelación?
+keywords:
+- documento
+- pdf
+- manual
+- ficha
+- tecnica
+- contrato
+- adjunto
+- dice
+- pone
+- normativa
+requires_rag: true
+permissions:
+- documents:read
+input_schema: schemas/input.json
+response_example: examples/response.json
+renderer: document_citations@1
+processors:
+- document_citations
+chat_reply_fallback: He buscado en los documentos y dejo las fuentes en el panel.
+responsive_button_label: Ver fuentes encontradas
+dependencies:
+  platform: '>=1.0,<2.0'

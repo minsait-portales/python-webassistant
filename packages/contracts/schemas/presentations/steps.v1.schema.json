@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://webassistant.ai/schemas/presentations/steps.v1.schema.json",
+  "title": "Presentación steps@1 (guía paso a paso con productos opcionales y acción final)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["steps"],
+  "properties": {
+    "intro": { "$ref": "_common.v1.schema.json#/$defs/text" },
+    "items": { "type": "array", "items": { "$ref": "_common.v1.schema.json#/$defs/product_item" }, "maxItems": 20 },
+    "steps": { "type": "array", "items": { "$ref": "_common.v1.schema.json#/$defs/step" }, "maxItems": 20 },
+    "outro": { "$ref": "_common.v1.schema.json#/$defs/text" }
+  }
+}

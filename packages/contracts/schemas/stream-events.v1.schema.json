@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://webassistant.ai/schemas/stream-events.v1.schema.json",
+  "title": "Eventos SSE de un run v1",
+  "description": "Cada evento SSE lleva `id` (secuencia del run, usable en Last-Event-ID), `event` (tipo) y `data` (JSON con esta forma).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["type", "run_id", "seq"],
+  "properties": {
+    "type": { "enum": ["run.started", "run.status", "reply.delta", "tool.started", "tool.finished", "run.completed", "run.failed", "run.cancelled", "heartbeat"] },
+    "run_id": { "type": "string" },
+    "conversation_id": { "type": "string" },
+    "seq": { "type": "integer", "minimum": 1 },
+    "status": { "type": "string" },
+    "delta": { "type": "string" },
+    "tool": { "type": "string" },
+    "response": { "$ref": "chat-response.v1.schema.json" },
+    "error": { "$ref": "problem.schema.json" }
+  }
+}

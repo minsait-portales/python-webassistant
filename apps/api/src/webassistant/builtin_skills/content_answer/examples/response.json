@@ -1,0 +1,21 @@
+{
+  "chat_reply": "Sí, puedes pagar un pedido con varios vendedores en un solo checkout.",
+  "result": {
+    "answer": "Pagas todo en un único checkout y el importe se reparte automáticamente entre los vendedores del pedido.",
+    "steps": [
+      {
+        "title": "Añade los productos al carrito",
+        "body": "Puedes mezclar artículos de varios vendedores."
+      },
+      {
+        "title": "Elige el método de pago",
+        "body": "Tarjeta o transferencia; el reparto es automático."
+      }
+    ],
+    "outro": "Cada vendedor gestiona su propio envío.",
+    "sources": [
+      "Guía de pagos y facturación"
+    ],
+    "query": "pago varios vendedores"
+  }
+}

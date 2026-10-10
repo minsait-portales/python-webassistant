@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://webassistant.ai/schemas/presentations/cart.v1.schema.json",
+  "title": "Presentación cart@1 (carrito del portal anfitrión obtenido mediante host action)",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "intro": { "$ref": "_common.v1.schema.json#/$defs/text" },
+    "items": { "type": "array", "items": { "$ref": "_common.v1.schema.json#/$defs/product_item" }, "maxItems": 100 },
+    "total": { "type": "string", "maxLength": 60 },
+    "outro": { "$ref": "_common.v1.schema.json#/$defs/text" },
+    "source_action": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$", "description": "Acción automática que obtiene el carrito en la página anfitriona." }
+  }
+}

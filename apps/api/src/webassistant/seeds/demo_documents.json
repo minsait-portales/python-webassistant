@@ -1,0 +1,698 @@
+[
+ {
+  "source_id": "p-1001",
+  "knowledge_base": "catalogo",
+  "type": "product",
+  "locale": "es",
+  "title": "Hamburguesas de ternera premium (pack 6)",
+  "text": "Hamburguesas de ternera premium (pack 6). Pack de seis hamburguesas de ternera de 150 g cada una, ideales para barbacoa. Recomendado: una por persona. Conservar refrigerado. Categoría: Carnes para barbacoa. Marca: Campo Norte.",
+  "canonical_url": "http://localhost:8000/demo/producto.html?id=p-1001",
+  "acl": [
+   "public"
+  ],
+  "version": "1",
+  "metadata": {
+   "product_id": "p-1001",
+   "variation_id": "p-1001-v1",
+   "sku": "P-1001",
+   "price_amount": 11.95,
+   "currency": "EUR",
+   "category": "Carnes para barbacoa",
+   "brand": "Campo Norte",
+   "availability": "En stock",
+   "image_url": "/demo/img/carnes.svg",
+   "image_alt": "Hamburguesas de ternera premium (pack 6)"
+  }
+ },
+ {
+  "source_id": "p-1002",
+  "knowledge_base": "catalogo",
+  "type": "product",
+  "locale": "es",
+  "title": "Costillas de cerdo adobadas 1 kg",
+  "text": "Costillas de cerdo adobadas 1 kg. Costillas de cerdo adobadas listas para la parrilla. Un kilo rinde para tres o cuatro personas en una barbacoa. Categoría: Carnes para barbacoa. Marca: Campo Norte.",
+  "canonical_url": "http://localhost:8000/demo/producto.html?id=p-1002",
+  "acl": [
+   "public"
+  ],
+  "version": "1",
+  "metadata": {
+   "product_id": "p-1002",
+   "variation_id": "p-1002-v1",
+   "sku": "P-1002",
+   "price_amount": 9.5,
+   "currency": "EUR",
+   "category": "Carnes para barbacoa",
+   "brand": "Campo Norte",
+   "availability": "En stock",
+   "image_url": "/demo/img/carnes.svg",
+   "image_alt": "Costillas de cerdo adobadas 1 kg"
+  }
+ },
+ {
+  "source_id": "p-1003",
+  "knowledge_base": "catalogo",
+  "type": "product",
+  "locale": "es",
+  "title": "Brochetas de pollo y verduras (pack 8)",
+  "text": "Brochetas de pollo y verduras (pack 8). Ocho brochetas de pollo marinado con pimiento y cebolla. Se hacen en diez minutos a la brasa. Categoría: Carnes para barbacoa. Marca: Granja Sol.",
+  "canonical_url": "http://localhost:8000/demo/producto.html?id=p-1003",
+  "acl": [
+   "public"
+  ],
+  "version": "1",
+  "metadata": {
+   "product_id": "p-1003",
+   "variation_id": "p-1003-v1",
+   "sku": "P-1003",
+   "price_amount": 8.75,
+   "currency": "EUR",
+   "category": "Carnes para barbacoa",
+   "brand": "Granja Sol",
+   "availability": "En stock",
+   "image_url": "/demo/img/carnes.svg",
+   "image_alt": "Brochetas de pollo y verduras (pack 8)"
+  }
+ },
+ {
+  "source_id": "p-1004",
+  "knowledge_base": "catalogo",
+  "type": "product",
+  "locale": "es",
+  "title": "Hamburguesas vegetales de garbanzo (pack 4)",
+  "text": "Hamburguesas vegetales de garbanzo (pack 4). Hamburguesas vegetarianas y veganas de garbanzo y espinaca, aptas para barbacoa. Sin frutos secos. Categoría: Alternativas vegetarianas. Marca: VerdeVivo.",
+  "canonical_url": "http://localhost:8000/demo/producto.html?id=p-1004",
+  "acl": [
+   "public"
+  ],
+  "version": "1",
+  "metadata": {
+   "product_id": "p-1004",
+   "variation_id": "p-1004-v1",
+   "sku": "P-1004",
+   "price_amount": 5.95,
+   "currency": "EUR",
+   "category": "Alternativas vegetarianas",
+   "brand": "VerdeVivo",
+   "availability": "En stock",
+   "image_url": "/demo/img/alternativas.svg",
+   "image_alt": "Hamburguesas vegetales de garbanzo (pack 4)"
+  }
+ },
+ {
+  "source_id": "p-1005",
+  "knowledge_base": "catalogo",
+  "type": "product",
+  "locale": "es",
+  "title": "Brochetas de tofu y verduras (pack 6)",
+  "text": "Brochetas de tofu y verduras (pack 6). Brochetas vegetarianas de tofu ahumado, calabacín y tomate cherry. Opción vegana para barbacoa. Categoría: Alternativas vegetarianas. Marca: VerdeVivo.",
+  "canonical_url": "http://localhost:8000/demo/producto.html?id=p-1005",
+  "acl": [
+   "public"
+  ],
+  "version": "1",
+  "metadata": {
+   "product_id": "p-1005",
+   "variation_id": "p-1005-v1",
+   "sku": "P-1005",
+   "price_amount": 6.4,
+   "currency": "EUR",
+   "category": "Alternativas vegetarianas",
+   "brand": "VerdeVivo",
+   "availability": "En stock",
+   "image_url": "/demo/img/alternativas.svg",
+   "image_alt": "Brochetas de tofu y verduras (pack 6)"
+  }
+ },
+ {
+  "source_id": "p-1006",
+  "knowledge_base": "catalogo",
+  "type": "product",
+  "locale": "es",
+  "title": "Mazorcas de maíz dulce (pack 4)",
+  "text": "Mazorcas de maíz dulce (pack 4). Cuatro mazorcas de maíz dulce para asar en la barbacoa. Guarnición vegetariana. Categoría: Guarniciones. Marca: Huerta Clara.",
+  "canonical_url": "http://localhost:8000/demo/producto.html?id=p-1006",
+  "acl": [
+   "public"
+  ],
+  "version": "1",
+  "metadata": {
+   "product_id": "p-1006",
+   "variation_id": "p-1006-v1",
+   "sku": "P-1006",
+   "price_amount": 2.99,
+   "currency": "EUR",
+   "category": "Guarniciones",
+   "brand": "Huerta Clara",
+   "availability": "En stock",
+   "image_url": "/demo/img/guarniciones.svg",
+   "image_alt": "Mazorcas de maíz dulce (pack 4)"
+  }
+ },
+ {
+  "source_id": "p-1007",
+  "knowledge_base": "catalogo",
+  "type": "product",
+  "locale": "es",
+  "title": "Ensalada de patata casera 1 kg",
+  "text": "Ensalada de patata casera 1 kg. Ensalada de patata con huevo y cebollino, lista para servir. Rinde para seis personas. Categoría: Guarniciones. Marca: Huerta Clara.",
+  "canonical_url": "http://localhost:8000/demo/producto.html?id=p-1007",
+  "acl": [
+   "public"
+  ],
+  "version": "1",
+  "metadata": {
+   "product_id": "p-1007",
+   "variation_id": "p-1007-v1",
+   "sku": "P-1007",
+   "price_amount": 4.5,
+   "currency": "EUR",
+   "category": "Guarniciones",
+   "brand": "Huerta Clara",
+   "availability": "En stock",
+   "image_url": "/demo/img/guarniciones.svg",
+   "image_alt": "Ensalada de patata casera 1 kg"
+  }
+ },
+ {
+  "source_id": "p-1008",
+  "knowledge_base": "catalogo",
+  "type": "product",
+  "locale": "es",
+  "title": "Pan de hamburguesa brioche (pack 12)",
+  "text": "Pan de hamburguesa brioche (pack 12). Doce panecillos de brioche para hamburguesas. Tostar ligeramente en la parrilla. Categoría: Guarniciones. Marca: Horno Real.",
+  "canonical_url": "http://localhost:8000/demo/producto.html?id=p-1008",
+  "acl": [
+   "public"
+  ],
+  "version": "1",
+  "metadata": {
+   "product_id": "p-1008",
+   "variation_id": "p-1008-v1",
+   "sku": "P-1008",
+   "price_amount": 3.2,
+   "currency": "EUR",
+   "category": "Guarniciones",
+   "brand": "Horno Real",
+   "availability": "En stock",
+   "image_url": "/demo/img/guarniciones.svg",
+   "image_alt": "Pan de hamburguesa brioche (pack 12)"
+  }
+ },
+ {
+  "source_id": "p-1009",
+  "knowledge_base": "catalogo",
+  "type": "product",
+  "locale": "es",
+  "title": "Agua mineral 1,5 L (pack 6)",
+  "text": "Agua mineral 1,5 L (pack 6). Pack de seis botellas de agua mineral natural de litro y medio. Calcula un litro por persona en verano. Categoría: Bebidas. Marca: Fuente Azul.",
+  "canonical_url": "http://localhost:8000/demo/producto.html?id=p-1009",
+  "acl": [
+   "public"
+  ],
+  "version": "1",
+  "metadata": {
+   "product_id": "p-1009",
+   "variation_id": "p-1009-v1",
+   "sku": "P-1009",
+   "price_amount": 2.7,
+   "currency": "EUR",
+   "category": "Bebidas",
+   "brand": "Fuente Azul",
+   "availability": "En stock",
+   "image_url": "/demo/img/bebidas.svg",
+   "image_alt": "Agua mineral 1,5 L (pack 6)"
+  }
+ },
+ {
+  "source_id": "p-1010",
+  "knowledge_base": "catalogo",
+  "type": "product",
+  "locale": "es",
+  "title": "Refresco de limón 33 cl (pack 12)",
+  "text": "Refresco de limón 33 cl (pack 12). Doce latas de refresco de limón sin azúcares añadidos. Bebida para fiestas y barbacoas. Categoría: Bebidas. Marca: Citrus.",
+  "canonical_url": "http://localhost:8000/demo/producto.html?id=p-1010",
+  "acl": [
+   "public"
+  ],
+  "version": "1",
+  "metadata": {
+   "product_id": "p-1010",
+   "variation_id": "p-1010-v1",
+   "sku": "P-1010",
+   "price_amount": 5.6,
+   "currency": "EUR",
+   "category": "Bebidas",
+   "brand": "Citrus",
+   "availability": "En stock",
+   "image_url": "/demo/img/bebidas.svg",
+   "image_alt": "Refresco de limón 33 cl (pack 12)"
+  }
+ },
+ {
+  "source_id": "p-1011",
+  "knowledge_base": "catalogo",
+  "type": "product",
+  "locale": "es",
+  "title": "Cerveza sin alcohol 33 cl (pack 12)",
+  "text": "Cerveza sin alcohol 33 cl (pack 12). Doce botellines de cerveza sin alcohol. Servir muy fría. Categoría: Bebidas. Marca: Malta Clara.",
+  "canonical_url": "http://localhost:8000/demo/producto.html?id=p-1011",
+  "acl": [
+   "public"
+  ],
+  "version": "1",
+  "metadata": {
+   "product_id": "p-1011",
+   "variation_id": "p-1011-v1",
+   "sku": "P-1011",
+   "price_amount": 7.9,
+   "currency": "EUR",
+   "category": "Bebidas",
+   "brand": "Malta Clara",
+   "availability": "En stock",
+   "image_url": "/demo/img/bebidas.svg",
+   "image_alt": "Cerveza sin alcohol 33 cl (pack 12)"
+  }
+ },
+ {
+  "source_id": "p-1012",
+  "knowledge_base": "catalogo",
+  "type": "product",
+  "locale": "es",
+  "title": "Carbón vegetal de encina 5 kg",
+  "text": "Carbón vegetal de encina 5 kg. Saco de cinco kilos de carbón vegetal de encina para barbacoa. Suficiente para dos o tres sesiones de parrilla. Categoría: Encendido y carbón. Marca: BrasaPro.",
+  "canonical_url": "http://localhost:8000/demo/producto.html?id=p-1012",
+  "acl": [
+   "public"
+  ],
+  "version": "1",
+  "metadata": {
+   "product_id": "p-1012",
+   "variation_id": "p-1012-v1",
+   "sku": "P-1012",
+   "price_amount": 7.99,
+   "currency": "EUR",
+   "category": "Encendido y carbón",
+   "brand": "BrasaPro",
+   "availability": "En stock",
+   "image_url": "/demo/img/encendido.svg",
+   "image_alt": "Carbón vegetal de encina 5 kg"
+  }
+ },
+ {
+  "source_id": "p-1013",
+  "knowledge_base": "catalogo",
+  "type": "product",
+  "locale": "es",
+  "title": "Pastillas de encendido ecológicas (32 uds)",
+  "text": "Pastillas de encendido ecológicas (32 uds). Pastillas de encendido de fibra de madera natural, sin olores. Encendido de carbón en diez minutos. Categoría: Encendido y carbón. Marca: BrasaPro.",
+  "canonical_url": "http://localhost:8000/demo/producto.html?id=p-1013",
+  "acl": [
+   "public"
+  ],
+  "version": "1",
+  "metadata": {
+   "product_id": "p-1013",
+   "variation_id": "p-1013-v1",
+   "sku": "P-1013",
+   "price_amount": 2.49,
+   "currency": "EUR",
+   "category": "Encendido y carbón",
+   "brand": "BrasaPro",
+   "availability": "En stock",
+   "image_url": "/demo/img/encendido.svg",
+   "image_alt": "Pastillas de encendido ecológicas (32 uds)"
+  }
+ },
+ {
+  "source_id": "p-1014",
+  "knowledge_base": "catalogo",
+  "type": "product",
+  "locale": "es",
+  "title": "Platos compostables (pack 50)",
+  "text": "Platos compostables (pack 50). Cincuenta platos compostables de fibra de caña de azúcar. Aptos para comida caliente. Categoría: Menaje desechable. Marca: EcoMesa.",
+  "canonical_url": "http://localhost:8000/demo/producto.html?id=p-1014",
+  "acl": [
+   "public"
+  ],
+  "version": "1",
+  "metadata": {
+   "product_id": "p-1014",
+   "variation_id": "p-1014-v1",
+   "sku": "P-1014",
+   "price_amount": 4.2,
+   "currency": "EUR",
+   "category": "Menaje desechable",
+   "brand": "EcoMesa",
+   "availability": "En stock",
+   "image_url": "/demo/img/menaje.svg",
+   "image_alt": "Platos compostables (pack 50)"
+  }
+ },
+ {
+  "source_id": "p-1015",
+  "knowledge_base": "catalogo",
+  "type": "product",
+  "locale": "es",
+  "title": "Vasos reutilizables (pack 20)",
+  "text": "Vasos reutilizables (pack 20). Veinte vasos reutilizables de polipropileno libre de BPA. Aptos para lavavajillas. Categoría: Menaje desechable. Marca: EcoMesa.",
+  "canonical_url": "http://localhost:8000/demo/producto.html?id=p-1015",
+  "acl": [
+   "public"
+  ],
+  "version": "1",
+  "metadata": {
+   "product_id": "p-1015",
+   "variation_id": "p-1015-v1",
+   "sku": "P-1015",
+   "price_amount": 3.9,
+   "currency": "EUR",
+   "category": "Menaje desechable",
+   "brand": "EcoMesa",
+   "availability": "En stock",
+   "image_url": "/demo/img/menaje.svg",
+   "image_alt": "Vasos reutilizables (pack 20)"
+  }
+ },
+ {
+  "source_id": "p-1016",
+  "knowledge_base": "catalogo",
+  "type": "product",
+  "locale": "es",
+  "title": "Barbacoa de carbón Kettle 57 cm",
+  "text": "Barbacoa de carbón Kettle 57 cm. Barbacoa de carbón con tapa de 57 cm de diámetro, termómetro integrado y sistema de limpieza de cenizas. Para hasta 10 personas. Categoría: Barbacoas. Marca: BrasaPro.",
+  "canonical_url": "http://localhost:8000/demo/producto.html?id=p-1016",
+  "acl": [
+   "public"
+  ],
+  "version": "1",
+  "metadata": {
+   "product_id": "p-1016",
+   "variation_id": "p-1016-v1",
+   "sku": "P-1016",
+   "price_amount": 129.0,
+   "currency": "EUR",
+   "category": "Barbacoas",
+   "brand": "BrasaPro",
+   "availability": "En stock",
+   "image_url": "/demo/img/barbacoas.svg",
+   "image_alt": "Barbacoa de carbón Kettle 57 cm"
+  }
+ },
+ {
+  "source_id": "p-2001",
+  "knowledge_base": "catalogo",
+  "type": "product",
+  "locale": "es",
+  "title": "Zapatillas de running Ligera 3",
+  "text": "Zapatillas de running Ligera 3. Zapatillas de running ligeras con amortiguación media, ideales para empezar a correr y rodajes de hasta 10 km. Peso 240 g. Categoría: Running. Marca: Zancada.",
+  "canonical_url": "http://localhost:8000/demo/producto.html?id=p-2001",
+  "acl": [
+   "public"
+  ],
+  "version": "1",
+  "metadata": {
+   "product_id": "p-2001",
+   "variation_id": "p-2001-v1",
+   "sku": "P-2001",
+   "price_amount": 79.95,
+   "currency": "EUR",
+   "category": "Running",
+   "brand": "Zancada",
+   "availability": "En stock",
+   "image_url": "/demo/img/running.svg",
+   "image_alt": "Zapatillas de running Ligera 3"
+  }
+ },
+ {
+  "source_id": "p-2002",
+  "knowledge_base": "catalogo",
+  "type": "product",
+  "locale": "es",
+  "title": "Zapatillas de running Maratón Pro",
+  "text": "Zapatillas de running Maratón Pro. Zapatillas de running con placa de carbono y máxima amortiguación para corredores avanzados y distancias de maratón. Categoría: Running. Marca: Zancada.",
+  "canonical_url": "http://localhost:8000/demo/producto.html?id=p-2002",
+  "acl": [
+   "public"
+  ],
+  "version": "1",
+  "metadata": {
+   "product_id": "p-2002",
+   "variation_id": "p-2002-v1",
+   "sku": "P-2002",
+   "price_amount": 139.0,
+   "currency": "EUR",
+   "category": "Running",
+   "brand": "Zancada",
+   "availability": "En stock",
+   "image_url": "/demo/img/running.svg",
+   "image_alt": "Zapatillas de running Maratón Pro"
+  }
+ },
+ {
+  "source_id": "p-2003",
+  "knowledge_base": "catalogo",
+  "type": "product",
+  "locale": "es",
+  "title": "Zapatillas de trail Montaña X",
+  "text": "Zapatillas de trail Montaña X. Zapatillas de trail running con suela de tacos y membrana impermeable para correr por montaña. Categoría: Running. Marca: Cresta.",
+  "canonical_url": "http://localhost:8000/demo/producto.html?id=p-2003",
+  "acl": [
+   "public"
+  ],
+  "version": "1",
+  "metadata": {
+   "product_id": "p-2003",
+   "variation_id": "p-2003-v1",
+   "sku": "P-2003",
+   "price_amount": 99.0,
+   "currency": "EUR",
+   "category": "Running",
+   "brand": "Cresta",
+   "availability": "En stock",
+   "image_url": "/demo/img/running.svg",
+   "image_alt": "Zapatillas de trail Montaña X"
+  }
+ },
+ {
+  "source_id": "p-2004",
+  "knowledge_base": "catalogo",
+  "type": "product",
+  "locale": "es",
+  "title": "Reloj GPS deportivo Pulso 5",
+  "text": "Reloj GPS deportivo Pulso 5. Reloj GPS con pulsómetro óptico, planes de entrenamiento y batería de 14 días. Ideal para empezar a correr con control del ritmo. Categoría: Electrónica deportiva. Marca: Pulso.",
+  "canonical_url": "http://localhost:8000/demo/producto.html?id=p-2004",
+  "acl": [
+   "public"
+  ],
+  "version": "1",
+  "metadata": {
+   "product_id": "p-2004",
+   "variation_id": "p-2004-v1",
+   "sku": "P-2004",
+   "price_amount": 149.0,
+   "currency": "EUR",
+   "category": "Electrónica deportiva",
+   "brand": "Pulso",
+   "availability": "En stock",
+   "image_url": "/demo/img/electronica.svg",
+   "image_alt": "Reloj GPS deportivo Pulso 5"
+  }
+ },
+ {
+  "source_id": "p-3001",
+  "knowledge_base": "catalogo",
+  "type": "product",
+  "locale": "es",
+  "title": "Smartphone Nova 12 128 GB",
+  "text": "Smartphone Nova 12 128 GB. Smartphone con pantalla de 6,5 pulgadas, batería de 5000 mAh con carga rápida de 33 W, 128 GB y cámara de 50 MP. Gran autonomía. Categoría: Móviles. Marca: Nova.",
+  "canonical_url": "http://localhost:8000/demo/producto.html?id=p-3001",
+  "acl": [
+   "public"
+  ],
+  "version": "1",
+  "metadata": {
+   "product_id": "p-3001",
+   "variation_id": "p-3001-v1",
+   "sku": "P-3001",
+   "price_amount": 399.0,
+   "currency": "EUR",
+   "category": "Móviles",
+   "brand": "Nova",
+   "availability": "En stock",
+   "image_url": "/demo/img/moviles.svg",
+   "image_alt": "Smartphone Nova 12 128 GB"
+  }
+ },
+ {
+  "source_id": "p-3002",
+  "knowledge_base": "catalogo",
+  "type": "product",
+  "locale": "es",
+  "title": "Smartphone Nova 12 Lite 64 GB",
+  "text": "Smartphone Nova 12 Lite 64 GB. Versión económica del Nova 12 con batería de 4500 mAh, 64 GB y pantalla de 6,1 pulgadas. Alternativa más barata. Categoría: Móviles. Marca: Nova.",
+  "canonical_url": "http://localhost:8000/demo/producto.html?id=p-3002",
+  "acl": [
+   "public"
+  ],
+  "version": "1",
+  "metadata": {
+   "product_id": "p-3002",
+   "variation_id": "p-3002-v1",
+   "sku": "P-3002",
+   "price_amount": 249.0,
+   "currency": "EUR",
+   "category": "Móviles",
+   "brand": "Nova",
+   "availability": "En stock",
+   "image_url": "/demo/img/moviles.svg",
+   "image_alt": "Smartphone Nova 12 Lite 64 GB"
+  }
+ },
+ {
+  "source_id": "p-3003",
+  "knowledge_base": "catalogo",
+  "type": "product",
+  "locale": "es",
+  "title": "Portátil Atlas 14 i5 16 GB",
+  "text": "Portátil Atlas 14 i5 16 GB. Portátil de 14 pulgadas con procesador i5, 16 GB de RAM y SSD de 512 GB. Ligero (1,3 kg) y autonomía de 12 horas. Categoría: Portátiles. Marca: Atlas.",
+  "canonical_url": "http://localhost:8000/demo/producto.html?id=p-3003",
+  "acl": [
+   "public"
+  ],
+  "version": "1",
+  "metadata": {
+   "product_id": "p-3003",
+   "variation_id": "p-3003-v1",
+   "sku": "P-3003",
+   "price_amount": 749.0,
+   "currency": "EUR",
+   "category": "Portátiles",
+   "brand": "Atlas",
+   "availability": "En stock",
+   "image_url": "/demo/img/portatiles.svg",
+   "image_alt": "Portátil Atlas 14 i5 16 GB"
+  }
+ },
+ {
+  "source_id": "p-3004",
+  "knowledge_base": "catalogo",
+  "type": "product",
+  "locale": "es",
+  "title": "Portátil Atlas 15 i7 32 GB",
+  "text": "Portátil Atlas 15 i7 32 GB. Portátil de 15 pulgadas con i7, 32 GB de RAM, SSD de 1 TB y gráfica dedicada. Para edición y trabajo exigente. Categoría: Portátiles. Marca: Atlas.",
+  "canonical_url": "http://localhost:8000/demo/producto.html?id=p-3004",
+  "acl": [
+   "public"
+  ],
+  "version": "1",
+  "metadata": {
+   "product_id": "p-3004",
+   "variation_id": "p-3004-v1",
+   "sku": "P-3004",
+   "price_amount": 1099.0,
+   "currency": "EUR",
+   "category": "Portátiles",
+   "brand": "Atlas",
+   "availability": "En stock",
+   "image_url": "/demo/img/portatiles.svg",
+   "image_alt": "Portátil Atlas 15 i7 32 GB"
+  }
+ },
+ {
+  "source_id": "guia-pagos",
+  "knowledge_base": "ayuda",
+  "type": "guide",
+  "locale": "es",
+  "title": "Guía de pagos y facturación",
+  "text": "# Métodos de pago\nAceptamos tarjeta de crédito o débito, transferencia bancaria y pago con móvil. El cargo se realiza al confirmar el pedido.\n\n# Pedidos con varios vendedores\nPuedes pagar un pedido con productos de varios vendedores en un único checkout. El importe se reparte automáticamente entre los vendedores.\n\n# Facturas\nSi necesitas factura con datos fiscales, introduce tu NIF o CIF antes de finalizar la compra. La factura se envía por correo y queda disponible en tu cuenta.",
+  "content_format": "markdown",
+  "canonical_url": "http://localhost:8000/demo/ayuda.html#guia-pagos",
+  "acl": [
+   "public"
+  ],
+  "version": "1"
+ },
+ {
+  "source_id": "guia-envios",
+  "knowledge_base": "ayuda",
+  "type": "guide",
+  "locale": "es",
+  "title": "Envíos y plazos de entrega",
+  "text": "# Plazos de entrega\nLos pedidos se entregan en un plazo de 24 a 72 horas laborables en península. Baleares y Canarias pueden tardar hasta 5 días.\n\n# Coste del envío\nEl envío es gratuito a partir de 49 euros. Por debajo de ese importe el coste es de 3,95 euros.\n\n# Seguimiento\nRecibirás un correo con el número de seguimiento cuando el pedido salga del almacén.",
+  "content_format": "markdown",
+  "canonical_url": "http://localhost:8000/demo/ayuda.html#guia-envios",
+  "acl": [
+   "public"
+  ],
+  "version": "1"
+ },
+ {
+  "source_id": "guia-devoluciones",
+  "knowledge_base": "ayuda",
+  "type": "guide",
+  "locale": "es",
+  "title": "Devoluciones y reembolsos",
+  "text": "# Plazo de devolución\nTienes 30 días naturales desde la entrega para devolver un producto sin dar explicaciones.\n\n# Cómo devolver un pedido\nEntra en Mis pedidos, elige el pedido y pulsa Solicitar devolución. Imprime la etiqueta y entrega el paquete en cualquier punto de recogida.\n\n# Reembolso\nEl reembolso se realiza en el mismo método de pago en un máximo de 14 días desde que recibimos el producto. Los productos frescos no admiten devolución salvo defecto.",
+  "content_format": "markdown",
+  "canonical_url": "http://localhost:8000/demo/ayuda.html#guia-devoluciones",
+  "acl": [
+   "public"
+  ],
+  "version": "1"
+ },
+ {
+  "source_id": "guia-garantia",
+  "knowledge_base": "ayuda",
+  "type": "guide",
+  "locale": "es",
+  "title": "Garantía de los productos",
+  "text": "# Garantía legal\nTodos los productos tienen tres años de garantía legal frente a defectos de fabricación.\n\n# Cómo reclamar la garantía\nContacta con atención al cliente indicando el número de pedido y una descripción del problema. Te indicaremos si procede reparación, sustitución o reembolso.",
+  "content_format": "markdown",
+  "canonical_url": "http://localhost:8000/demo/ayuda.html#guia-garantia",
+  "acl": [
+   "public"
+  ],
+  "version": "1"
+ },
+ {
+  "source_id": "guia-cuenta",
+  "knowledge_base": "ayuda",
+  "type": "guide",
+  "locale": "es",
+  "title": "Tu cuenta y datos personales",
+  "text": "# Cambiar datos de la cuenta\nDesde Mi perfil puedes cambiar tu nombre, correo electrónico y contraseña.\n\n# Privacidad\nPuedes descargar o eliminar tus datos personales desde la sección Privacidad de tu perfil.",
+  "content_format": "markdown",
+  "canonical_url": "http://localhost:8000/demo/ayuda.html#guia-cuenta",
+  "acl": [
+   "public"
+  ],
+  "version": "1"
+ },
+ {
+  "source_id": "manual-nova-12",
+  "knowledge_base": "documentos",
+  "type": "document",
+  "locale": "es",
+  "title": "Manual de usuario Smartphone Nova 12",
+  "text": "Seguridad de la batería\n\nLa batería del Nova 12 es de polímero de litio con una capacidad de 5000 mAh. Para prolongar su vida útil, evita exponer el teléfono a temperaturas superiores a 45 grados.\n\nCarga\n\nEl cargador incluido ofrece carga rápida de 33 W. Una carga completa tarda aproximadamente 70 minutos. No utilices cargadores no certificados.\n\nAutonomía\n\nCon un uso moderado, la batería dura hasta dos días. El modo de ahorro de energía amplía la autonomía hasta un 20 por ciento.",
+  "canonical_url": "http://localhost:8000/demo/documentos/manual-nova-12.pdf",
+  "acl": [
+   "public"
+  ],
+  "version": "1"
+ },
+ {
+  "source_id": "ficha-kettle-57",
+  "knowledge_base": "documentos",
+  "type": "document",
+  "locale": "es",
+  "title": "Ficha técnica Barbacoa Kettle 57 cm",
+  "text": "Especificaciones técnicas\n\nDiámetro de la parrilla: 57 cm. Superficie de cocción: 2550 centímetros cuadrados. Peso: 15 kg. Material: acero esmaltado.\n\nUso recomendado\n\nCapacidad para cocinar para hasta 10 personas. Usar exclusivamente al aire libre y con carbón vegetal o briquetas.\n\nMantenimiento\n\nVaciar el cenicero tras cada uso cuando las cenizas estén frías. La garantía del cuerpo esmaltado es de 10 años.",
+  "canonical_url": "http://localhost:8000/demo/documentos/ficha-kettle-57.pdf",
+  "acl": [
+   "public"
+  ],
+  "version": "1"
+ }
+]

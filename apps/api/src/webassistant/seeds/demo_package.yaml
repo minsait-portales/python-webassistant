@@ -1,0 +1,133 @@
+# Paquete de configuración de la demo autónoma (CG-01.5, CG-16.3). Sin secretos.
+format: webassistant.config-package
+version: "1"
+tenant:
+  slug: demo
+  name: Minsait Demo
+  settings: {}
+agent_configs:
+  - key: estandar
+    name: Agente estándar
+    policy:
+      max_iterations: 4
+      max_tool_calls: 6
+      allowed_tools: [search_knowledge]
+      rag: {amount: 6, max_amount: 10, min_score: 0.05}
+      repair_attempts: 1
+      force_rag_retry: true
+      loop_detection: true
+      history_window: 8
+assistants:
+  - key: catalogo
+    name: Asistente de catálogo
+    agent_config: estandar
+    publish: true
+    config:
+      instructions: >-
+        Eres el asistente de la tienda de demostración de Minsait. Ayudas a encontrar productos,
+        preparar compras para eventos, resolver dudas de compra, envíos, pagos y garantía, y
+        consultar documentación técnica. Responde con amabilidad y concisión.
+      scope_description: "el catálogo de la tienda, sus productos, carrito, pedidos, pagos, envíos, devoluciones, garantía, documentación y la cuenta del usuario"
+      default_locale: es
+      locales: [es, en]
+      model: {provider: simulated, model_id: simulated-chat-v1, params: {}}
+      limits: {max_message_length: 800, max_history_messages: 8, max_context_tokens: 24000, max_output_tokens: 2000}
+      messages:
+        welcome: "Bienvenido a tu nueva manera de navegar. ¿Qué necesitas?"
+        input_placeholder: "Escribe tu consulta..."
+        privacy_notice: "Al enviar una consulta aceptas que se procese para generar la respuesta del asistente. No incluyas datos personales, confidenciales o de pago."
+        login_required: "Para usar el asistente debes iniciar sesión."
+        access_denied: "No tienes permisos para usar este asistente."
+        fallback: "La consulta es demasiado exigente para resolverla de una sola vez. Prueba a concretarla un poco más."
+      skills:
+        - {name: default}
+        - {name: content_answer}
+        - {name: clarification}
+        - {name: product_results}
+        - {name: product_recommendations}
+        - {name: product_alternatives}
+        - {name: product_comparison}
+        - {name: product_summary}
+        - {name: event_product_selection}
+        - {name: shopping_cart_add}
+        - {name: shopping_cart_view}
+        - {name: payment}
+        - {name: document_lookup}
+        - {name: content_create, config: {provider_context: {creation_targets: [{content_type: page, label: "Página"}, {content_type: article, label: "Artículo"}, {content_type: faq, label: "Pregunta frecuente"}]}}}
+        - {name: content_edit}
+        - {name: user_profile}
+        - {name: sales_analytics}
+      knowledge_bases: [catalogo, ayuda, documentos]
+      suggestions:
+        - "Organiza una barbacoa para 10 personas"
+        - "Recomiéndame unas zapatillas para empezar a correr"
+        - "¿Cómo puedo devolver un pedido?"
+        - "¿Qué dice el manual sobre la batería?"
+      history: {strategy: summary, window_messages: 8}
+sites:
+  - public_id: site_demo
+    name: Tienda de demostración
+    access_mode: public
+    allowed_origins:
+      - http://localhost:8000
+      - http://127.0.0.1:8000
+      - http://localhost:8080
+      - http://localhost:5173
+    default_assistant: catalogo
+    default_locale: es
+    languages: [es, en]
+    capabilities: [cart, content_forms, user_profile]
+    theme:
+      accent: "#480e2a"
+      on_accent: "#ffffff"
+      text: "#260717"
+      surface: "#ffffff"
+      muted_surface: "#f6f5f1"
+      border: "#e3e2da"
+      highlight: "#ff0054"
+      launcher_label: WebAssistant AI
+      position: left
+    settings:
+      allowed_widget_scopes: ["catalog:read", "cart:read", "cart:write", "content:write", "profile:read", "analytics:read"]
+      anonymous_scopes: ["catalog:read", "cart:read", "cart:write"]
+      link_anonymous_on_login: true
+      desktop_always_open: false
+knowledge_bases:
+  - key: catalogo
+    name: Catálogo de productos
+    description: Fichas de producto sincronizadas desde el portal.
+    default_locale: es
+    chunking: {strategy: whole}
+  - key: ayuda
+    name: Guías y ayuda
+    description: Contenidos editoriales publicados.
+    default_locale: es
+    chunking: {strategy: heading, max_chars: 900, overlap_chars: 100}
+  - key: documentos
+    name: Documentación técnica
+    description: Texto extraído de PDFs del portal; los originales permanecen en el portal.
+    default_locale: es
+    chunking: {strategy: paragraph, max_chars: 700, overlap_chars: 80}
+policies:
+  - allowed_models: []
+    daily_budget: "50"
+    monthly_budget: "500"
+    currency: USD
+    alert_threshold_pct: 80
+    max_concurrent_runs: 50
+    max_concurrent_runs_per_subject: 2
+retention:
+  conversations_days: 90
+  payloads_days: 30
+  audit_days: 365
+  usage_days: 730
+  mode: anonymize
+model_prices:
+  - {provider: openai, model: gpt-6-luna, input_per_million: "0.1", cached_per_million: "0.01", output_per_million: "0.5", currency: USD, valid_from: "2026-01-01T00:00:00+00:00", source: "Tabla instalada del módulo Drupal (pricing_last_saved)"}
+  - {provider: openai, model: gpt-5.6, input_per_million: "5.0", cached_per_million: "0.5", output_per_million: "30.0", currency: USD, valid_from: "2026-01-01T00:00:00+00:00", source: "Tabla instalada del módulo Drupal"}
+  - {provider: openai, model: gpt-5.4-mini, input_per_million: "0.75", cached_per_million: "0.075", output_per_million: "4.5", currency: USD, valid_from: "2026-01-01T00:00:00+00:00", source: "Tabla instalada del módulo Drupal"}
+  - {provider: openai, model: gpt-4.1-mini, input_per_million: "0.4", cached_per_million: "0.1", output_per_million: "1.6", currency: USD, valid_from: "2026-01-01T00:00:00+00:00", source: "Tabla instalada del módulo Drupal"}
+  - {provider: openai, model: text-embedding-3-small, input_per_million: "0.02", cached_per_million: "0", output_per_million: "0", currency: USD, valid_from: "2026-01-01T00:00:00+00:00", source: "Tabla instalada del módulo Drupal"}
+  - {provider: openai, model: text-embedding-3-large, input_per_million: "0.13", cached_per_million: "0", output_per_million: "0", currency: USD, valid_from: "2026-01-01T00:00:00+00:00", source: "Tabla instalada del módulo Drupal"}
+  - {provider: simulated, model: simulated-chat-v1, input_per_million: "0.1", cached_per_million: "0.01", output_per_million: "0.5", currency: USD, valid_from: "2026-01-01T00:00:00+00:00", source: "Proveedor simulado con precio de referencia gpt-6-luna"}
+  - {provider: simulated, model: simulated-embedding-v1, input_per_million: "0.02", cached_per_million: "0", output_per_million: "0", currency: USD, valid_from: "2026-01-01T00:00:00+00:00", source: "Proveedor simulado con precio de referencia text-embedding-3-small"}

@@ -1,0 +1,50 @@
+# Skill shopping_cart_add: migrada desde el módulo Drupal webassistant_ai (CG-06.6).
+api_version: webassistant.ai/v1
+name: shopping_cart_add
+version: 1.0.0
+title: Añadir al carrito
+group: ecommerce
+description: Prepara la confirmación explícita para añadir productos concretos al carrito.
+intent: Usar cuando el usuario quiera añadir un producto concreto al carrito o comprar una opción concreta del catálogo.
+when_to_use:
+- El usuario pide añadir un producto o variación al carrito.
+- El usuario expresa intención de compra sobre un producto recomendado o encontrado.
+examples:
+- Añade el primero al carrito
+- Quiero comprar este producto
+- Mete dos unidades en la cesta
+keywords:
+- anade
+- anadir
+- carrito
+- cesta
+- compra
+- comprar
+- mete
+- unidades
+requires_rag: true
+permissions:
+- catalog:read
+- cart:write
+input_schema: schemas/input.json
+response_example: examples/response.json
+renderer: product_grid@1
+processors:
+- catalog_items
+chat_reply_fallback: He preparado la confirmación para añadir al carrito.
+responsive_button_label: Ver confirmación
+actions:
+  add_to_cart:
+    type: host
+    label: Añadir al carrito
+    host_action: cart.add
+    permission: cart:write
+    confirmation: required
+    effects: true
+    target: item
+    input_schema: schemas/actions/add_to_cart.json
+    description: Añade el producto al carrito del portal tras confirmación explícita.
+dependencies:
+  platform: '>=1.0,<2.0'
+  capabilities:
+  - cart

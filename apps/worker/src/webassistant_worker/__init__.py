@@ -1,0 +1,1 @@
+"""Worker asíncrono de WebAssistant."""

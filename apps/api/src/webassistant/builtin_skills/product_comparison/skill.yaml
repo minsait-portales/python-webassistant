@@ -1,0 +1,36 @@
+# Skill product_comparison: migrada desde el módulo Drupal webassistant_ai (CG-06.6).
+api_version: webassistant.ai/v1
+name: product_comparison
+version: 1.0.0
+title: Comparar productos
+group: ecommerce
+description: Compara dos o más productos y muestra diferencias, ventajas y criterios de elección.
+intent: Usar cuando el usuario pida comparar productos o decidir entre varias opciones concretas.
+when_to_use:
+- El usuario menciona dos o más productos.
+- El usuario pregunta cuál conviene más entre varias opciones.
+examples:
+- Compara estos dos portátiles
+- ¿Qué diferencia hay entre el modelo A y el B?
+- ¿Cuál es mejor, este o aquel?
+keywords:
+- compara
+- comparar
+- comparativa
+- diferencia
+- diferencias
+- versus
+- vs
+- cual
+requires_rag: true
+permissions:
+- catalog:read
+input_schema: schemas/input.json
+response_example: examples/response.json
+renderer: product_comparison@1
+processors:
+- catalog_items
+chat_reply_fallback: He preparado la comparativa en el panel.
+responsive_button_label: Ver comparativa
+dependencies:
+  platform: '>=1.0,<2.0'

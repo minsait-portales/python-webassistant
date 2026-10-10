@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://webassistant.ai/schemas/host-action.v1.schema.json",
+  "title": "Host action v1",
+  "description": "Instrucción que la lógica JavaScript del widget ejecuta sobre la página anfitriona mediante el handler registrado por el portal (WebAssistant.registerHostAction). El resultado se notifica a la API con el mismo correlation_id.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "name", "execution_id", "correlation_id", "params"],
+  "properties": {
+    "version": { "const": "1" },
+    "name": { "type": "string", "pattern": "^[a-z][a-z0-9_.]*$" },
+    "execution_id": { "type": "string" },
+    "correlation_id": { "type": "string" },
+    "skill": { "type": "string" },
+    "action": { "type": "string" },
+    "run_id": { "type": ["string", "null"] },
+    "params": { "type": "object" },
+    "expires_at": { "type": "string", "format": "date-time" }
+  }
+}

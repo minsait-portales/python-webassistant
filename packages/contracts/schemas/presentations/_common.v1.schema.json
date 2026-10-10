@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://webassistant.ai/schemas/presentations/_common.v1.schema.json",
+  "title": "Definiciones comunes de presentaciones v1",
+  "$defs": {
+    "text": { "type": "string", "maxLength": 4000 },
+    "short_text": { "type": "string", "maxLength": 300 },
+    "url": { "type": "string", "maxLength": 2048, "pattern": "^(https?://|/)[^\\s]*$" },
+    "step": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title"],
+      "properties": {
+        "title": { "$ref": "#/$defs/short_text" },
+        "body": { "$ref": "#/$defs/text" }
+      }
+    },
+    "product_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["product_id", "title"],
+      "properties": {
+        "product_id": { "type": "string", "maxLength": 128 },
+        "variation_id": { "type": ["string", "null"], "maxLength": 128 },
+        "title": { "$ref": "#/$defs/short_text" },
+        "body": { "$ref": "#/$defs/text" },
+        "url": { "$ref": "#/$defs/url" },
+        "image_url": { "$ref": "#/$defs/url" },
+        "image_alt": { "$ref": "#/$defs/short_text" },
+        "price": { "type": "string", "maxLength": 60 },
+        "price_amount": { "type": ["number", "null"] },
+        "currency": { "type": "string", "maxLength": 3 },
+        "quantity": { "type": "integer", "minimum": 1, "maximum": 999 },
+        "category": { "$ref": "#/$defs/short_text" },
+        "brand": { "$ref": "#/$defs/short_text" },
+        "store_name": { "$ref": "#/$defs/short_text" },
+        "availability": { "type": "string", "maxLength": 60 },
+        "rating": { "type": ["number", "null"], "minimum": 0, "maximum": 5 },
+        "badges": { "type": "array", "items": { "type": "string", "maxLength": 40 }, "maxItems": 5 },
+        "actions": { "type": "array", "items": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" }, "maxItems": 5 }
+      }
+    },
+    "source_link": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title"],
+      "properties": {
+        "title": { "$ref": "#/$defs/short_text" },
+        "url": { "$ref": "#/$defs/url" },
+        "snippet": { "$ref": "#/$defs/text" },
+        "source_id": { "type": "string", "maxLength": 256 }
+      }
+    }
+  }
+}

@@ -1,0 +1,44 @@
+# Skill content_create: migrada desde el módulo Drupal webassistant_ai (CG-06.6).
+api_version: webassistant.ai/v1
+name: content_create
+version: 1.0.0
+title: Crear contenido
+group: content
+description: Propone abrir en el portal el formulario de alta de un tipo de contenido.
+intent: Usar cuando el usuario pida crear, dar de alta, añadir o publicar un contenido nuevo en el portal.
+when_to_use:
+- El usuario quiere crear una página, artículo, noticia, FAQ, producto u otro contenido.
+- Elige `content_type` desde `context.creation_targets` si existe; si no, usa el nombre que indique el usuario.
+- Si el usuario aporta un título inicial, devuélvelo como `content_title`.
+examples:
+- Quiero crear una página nueva
+- Da de alta una noticia
+- Añade un artículo sobre ofertas
+keywords:
+- crear
+- alta
+- nuevo
+- nueva
+- publicar
+- articulo
+- noticia
+- pagina
+requires_rag: false
+permissions:
+- content:write
+input_schema: schemas/input.json
+response_example: examples/response.json
+renderer: host_action@1
+chat_reply_fallback: Te propongo abrir el formulario de creación.
+responsive_button_label: Abrir formulario de creación
+actions:
+  open_create_form:
+    type: host
+    label: Abrir formulario
+    host_action: content.create
+    description: Abre en el portal el formulario de alta.
+    input_schema: schemas/actions/open_create_form.json
+dependencies:
+  platform: '>=1.0,<2.0'
+  capabilities:
+  - content_forms

@@ -1,0 +1,49 @@
+# Skill sales_analytics: migrada desde el módulo Drupal webassistant_ai (CG-06.6).
+api_version: webassistant.ai/v1
+name: sales_analytics
+version: 1.0.0
+title: Analítica de ventas
+group: ecommerce
+description: Informe de ventas del comercio (facturación, pedidos, ticket medio, evolución y reparto). El portal
+  genera el informe; solo para administración.
+intent: 'Usar cuando alguien de administración pregunte por ventas, facturación, ingresos o comparativas de periodo.
+  `range`: month, quarter, year, all o custom (con `from`/`to` AAAA-MM-DD). `focus`: revenue, categories, products,
+  stores, orders u overview.'
+when_to_use:
+- 'Preguntan cuánto se ha vendido o facturado en un periodo: focus revenue.'
+- 'Preguntan qué categorías o productos venden más: focus categories o products.'
+- 'Piden pedidos recientes o facturas: focus orders.'
+- 'Piden un informe general: focus overview.'
+examples:
+- ¿Cuánto hemos facturado este mes?
+- ¿Qué productos se venden más?
+- Informe de ventas del año
+keywords:
+- ventas
+- facturacion
+- facturado
+- ingresos
+- vendido
+- informe
+- ticket
+- pedidos
+requires_rag: false
+permissions:
+- analytics:read
+input_schema: schemas/input.json
+response_example: examples/response.json
+renderer: host_action@1
+chat_reply_fallback: Te propongo abrir el informe de ventas.
+responsive_button_label: Ver informe de ventas
+actions:
+  show_sales_report:
+    type: host
+    label: Abrir informe
+    host_action: analytics.sales_report
+    permission: analytics:read
+    description: El portal muestra el informe con sus datos.
+    input_schema: schemas/actions/show_sales_report.json
+dependencies:
+  platform: '>=1.0,<2.0'
+  capabilities:
+  - analytics

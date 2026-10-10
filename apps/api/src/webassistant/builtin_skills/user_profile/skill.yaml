@@ -1,0 +1,42 @@
+# Skill user_profile: migrada desde el módulo Drupal webassistant_ai (CG-06.6).
+api_version: webassistant.ai/v1
+name: user_profile
+version: 1.0.0
+title: Editar perfil
+group: account
+description: Propone abrir el perfil del usuario actual en el portal.
+intent: Usar cuando el usuario pregunte por su perfil, datos personales, cuenta, email, nombre o contraseña.
+when_to_use:
+- El usuario pide ver, editar o actualizar su perfil.
+- El usuario quiere cambiar nombre, email, contraseña u otra información de cuenta.
+examples:
+- Quiero cambiar mi email
+- ¿Dónde edito mi perfil?
+- Cambiar contraseña
+keywords:
+- perfil
+- cuenta
+- email
+- correo
+- contrasena
+- datos
+- personal
+requires_rag: false
+permissions:
+- profile:read
+input_schema: schemas/input.json
+response_example: examples/response.json
+renderer: host_action@1
+chat_reply_fallback: Te propongo abrir tu perfil.
+responsive_button_label: Abrir mi perfil
+actions:
+  open_profile:
+    type: host
+    label: Abrir mi perfil
+    host_action: user.profile
+    description: Abre la página de perfil del portal.
+    input_schema: schemas/actions/open_profile.json
+dependencies:
+  platform: '>=1.0,<2.0'
+  capabilities:
+  - user_profile

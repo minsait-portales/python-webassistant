@@ -1,0 +1,9 @@
+{
+  "chat_reply": "La tienda del centro abre de 10:00 a 21:00.",
+  "result": {
+    "answer": "La tienda del centro abre de lunes a sábado de 10:00 a 21:00.",
+    "steps": [{"title": "Domingos", "body": "Abre los domingos de apertura comercial de 11:00 a 20:00."}],
+    "outro": "Consulta festivos locales en la página de la tienda.",
+    "sources": ["Tienda Centro"]
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "items"
+  ],
+  "properties": {
+    "intro": {
+      "type": "string",
+      "maxLength": 4000
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "product_id"
+        ],
+        "properties": {
+          "product_id": {
+            "type": [
+              "string",
+              "integer"
+            ],
+            "description": "Identificador presente en los resultados RAG o en la colección activa."
+          },
+          "variation_id": {
+            "type": [
+              "string",
+              "integer",
+              "null"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 300
+          },
+          "body": {
+            "type": "string",
+            "maxLength": 4000
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 999
+          }
+        }
+      },
+      "maxItems": 40
+    },
+    "outro": {
+      "type": "string",
+      "maxLength": 4000
+    }
+  }
+}

@@ -1,0 +1,44 @@
+# Skill payment: migrada desde el módulo Drupal webassistant_ai (CG-06.6).
+api_version: webassistant.ai/v1
+name: payment
+version: 1.0.0
+title: Pago
+group: ecommerce
+description: Guía al usuario hacia la revisión del carrito y el checkout del portal.
+intent: Usar cuando el usuario quiera pagar, finalizar la compra, ir a checkout o conocer cómo completar el pago.
+when_to_use:
+- El usuario dice que quiere pagar o finalizar la compra.
+- El usuario pregunta por el siguiente paso después de añadir productos.
+examples:
+- Quiero pagar
+- Finalizar compra
+- ¿Cómo termino el pedido?
+keywords:
+- pagar
+- pago
+- checkout
+- finalizar
+- terminar
+- pedido
+- tramitar
+requires_rag: false
+permissions:
+- cart:read
+input_schema: schemas/input.json
+response_example: examples/response.json
+renderer: steps@1
+processors:
+- catalog_items
+chat_reply_fallback: He preparado el acceso al pago en el panel.
+responsive_button_label: Ver opciones de pago
+actions:
+  go_to_checkout:
+    type: host
+    label: Ir al pago
+    host_action: cart.checkout
+    description: Abre el checkout seguro del portal.
+    input_schema: schemas/actions/go_to_checkout.json
+dependencies:
+  platform: '>=1.0,<2.0'
+  capabilities:
+  - cart

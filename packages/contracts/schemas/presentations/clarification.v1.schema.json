@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://webassistant.ai/schemas/presentations/clarification.v1.schema.json",
+  "title": "Presentación clarification@1 (pregunta de aclaración con respuestas rápidas)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["question"],
+  "properties": {
+    "question": { "$ref": "_common.v1.schema.json#/$defs/text" },
+    "options": { "type": "array", "items": { "type": "string", "maxLength": 120 }, "maxItems": 6 }
+  }
+}

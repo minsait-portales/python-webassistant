@@ -1,0 +1,20 @@
+{
+  "chat_reply": "Te resumo la ficha en el panel.",
+  "result": {
+    "description": "Resumen claro del producto solicitado.",
+    "items": [
+      {
+        "product_id": "123",
+        "title": "Producto solicitado",
+        "body": "Resumen breve del producto."
+      }
+    ],
+    "points": [
+      {
+        "title": "Punto clave",
+        "body": "Dato importante de la ficha."
+      }
+    ],
+    "outro": "Puedo ampliar cualquier punto."
+  }
+}
