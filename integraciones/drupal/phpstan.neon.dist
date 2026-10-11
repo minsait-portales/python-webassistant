@@ -1,0 +1,11 @@
+# PHPStan del conector (mglaman/phpstan-drupal y deprecation rules se cargan con
+# phpstan/extension-installer desde el proyecto Drupal). El módulo se analiza en
+# su enlace dentro de la instalación Drupal: DRUPAL_ROOT=/ruta/drupal.
+parameters:
+  level: 5
+  paths:
+    - %env.DRUPAL_ROOT%/web/modules/custom/webassistant_connector
+  excludePaths:
+    analyseAndScan:
+      - %env.DRUPAL_ROOT%/web/modules/custom/webassistant_connector/tests/stubs/*
+  reportUnmatchedIgnoredErrors: false

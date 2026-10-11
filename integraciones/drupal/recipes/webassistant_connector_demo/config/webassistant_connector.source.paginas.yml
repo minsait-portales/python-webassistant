@@ -1,0 +1,53 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_documentos
+    - node.type.article
+    - node.type.page
+  module:
+    - node
+    - webassistant_connector_documents
+third_party_settings:
+  webassistant_connector_documents:
+    enabled: true
+    fields:
+      - field_documentos
+    knowledge_base: documentos
+    mime_types:
+      - application/pdf
+      - application/vnd.openxmlformats-officedocument.wordprocessingml.document
+    max_bytes: 50000000
+    url_ttl: 0
+    download_base_url: ''
+id: paginas
+label: 'Páginas y artículos'
+entity_type: node
+bundles:
+  - article
+  - page
+langcodes: []
+knowledge_base: ayuda
+document_type: guide
+normalizer: content_entity
+acl_mode: access
+site_scoped: false
+mapping_version: 1
+fields:
+  -
+    field: title
+    role: title
+  -
+    field: body
+    role: main_content
+  -
+    field: field_tags
+    role: metadata
+    key: tags
+    depth: 1
+  -
+    field: field_image
+    role: image
+  -
+    field: changed
+    role: date

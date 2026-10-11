@@ -13,7 +13,8 @@
     "typecheck": "npm run typecheck --workspaces",
     "lint": "eslint . && prettier --check \"**/*.{ts,mjs,json,css,md}\" --ignore-path .prettierignore",
     "format": "prettier --write \"**/*.{ts,mjs,json,css}\" --ignore-path .prettierignore",
-    "test": "npm run test --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present && npm run test:drupal",
+    "test:drupal": "vitest run -c integraciones/drupal/tests/js/vitest.config.mjs",
     "e2e": "npm run e2e -w @webassistant/widget && npm run e2e -w @webassistant/admin",
     "generate:sdk": "npm run generate -w @webassistant/sdk"
   },

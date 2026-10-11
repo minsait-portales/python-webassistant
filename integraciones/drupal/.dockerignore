@@ -1,0 +1,8 @@
+# Contexto de la imagen de Drupal: módulo, receta y arranque.
+docs
+tests
+**/node_modules
+**/test-results
+**/playwright-report
+scripts
+*.md

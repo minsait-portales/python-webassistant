@@ -1,0 +1,329 @@
+# Schema for the configuration of the WebAssistant connector (design section 3).
+webassistant_connector.settings:
+  type: config_object
+  label: 'WebAssistant connector settings'
+  mapping:
+    enabled:
+      type: boolean
+      label: 'Connector enabled'
+    api:
+      type: mapping
+      label: 'Platform API'
+      mapping:
+        base_url:
+          type: string
+          label: 'Server-to-server API URL'
+        public_url:
+          type: string
+          label: 'Browser API URL (empty: same as the server URL)'
+        timeout:
+          type: integer
+          label: 'Request timeout in seconds'
+          constraints:
+            Range:
+              min: 1
+              max: 120
+        connect_timeout:
+          type: integer
+          label: 'Connection timeout in seconds'
+          constraints:
+            Range:
+              min: 1
+              max: 60
+    site_id:
+      type: string
+      label: 'Public site ID'
+      constraints:
+        Regex:
+          pattern: '/^[a-z][a-z0-9_-]{1,63}$/'
+          message: 'The site ID must start with a lowercase letter and contain only lowercase letters, digits, hyphens and underscores.'
+    tenant_id:
+      type: string
+      label: 'Tenant ID (informative)'
+    assistant_id:
+      type: string
+      label: 'Default assistant ID (empty: the site default)'
+    client_id:
+      type: string
+      label: 'API client ID (not secret)'
+    widget:
+      type: mapping
+      label: 'Widget'
+      mapping:
+        placement:
+          type: string
+          label: 'Placement'
+          constraints:
+            Choice:
+              choices:
+                - global
+                - block
+        position:
+          type: string
+          label: 'Position'
+          constraints:
+            Choice:
+              choices:
+                - ''
+                - left
+                - right
+        open:
+          type: boolean
+          label: 'Open on load'
+        result_target:
+          type: string
+          label: 'CSS selector of the results container'
+        pass_locale:
+          type: boolean
+          label: 'Send the interface language'
+        visibility:
+          type: mapping
+          label: 'Visibility'
+          mapping:
+            exclude_admin_routes:
+              type: boolean
+              label: 'Hide on administration routes'
+            pages:
+              type: string
+              label: 'Path patterns, one per line'
+            negate:
+              type: boolean
+              label: 'Hide on the listed pages (instead of showing only there)'
+        analytics_datalayer:
+          type: boolean
+          label: 'Publish widget events in window.dataLayer'
+    identity:
+      type: mapping
+      label: 'Identity'
+      mapping:
+        authenticated:
+          type: boolean
+          label: 'Issue widget tokens for authenticated users'
+        token_ttl:
+          type: integer
+          label: 'Token lifetime in seconds'
+          constraints:
+            Range:
+              min: 60
+              max: 3600
+        send_origin:
+          type: boolean
+          label: 'Bind the token to the page origin'
+        send_roles:
+          type: boolean
+          label: 'Send user roles'
+        base_scopes:
+          type: sequence
+          label: 'Scopes granted to every authenticated user'
+          sequence:
+            type: string
+            label: 'Scope'
+        scope_permissions:
+          type: sequence
+          label: 'Scopes granted by Drupal permissions'
+          sequence:
+            type: mapping
+            label: 'Scope mapping'
+            mapping:
+              scope:
+                type: string
+                label: 'Scope'
+              permission:
+                type: string
+                label: 'Permission'
+        rate_limit:
+          type: integer
+          label: 'Tokens per user and minute'
+          constraints:
+            Range:
+              min: 1
+              max: 1000
+    sync:
+      type: mapping
+      label: 'Synchronization'
+      mapping:
+        enabled:
+          type: boolean
+          label: 'Synchronization enabled'
+        source_id_prefix:
+          type: string
+          label: 'Remote source_id prefix'
+          constraints:
+            Regex:
+              pattern: '/^[a-z][a-z0-9_.-]{1,31}$/'
+              message: 'The prefix must start with a lowercase letter and contain only lowercase letters, digits, dots, hyphens and underscores (up to 32 characters).'
+        public_base_url:
+          type: string
+          label: 'Public base URL for canonical URLs'
+        default_locale:
+          type: string
+          label: 'Locale for entities without language'
+          constraints:
+            Regex:
+              pattern: '/^[a-z]{2}(-[A-Z]{2})?$/'
+              message: 'The locale must look like "es" or "pt-BR".'
+        batch_size:
+          type: integer
+          label: 'Documents per ingestion request'
+          constraints:
+            Range:
+              min: 1
+              max: 100
+        max_attempts:
+          type: integer
+          label: 'Maximum delivery attempts'
+          constraints:
+            Range:
+              min: 1
+              max: 100
+        process_limit:
+          type: integer
+          label: 'Events per queue or cron run'
+          constraints:
+            Range:
+              min: 1
+              max: 100000
+        reconcile_interval:
+          type: integer
+          label: 'Reconciliation interval in seconds (0: disabled)'
+          constraints:
+            Range:
+              min: 0
+        retention_days:
+          type: integer
+          label: 'Days to keep completed events'
+          constraints:
+            Range:
+              min: 0
+              max: 3650
+
+# Source config entity (design section 8.1). Third-party settings of other
+# modules use the type
+# webassistant_connector.source.*.third_party.<module>.
+webassistant_connector.source.*:
+  type: config_entity
+  label: 'WebAssistant source'
+  mapping:
+    id:
+      type: machine_name
+      label: 'ID'
+    label:
+      type: required_label
+      label: 'Label'
+    entity_type:
+      type: string
+      label: 'Entity type'
+      constraints:
+        NotBlank: {}
+    bundles:
+      type: sequence
+      label: 'Bundles (empty: all)'
+      sequence:
+        type: string
+        label: 'Bundle'
+    langcodes:
+      type: sequence
+      label: 'Languages (empty: all)'
+      sequence:
+        type: string
+        label: 'Language code'
+    knowledge_base:
+      type: string
+      label: 'Knowledge base'
+      constraints:
+        Regex:
+          pattern: '/^[a-z][a-z0-9_-]{1,62}$/'
+          message: 'The knowledge base key must match ^[a-z][a-z0-9_-]{1,62}$.'
+    document_type:
+      type: string
+      label: 'Document type'
+      constraints:
+        Regex:
+          pattern: '/^[a-z][a-z0-9_]{1,40}$/'
+          message: 'The document type must match ^[a-z][a-z0-9_]{1,40}$.'
+    normalizer:
+      type: string
+      label: 'Normalizer plugin'
+    acl_mode:
+      type: string
+      label: 'ACL mode'
+      constraints:
+        Choice:
+          - access
+          - public
+          - authenticated
+          - field
+    site_scoped:
+      type: boolean
+      label: 'Limit documents to this site'
+    mapping_version:
+      type: integer
+      label: 'Mapping version'
+      constraints:
+        Range:
+          min: 1
+    fields:
+      type: sequence
+      label: 'Field roles'
+      sequence:
+        type: mapping
+        label: 'Field role'
+        mapping:
+          field:
+            type: string
+            label: 'Field name'
+          role:
+            type: string
+            label: 'Role'
+            constraints:
+              Choice:
+                - title
+                - main_content
+                - context
+                - metadata
+                - filter
+                - url
+                - image
+                - date
+                - acl
+                - exclusion
+          key:
+            type: string
+            label: 'Metadata key'
+            requiredKey: false
+          depth:
+            type: integer
+            label: 'Reference depth'
+            requiredKey: false
+            constraints:
+              Range:
+                min: 0
+                max: 2
+          target_bundles:
+            type: sequence
+            label: 'Allowed bundles of referenced entities (empty: all)'
+            requiredKey: false
+            sequence:
+              type: string
+              label: 'Bundle'
+
+# Widget block (design section 6).
+block.settings.webassistant_connector_widget:
+  type: block_settings
+  label: 'WebAssistant widget block'
+  mapping:
+    assistant_id:
+      type: string
+      label: 'Assistant ID (empty: the default one)'
+    result_target:
+      type: string
+      label: 'CSS selector of the results container'
+    render_result_container:
+      type: boolean
+      label: 'Render the results container'
+    position:
+      type: string
+      label: 'Position'
+    open:
+      type: boolean
+      label: 'Open on load'

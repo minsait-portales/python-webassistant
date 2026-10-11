@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Estándares de código del conector Drupal (drupal/coder). -->
+<ruleset name="webassistant_connector">
+  <description>Drupal y DrupalPractice para el conector WebAssistant.</description>
+  <file>webassistant_connector</file>
+  <arg name="extensions" value="php,module,inc,install,test,profile,theme,info,yml"/>
+  <arg name="report-width" value="120"/>
+  <arg value="sp"/>
+  <exclude-pattern>*/node_modules/*</exclude-pattern>
+  <exclude-pattern>*/vendor/*</exclude-pattern>
+  <rule ref="Drupal"/>
+  <rule ref="DrupalPractice"/>
+</ruleset>

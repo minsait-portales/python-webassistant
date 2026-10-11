@@ -1,0 +1,8 @@
+name: 'WebAssistant connector test'
+type: module
+description: 'Test helpers of the WebAssistant connector: replaces the platform client with an in-memory fake.'
+package: Testing
+hidden: true
+core_version_requirement: ^11.2
+dependencies:
+  - webassistant_connector:webassistant_connector

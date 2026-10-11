@@ -33,6 +33,18 @@ export default tseslint.config(
   { files: ['**/*.mjs', '**/*.config.ts', '**/e2e/serve.mjs'], languageOptions: { globals: globals.node } },
   { files: ['demo/**/*.js'], languageOptions: { sourceType: 'script', globals: globals.browser } },
   {
+    files: ['integraciones/drupal/tests/js/**/*.mjs'],
+    languageOptions: { globals: { ...globals.browser, ...globals.node } },
+  },
+  {
+    // Behaviors del conector Drupal (script clásico con las globales de Drupal).
+    files: ['integraciones/drupal/**/js/**/*.js'],
+    languageOptions: {
+      sourceType: 'script',
+      globals: { ...globals.browser, Drupal: 'readonly', drupalSettings: 'readonly', once: 'readonly' },
+    },
+  },
+  {
     files: ['**/tests/**/*.ts', '**/e2e/**/*.ts'],
     rules: { 'no-restricted-properties': 'off', '@typescript-eslint/no-non-null-assertion': 'off' },
   },

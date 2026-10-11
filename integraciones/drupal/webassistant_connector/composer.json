@@ -1,0 +1,20 @@
+{
+  "name": "minsait/webassistant_connector",
+  "description": "Drupal 11 connector for the WebAssistant platform: widget, identity, host actions and content synchronization.",
+  "type": "drupal-custom-module",
+  "license": "GPL-2.0-or-later",
+  "keywords": [
+    "Drupal",
+    "WebAssistant",
+    "assistant",
+    "RAG"
+  ],
+  "require": {
+    "php": ">=8.3",
+    "drupal/core": "^11.2"
+  },
+  "suggest": {
+    "drupal/commerce": "Required by the webassistant_connector_commerce submodule."
+  },
+  "minimum-stability": "stable"
+}

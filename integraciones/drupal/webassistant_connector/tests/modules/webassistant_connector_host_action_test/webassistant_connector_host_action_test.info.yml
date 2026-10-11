@@ -1,0 +1,7 @@
+name: 'WebAssistant connector host action test'
+type: module
+description: 'Test host actions for the WebAssistant connector tests.'
+package: Testing
+hidden: true
+dependencies:
+  - webassistant_connector:webassistant_connector

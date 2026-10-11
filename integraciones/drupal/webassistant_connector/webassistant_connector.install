@@ -1,0 +1,256 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the WebAssistant connector.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_schema().
+ */
+function webassistant_connector_schema(): array {
+  $schema['webassistant_connector_outbox'] = [
+    'description' => 'Pending synchronization events (transactional outbox) for the WebAssistant platform.',
+    'fields' => [
+      'id' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'Primary key.',
+      ],
+      'event_id' => [
+        'type' => 'varchar_ascii',
+        'length' => 36,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Event UUID.',
+      ],
+      'operation' => [
+        'type' => 'varchar_ascii',
+        'length' => 16,
+        'not null' => TRUE,
+        'default' => 'upsert',
+        'description' => 'Operation: upsert or delete.',
+      ],
+      'source' => [
+        'type' => 'varchar_ascii',
+        'length' => 64,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'ID of the webassistant_source config entity.',
+      ],
+      'entity_type' => [
+        'type' => 'varchar_ascii',
+        'length' => 64,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Entity type ID.',
+      ],
+      'entity_id' => [
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Entity ID.',
+      ],
+      'entity_uuid' => [
+        'type' => 'varchar_ascii',
+        'length' => 36,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Entity UUID.',
+      ],
+      'langcode' => [
+        'type' => 'varchar_ascii',
+        'length' => 12,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Language code of the translation.',
+      ],
+      'revision_id' => [
+        'type' => 'varchar_ascii',
+        'length' => 32,
+        'not null' => FALSE,
+        'description' => 'Revision ID at capture time (informative).',
+      ],
+      'status' => [
+        'type' => 'varchar_ascii',
+        'length' => 16,
+        'not null' => TRUE,
+        'default' => 'pending',
+        'description' => 'Status: pending, processing, done, failed or dead.',
+      ],
+      'attempts' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Number of delivery attempts.',
+      ],
+      'next_attempt' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Timestamp of the next attempt.',
+      ],
+      'last_error' => [
+        'type' => 'varchar',
+        'length' => 1024,
+        'not null' => FALSE,
+        'description' => 'Last error, without secrets.',
+      ],
+      'correlation_id' => [
+        'type' => 'varchar_ascii',
+        'length' => 64,
+        'not null' => FALSE,
+        'description' => 'X-Request-Id of the last platform request.',
+      ],
+      'remote' => [
+        'type' => 'text',
+        'size' => 'normal',
+        'not null' => FALSE,
+        'description' => 'Summarized remote result (JSON).',
+      ],
+      'created' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Timestamp of creation.',
+      ],
+      'changed' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Timestamp of the last change.',
+      ],
+    ],
+    'primary key' => ['id'],
+    'unique keys' => [
+      'event_id' => ['event_id'],
+    ],
+    'indexes' => [
+      'status_next_attempt' => ['status', 'next_attempt'],
+      'entity_key' => ['source', 'entity_type', 'entity_id', 'langcode'],
+    ],
+  ];
+
+  $schema['webassistant_connector_document'] = [
+    'description' => 'Documents sent to the WebAssistant platform per entity and translation.',
+    'fields' => [
+      'knowledge_base' => [
+        'type' => 'varchar_ascii',
+        'length' => 64,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Remote knowledge base key.',
+      ],
+      'remote_id' => [
+        'type' => 'varchar_ascii',
+        'length' => 256,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Remote source_id.',
+      ],
+      'source' => [
+        'type' => 'varchar_ascii',
+        'length' => 64,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'ID of the webassistant_source config entity.',
+      ],
+      'entity_type' => [
+        'type' => 'varchar_ascii',
+        'length' => 64,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Entity type ID.',
+      ],
+      'entity_id' => [
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Entity ID.',
+      ],
+      'langcode' => [
+        'type' => 'varchar_ascii',
+        'length' => 12,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Language code of the translation.',
+      ],
+      'attachment' => [
+        'type' => 'varchar_ascii',
+        'length' => 64,
+        'not null' => FALSE,
+        'description' => 'UUID of the attached file, if the document is an original.',
+      ],
+      'version' => [
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Version sent.',
+      ],
+      'content_hash' => [
+        'type' => 'varchar_ascii',
+        'length' => 64,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'SHA-256 of the content sent.',
+      ],
+      'acl' => [
+        'type' => 'text',
+        'size' => 'normal',
+        'not null' => FALSE,
+        'description' => 'ACL sent (JSON list).',
+      ],
+      'remote_status' => [
+        'type' => 'varchar_ascii',
+        'length' => 16,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Last remote status (queued, ready, failed...).',
+      ],
+      'synced' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Timestamp of the last synchronization.',
+      ],
+    ],
+    'primary key' => ['knowledge_base', 'remote_id'],
+    'indexes' => [
+      'entity_key' => ['source', 'entity_type', 'entity_id', 'langcode'],
+      'attachment' => ['attachment'],
+    ],
+  ];
+
+  return $schema;
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function webassistant_connector_uninstall(bool $is_syncing): void {
+  // State entries owned by the module (all prefixed with the module name).
+  $state_names = array_filter(
+    array_keys(\Drupal::keyValue('state')->getAll()),
+    static fn (string $name): bool => str_starts_with($name, 'webassistant_connector.'),
+  );
+  if ($state_names !== []) {
+    \Drupal::state()->deleteMultiple(array_values($state_names));
+  }
+
+  // Key/value collections (idempotency of host actions and module data).
+  foreach (['webassistant_connector', 'webassistant_connector.host_action'] as $collection) {
+    \Drupal::keyValue($collection)->deleteAll();
+    \Drupal::keyValueExpirable($collection)->deleteAll();
+  }
+
+  // Queues.
+  foreach (['webassistant_connector_dispatch', 'webassistant_connector_reconcile'] as $queue) {
+    \Drupal::queue($queue)->deleteQueue();
+  }
+}

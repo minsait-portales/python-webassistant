@@ -75,6 +75,7 @@ packages/contracts  OpenAPI y JSON Schema de todos los contratos v1
 packages/sdk-js     SDK TypeScript (@webassistant/sdk)
 packages/skill-sdk  SDK Python de skills (webassistant-skill-sdk + CLI webassistant-skill)
 examples/skills     Skill de ejemplo instalada sin tocar el núcleo
+integraciones/      Conectores de plataformas (Drupal 11: módulo webassistant_connector)
 demo/               Web HTML de demostración (CG-16.3)
 docker/, compose*.yaml   Imagen única y despliegue con Docker Compose
 deploy/k8s          Kustomize para la arquitectura objetivo de producción
@@ -111,6 +112,7 @@ Las pruebas sobre PostgreSQL real (migraciones y RLS) se activan con
 | [Modelo de amenazas](docs/seguridad/modelo-amenazas.md) | Riesgos y mitigaciones |
 | [Guía de integración](docs/integracion.md) | API v1, autenticación, widget, host actions, eventos, SDK e ingesta |
 | [Matriz por plataforma](docs/integraciones.md) | Propuesta de integración con Drupal, Liferay, AEM, SharePoint y WordPress |
+| [Conector Drupal 11](integraciones/drupal/README.md) | Módulo `webassistant_connector`: widget, identidad, sincronización, originales, Commerce y host actions |
 | [Guía de skills](docs/skills.md) | Crear e instalar skills sin modificar el núcleo |
 | [Manual de la consola](docs/consola.md) | Administración, costes, límites y auditoría |
 | [Configuración](docs/configuracion.md) | Todas las variables `WEBASSISTANT_*` |

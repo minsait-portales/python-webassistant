@@ -1,0 +1,47 @@
+webassistant_connector.settings:
+  title: 'Settings'
+  route_name: webassistant_connector.settings
+  base_route: webassistant_connector.settings
+  weight: 0
+
+webassistant_connector.identity:
+  title: 'Identity'
+  route_name: webassistant_connector.identity
+  base_route: webassistant_connector.settings
+  weight: 10
+
+webassistant_connector.sync_settings:
+  title: 'Synchronization'
+  route_name: webassistant_connector.sync_settings
+  base_route: webassistant_connector.settings
+  weight: 20
+
+webassistant_connector.sources:
+  title: 'Sources'
+  route_name: entity.webassistant_source.collection
+  base_route: webassistant_connector.settings
+  weight: 30
+
+webassistant_connector.status:
+  title: 'Status'
+  route_name: webassistant_connector.status
+  base_route: webassistant_connector.settings
+  weight: 40
+
+entity.webassistant_source.edit_form:
+  title: 'Edit'
+  route_name: entity.webassistant_source.edit_form
+  base_route: entity.webassistant_source.edit_form
+  weight: 0
+
+entity.webassistant_source.preview_form:
+  title: 'Preview'
+  route_name: entity.webassistant_source.preview_form
+  base_route: entity.webassistant_source.edit_form
+  weight: 10
+
+entity.webassistant_source.delete_form:
+  title: 'Delete'
+  route_name: entity.webassistant_source.delete_form
+  base_route: entity.webassistant_source.edit_form
+  weight: 20

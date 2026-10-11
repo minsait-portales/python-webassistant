@@ -1,0 +1,5 @@
+entity.webassistant_source.add_form:
+  title: 'Add source'
+  route_name: entity.webassistant_source.add_form
+  appears_on:
+    - entity.webassistant_source.collection

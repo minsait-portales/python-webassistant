@@ -1,0 +1,72 @@
+name: 'WebAssistant connector demo'
+description: 'Installs the WebAssistant connector with example synchronization sources (pages and articles with PDF originals), permissions and settings for the Docker demo.'
+type: 'Site'
+install:
+  - file
+  - language
+  - node
+  - webassistant_connector
+  - webassistant_connector_documents
+input:
+  site_id:
+    data_type: string
+    description: 'Public site ID registered in the WebAssistant platform.'
+    constraints:
+      Regex:
+        pattern: '/^[a-z][a-z0-9_-]{1,63}$/'
+    default:
+      source: value
+      value: site_demo
+  public_base_url:
+    data_type: string
+    description: 'Public base URL of this Drupal site (canonical URLs of the documents).'
+    default:
+      source: value
+      value: 'http://localhost:8080'
+  download_base_url:
+    data_type: string
+    description: 'URL with which the platform worker reaches this Drupal site to download originals.'
+    default:
+      source: value
+      value: 'http://drupal'
+config:
+  actions:
+    webassistant_connector.settings:
+      simpleConfigUpdate:
+        site_id: ${site_id}
+        sync.public_base_url: ${public_base_url}
+        sync.source_id_prefix: drupal-demo
+    webassistant_connector.source.paginas:
+      setThirdPartySetting:
+        module: webassistant_connector_documents
+        key: download_base_url
+        value: ${download_base_url}
+    core.entity_form_display.node.article.default:
+      setComponent:
+        name: field_documentos
+        options:
+          type: file_generic
+          weight: 20
+          region: content
+          settings:
+            progress_indicator: throbber
+          third_party_settings: {}
+    core.entity_view_display.node.article.default:
+      setComponent:
+        name: field_documentos
+        options:
+          type: file_default
+          label: above
+          weight: 20
+          region: content
+          settings:
+            use_description_as_link_text: true
+          third_party_settings: {}
+    user.role.anonymous:
+      grantPermissions:
+        - 'use webassistant connector'
+    user.role.authenticated:
+      grantPermissions:
+        - 'use webassistant connector'
+        - 'use webassistant content actions'
+        - 'use webassistant profile actions'

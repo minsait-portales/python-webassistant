@@ -1,0 +1,75 @@
+# Widget token for the authenticated user (section 5). JSON only, never cached.
+webassistant_connector.token:
+  path: '/webassistant/token'
+  methods: [POST]
+  defaults:
+    _controller: '\Drupal\webassistant_connector\Controller\TokenController::token'
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    _permission: 'use webassistant connector'
+    _csrf_request_header_token: 'TRUE'
+    _format: 'json'
+  options:
+    no_cache: TRUE
+
+# Host action endpoint (section 7). The body is the host action object in JSON.
+webassistant_connector.host_action:
+  path: '/webassistant/host-action/{name}'
+  methods: [POST]
+  defaults:
+    _controller: '\Drupal\webassistant_connector\Controller\HostActionController::execute'
+  requirements:
+    name: '[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+'
+    _custom_access: '\Drupal\webassistant_connector\Access\HostActionAccessCheck::access'
+    _csrf_request_header_token: 'TRUE'
+    _format: 'json'
+    _content_type_format: 'json'
+  options:
+    no_cache: TRUE
+
+# Administration (section 10). Source entity routes (collection, add, edit,
+# delete) come from the AdminHtmlRouteProvider of the webassistant_source
+# entity type; the preview form is declared here.
+webassistant_connector.settings:
+  path: '/admin/config/services/webassistant-connector'
+  defaults:
+    _form: '\Drupal\webassistant_connector\Form\SettingsForm'
+    _title: 'WebAssistant connector'
+  requirements:
+    _permission: 'administer webassistant connector'
+
+webassistant_connector.identity:
+  path: '/admin/config/services/webassistant-connector/identity'
+  defaults:
+    _form: '\Drupal\webassistant_connector\Form\IdentityForm'
+    _title: 'Identity'
+  requirements:
+    _permission: 'administer webassistant connector'
+
+webassistant_connector.sync_settings:
+  path: '/admin/config/services/webassistant-connector/sync'
+  defaults:
+    _form: '\Drupal\webassistant_connector\Form\SyncSettingsForm'
+    _title: 'Synchronization'
+  requirements:
+    _permission: 'administer webassistant connector'
+
+webassistant_connector.status:
+  path: '/admin/config/services/webassistant-connector/status'
+  defaults:
+    _controller: '\Drupal\webassistant_connector\Controller\StatusController::page'
+    _title: 'WebAssistant status'
+  requirements:
+    _permission: 'administer webassistant connector'
+
+entity.webassistant_source.preview_form:
+  path: '/admin/config/services/webassistant-connector/sources/{webassistant_source}/preview'
+  defaults:
+    _entity_form: 'webassistant_source.preview'
+    _title: 'Preview canonical document'
+  requirements:
+    _permission: 'administer webassistant connector'
+  options:
+    parameters:
+      webassistant_source:
+        type: 'entity:webassistant_source'

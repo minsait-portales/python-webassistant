@@ -1,0 +1,16 @@
+administer webassistant connector:
+  title: 'Administer WebAssistant connector'
+  description: 'Configure the platform connection, identity, synchronization sources and diagnostics, and run the Drush commands.'
+  restrict access: true
+
+use webassistant connector:
+  title: 'Use WebAssistant connector'
+  description: 'Obtain an authenticated widget token and execute host actions.'
+
+use webassistant content actions:
+  title: 'Use WebAssistant content actions'
+  description: 'Grants the content:write scope and the content.create and content.edit host actions. Drupal access checks still apply.'
+
+use webassistant profile actions:
+  title: 'Use WebAssistant profile actions'
+  description: 'Grants the profile:read scope and the user.profile host action.'

@@ -129,6 +129,57 @@ jobs:
             apps/*/test-results
             apps/*/playwright-report
 
+  drupal:
+    name: Conector Drupal 11 (calidad y PHPUnit)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          extensions: gd, pdo_sqlite, sqlite3, zip, intl
+          coverage: none
+          tools: composer:v2
+      - name: Drupal 11 con dependencias de desarrollo
+        run: |
+          composer create-project drupal/recommended-project:^11.2 "$RUNNER_TEMP/drupal" --no-interaction
+          cd "$RUNNER_TEMP/drupal"
+          composer require --dev --no-interaction -W drupal/core-dev:^11.2 drush/drush:^13 phpstan/phpstan-deprecation-rules:^2
+      - name: phpcs, phpstan y PHPUnit (unit, kernel y functional)
+        run: integraciones/drupal/scripts/check.sh all
+        env:
+          DRUPAL_ROOT: ${{ runner.temp }}/drupal
+          SIMPLETEST_DB: sqlite://localhost//tmp/webassistant-connector.sqlite
+
+  drupal-e2e:
+    name: Conector Drupal 11 extremo a extremo
+    runs-on: ubuntu-24.04
+    needs: [drupal]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Plataforma + Drupal 11 con el conector
+        run: docker compose -f compose.yaml -f integraciones/drupal/compose.drupal.yaml up -d --build --wait --wait-timeout 600
+      - name: Drupal ↔ plataforma (sincronización, PDF, búsqueda, widget, token y host actions)
+        run: npx playwright test -c integraciones/drupal/tests/e2e/playwright.config.ts
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: drupal-e2e
+          path: |
+            integraciones/drupal/tests/e2e/test-results
+            integraciones/drupal/tests/e2e/playwright-report
+      - name: Logs si falla
+        if: failure()
+        run: docker compose -f compose.yaml -f integraciones/drupal/compose.drupal.yaml logs --no-color drupal api worker | tail -400
+      - if: always()
+        run: docker compose -f compose.yaml -f integraciones/drupal/compose.drupal.yaml down -v
+
   security:
     name: Seguridad (SAST y dependencias)
     runs-on: ubuntu-24.04

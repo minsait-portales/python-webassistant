@@ -1,0 +1,8 @@
+widget:
+  version: 1.0.0
+  js:
+    js/webassistant-connector.js: {}
+  dependencies:
+    - core/drupal
+    - core/drupalSettings
+    - core/once

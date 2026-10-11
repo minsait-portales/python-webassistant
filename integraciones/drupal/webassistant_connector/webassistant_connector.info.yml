@@ -1,0 +1,9 @@
+name: 'WebAssistant connector'
+type: module
+description: 'Connects Drupal with the WebAssistant platform: widget, identity, host actions and content synchronization.'
+package: Minsait
+core_version_requirement: ^11.2
+php: 8.3
+configure: webassistant_connector.settings
+'interface translation project': webassistant_connector
+'interface translation server pattern': modules/custom/webassistant_connector/translations/%language.po

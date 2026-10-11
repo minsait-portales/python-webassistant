@@ -1,0 +1,6 @@
+webassistant_connector.settings:
+  title: 'WebAssistant connector'
+  description: 'Connect the site with the WebAssistant platform: widget, identity, synchronization and status.'
+  route_name: webassistant_connector.settings
+  parent: system.admin_config_services
+  weight: 10

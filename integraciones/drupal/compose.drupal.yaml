@@ -1,0 +1,64 @@
+# Drupal 11 con el conector WebAssistant junto a la plataforma (desarrollo, demo y e2e).
+# Desde la raíz del repositorio:
+#
+#   docker compose -f compose.yaml -f integraciones/drupal/compose.drupal.yaml up -d --build --wait
+#
+#   http://localhost:8080          portal Drupal con el widget (admin/admin, editor/editor)
+#   http://localhost:8000/admin/   consola de la plataforma
+#
+# El Drupal usa el site site_demo y el cliente API wa_demo_portal que crea la demo de la
+# plataforma (el origen http://localhost:8080 ya está permitido). El worker descarga los
+# originales firmados desde http://drupal (red interna de Docker).
+
+services:
+  drupal:
+    image: ${WEBASSISTANT_DRUPAL_IMAGE:-webassistant-drupal:local}
+    build:
+      context: integraciones/drupal
+      dockerfile: docker/Dockerfile
+      secrets: [extra_ca]
+      # Redes restringidas: DRUPAL_BUILD_NETWORK=host y DRUPAL_BUILD_HTTPS_PROXY con el proxy.
+      network: ${DRUPAL_BUILD_NETWORK:-default}
+      args:
+        WITH_COMMERCE: ${DRUPAL_WITH_COMMERCE:-0}
+        DRUPAL_PACKAGES: ${DRUPAL_PACKAGES:-1}
+        COMPOSER_PREFER_SOURCE: ${DRUPAL_COMPOSER_PREFER_SOURCE:-0}
+        HTTPS_PROXY: ${DRUPAL_BUILD_HTTPS_PROXY:-}
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "${DRUPAL_PORT:-8080}:80"
+    environment:
+      DRUPAL_SITE_NAME: ${DRUPAL_SITE_NAME:-Portal Drupal WebAssistant}
+      DRUPAL_ADMIN_PASSWORD: ${DRUPAL_ADMIN_PASSWORD:-admin}
+      DRUPAL_EDITOR_PASSWORD: ${DRUPAL_EDITOR_PASSWORD:-editor}
+      DRUPAL_PUBLIC_URL: ${DRUPAL_PUBLIC_URL:-http://localhost:8080}
+      DRUPAL_DEFAULT_LANGCODE: ${DRUPAL_DEFAULT_LANGCODE:-es}
+      DRUPAL_CRON_INTERVAL: ${DRUPAL_CRON_INTERVAL:-30}
+      DRUPAL_TRUSTED_HOSTS: '^localhost$,^127\.0\.0\.1$,^drupal$'
+      # Conexión con la plataforma (secretos solo en variables de entorno).
+      WEBASSISTANT_API_URL: http://api:8000
+      WEBASSISTANT_API_PUBLIC_URL: ${WEBASSISTANT_PUBLIC_BASE_URL:-http://localhost:8000}
+      WEBASSISTANT_SITE_ID: ${WEBASSISTANT_DRUPAL_SITE_ID:-site_demo}
+      WEBASSISTANT_CLIENT_ID: ${WEBASSISTANT_DRUPAL_CLIENT_ID:-wa_demo_portal}
+      WEBASSISTANT_CLIENT_SECRET: ${WEBASSISTANT_DRUPAL_CLIENT_SECRET:-demo-portal-secret-change-me}
+      WEBASSISTANT_DOWNLOAD_BASE_URL: http://drupal
+    volumes:
+      - drupal-data:/var/www/drupal-data
+      - drupal-files:/opt/drupal/web/sites/default/files
+      - drupal-private:/var/www/private
+
+  # La plataforma descarga los originales del portal por la red interna.
+  api:
+    environment:
+      WEBASSISTANT_INGEST_ALLOWED_DOWNLOAD_HOSTS: ${WEBASSISTANT_INGEST_ALLOWED_DOWNLOAD_HOSTS:-drupal}
+  worker:
+    environment:
+      WEBASSISTANT_INGEST_ALLOWED_DOWNLOAD_HOSTS: ${WEBASSISTANT_INGEST_ALLOWED_DOWNLOAD_HOSTS:-drupal}
+
+volumes:
+  drupal-data:
+  drupal-files:
+  drupal-private:

@@ -1,0 +1,119 @@
+# Services of the WebAssistant connector (design sections 3-10).
+#
+# Every service is autowired: constructors may add dependencies without
+# touching this file as long as the types have an autowire alias (core
+# interfaces, or the class/interface aliases declared below). Use
+# #[Autowire(service: 'logger.channel.webassistant_connector')] for the logger
+# and #[Autowire(service: 'lock')] for the lock backend.
+#
+# Hook classes (src/Hook) are registered automatically by core as autowired
+# services, so they are not listed here.
+services:
+  _defaults:
+    autowire: true
+
+  logger.channel.webassistant_connector:
+    parent: logger.channel_base
+    arguments: ['webassistant_connector']
+
+  # Platform (sections 3.1 and 4).
+  webassistant_connector.credentials:
+    class: Drupal\webassistant_connector\Platform\Credentials
+  Drupal\webassistant_connector\Platform\Credentials: '@webassistant_connector.credentials'
+
+  webassistant_connector.platform_client:
+    class: Drupal\webassistant_connector\Platform\PlatformClient
+  Drupal\webassistant_connector\Platform\PlatformClientInterface: '@webassistant_connector.platform_client'
+  Drupal\webassistant_connector\Platform\PlatformClient: '@webassistant_connector.platform_client'
+
+  # Identity and widget (sections 5 and 6).
+  webassistant_connector.locale_mapper:
+    class: Drupal\webassistant_connector\Locale\LocaleMapper
+  Drupal\webassistant_connector\Locale\LocaleMapper: '@webassistant_connector.locale_mapper'
+
+  webassistant_connector.identity_mapper:
+    class: Drupal\webassistant_connector\Identity\IdentityMapper
+  Drupal\webassistant_connector\Identity\IdentityMapper: '@webassistant_connector.identity_mapper'
+
+  webassistant_connector.scope_resolver:
+    class: Drupal\webassistant_connector\Identity\ScopeResolver
+  Drupal\webassistant_connector\Identity\ScopeResolver: '@webassistant_connector.scope_resolver'
+
+  webassistant_connector.widget_token_manager:
+    class: Drupal\webassistant_connector\Identity\WidgetTokenManager
+  Drupal\webassistant_connector\Identity\WidgetTokenManager: '@webassistant_connector.widget_token_manager'
+
+  webassistant_connector.widget_attachment_builder:
+    class: Drupal\webassistant_connector\Widget\WidgetAttachmentBuilder
+  Drupal\webassistant_connector\Widget\WidgetAttachmentBuilder: '@webassistant_connector.widget_attachment_builder'
+
+  # Host actions (section 7).
+  plugin.manager.webassistant_connector.host_action:
+    class: Drupal\webassistant_connector\HostAction\HostActionManager
+    parent: default_plugin_manager
+  Drupal\webassistant_connector\HostAction\HostActionManager: '@plugin.manager.webassistant_connector.host_action'
+
+  webassistant_connector.host_action_registry:
+    class: Drupal\webassistant_connector\HostAction\HostActionRegistry
+  Drupal\webassistant_connector\HostAction\HostActionRegistry: '@webassistant_connector.host_action_registry'
+
+  webassistant_connector.host_action_dispatcher:
+    class: Drupal\webassistant_connector\HostAction\HostActionDispatcher
+  Drupal\webassistant_connector\HostAction\HostActionDispatcher: '@webassistant_connector.host_action_dispatcher'
+
+  # Sources and normalization (section 8).
+  plugin.manager.webassistant_connector.normalizer:
+    class: Drupal\webassistant_connector\Normalizer\NormalizerManager
+    parent: default_plugin_manager
+  Drupal\webassistant_connector\Normalizer\NormalizerManager: '@plugin.manager.webassistant_connector.normalizer'
+
+  webassistant_connector.source_id_generator:
+    class: Drupal\webassistant_connector\Sync\SourceIdGenerator
+  Drupal\webassistant_connector\Sync\SourceIdGenerator: '@webassistant_connector.source_id_generator'
+
+  webassistant_connector.url_resolver:
+    class: Drupal\webassistant_connector\Sync\UrlResolver
+  Drupal\webassistant_connector\Sync\UrlResolver: '@webassistant_connector.url_resolver'
+
+  webassistant_connector.acl_resolver:
+    class: Drupal\webassistant_connector\Sync\AclResolver
+  Drupal\webassistant_connector\Sync\AclResolver: '@webassistant_connector.acl_resolver'
+
+  webassistant_connector.source_matcher:
+    class: Drupal\webassistant_connector\Sync\SourceMatcher
+  Drupal\webassistant_connector\Sync\SourceMatcher: '@webassistant_connector.source_matcher'
+
+  # Contributors are services tagged webassistant_connector.document_contributor
+  # that implement DocumentContributorInterface (e.g. the Documents submodule).
+  webassistant_connector.document_builder:
+    class: Drupal\webassistant_connector\Sync\DocumentBuilder
+    arguments:
+      $contributors: !tagged_iterator webassistant_connector.document_contributor
+      # Optional: documents are built outside any workspace (amendment A13).
+      $workspaceManager: '@?workspaces.manager'
+  Drupal\webassistant_connector\Sync\DocumentBuilder: '@webassistant_connector.document_builder'
+
+  # Outbox, queue and ingestion (section 9).
+  webassistant_connector.outbox:
+    class: Drupal\webassistant_connector\Sync\Outbox
+  Drupal\webassistant_connector\Sync\Outbox: '@webassistant_connector.outbox'
+
+  webassistant_connector.document_map:
+    class: Drupal\webassistant_connector\Sync\DocumentMap
+  Drupal\webassistant_connector\Sync\DocumentMap: '@webassistant_connector.document_map'
+
+  webassistant_connector.sync_processor:
+    class: Drupal\webassistant_connector\Sync\SyncProcessor
+  Drupal\webassistant_connector\Sync\SyncProcessor: '@webassistant_connector.sync_processor'
+
+  webassistant_connector.indexer:
+    class: Drupal\webassistant_connector\Sync\Indexer
+  Drupal\webassistant_connector\Sync\Indexer: '@webassistant_connector.indexer'
+
+  webassistant_connector.reconciler:
+    class: Drupal\webassistant_connector\Sync\Reconciler
+  Drupal\webassistant_connector\Sync\Reconciler: '@webassistant_connector.reconciler'
+
+  webassistant_connector.sync_status:
+    class: Drupal\webassistant_connector\Sync\SyncStatus
+  Drupal\webassistant_connector\Sync\SyncStatus: '@webassistant_connector.sync_status'

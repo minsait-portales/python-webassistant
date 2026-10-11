@@ -1,0 +1,26 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_documentos
+    - node.type.article
+  module:
+    - file
+id: node.article.field_documentos
+field_name: field_documentos
+entity_type: node
+bundle: article
+label: Documentos
+description: 'Originales (PDF o Word) que el asistente puede citar.'
+required: false
+translatable: true
+default_value: {}
+default_value_callback: ''
+settings:
+  handler: 'default:file'
+  handler_settings: {}
+  file_directory: documentos
+  file_extensions: 'pdf docx'
+  max_filesize: ''
+  description_field: true
+field_type: file

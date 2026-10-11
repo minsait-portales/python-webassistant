@@ -1,0 +1,61 @@
+enabled: true
+api:
+  base_url: 'http://localhost:8000'
+  public_url: ''
+  timeout: 10
+  connect_timeout: 5
+site_id: site_demo
+tenant_id: ''
+assistant_id: ''
+client_id: ''
+widget:
+  placement: global
+  position: ''
+  open: false
+  result_target: ''
+  pass_locale: true
+  visibility:
+    exclude_admin_routes: true
+    pages: ''
+    negate: true
+  analytics_datalayer: false
+identity:
+  authenticated: true
+  token_ttl: 900
+  send_origin: true
+  send_roles: true
+  base_scopes:
+    - 'chat:use'
+    - 'knowledge:read'
+    - 'documents:read'
+    - 'actions:execute'
+  scope_permissions:
+    -
+      scope: 'catalog:read'
+      permission: 'access content'
+    -
+      scope: 'cart:read'
+      permission: 'use webassistant cart actions'
+    -
+      scope: 'cart:write'
+      permission: 'use webassistant cart actions'
+    -
+      scope: 'content:write'
+      permission: 'use webassistant content actions'
+    -
+      scope: 'profile:read'
+      permission: 'use webassistant profile actions'
+    -
+      scope: 'analytics:read'
+      permission: 'use webassistant analytics actions'
+  rate_limit: 30
+sync:
+  enabled: true
+  source_id_prefix: drupal
+  public_base_url: ''
+  default_locale: es
+  batch_size: 50
+  max_attempts: 8
+  process_limit: 200
+  reconcile_interval: 86400
+  retention_days: 7

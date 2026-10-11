@@ -1,6 +1,7 @@
 # Matriz de integración por plataforma (CG-17.5)
 
-**Estado: propuesta técnica** para revisar con los equipos de cada plataforma (CG-17.2). Los acuerdos
+**Estado: propuesta técnica** para revisar con los equipos de cada plataforma (CG-17.2). El conector de
+Drupal 11 ya está implementado como referencia en [`integraciones/drupal`](../integraciones/drupal/README.md). Los acuerdos
 cerrados se registran como ADR y se reflejan en esta tabla. Los conectores específicos (módulos, plugins,
 extensiones) quedan fuera del núcleo y los mantiene cada equipo; el producto ofrece la API v1, el SDK, el
 widget y estos contratos.
@@ -29,7 +30,7 @@ widget y estos contratos.
 | ACL | Acceso de nodo / grupos | Permisos de recurso | ACL de JCR | Permisos de elemento | Estado de publicación y roles |
 | Host actions típicas | Commerce (carrito), formularios de nodo | Commerce, formularios | Formularios, perfil | Formularios de lista, perfil | WooCommerce (carrito), formularios |
 | Responsable del conector | Equipo Drupal | Equipo Liferay | Equipo AEM | Equipo Microsoft 365 | Equipo WordPress |
-| Estado del acuerdo | Referencia: módulo `webassistant_ai` actual y demo | Pendiente | Pendiente | Pendiente | Pendiente |
+| Estado | **Conector implementado**: [`integraciones/drupal`](../integraciones/drupal/README.md) (Drupal 11.2+) | Pendiente | Pendiente | Pendiente | Pendiente |
 
 ## Decisiones abiertas
 
