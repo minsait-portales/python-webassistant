@@ -37,7 +37,7 @@ jobs:
         options: >-
           --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v6
         with:
           version: ${{ env.UV_VERSION }}
@@ -74,7 +74,7 @@ jobs:
     name: TypeScript (SDK, widget y consola)
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -100,7 +100,7 @@ jobs:
       matrix:
         browser: [chromium, firefox, webkit]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v6
         with:
           version: ${{ env.UV_VERSION }}
@@ -133,7 +133,7 @@ jobs:
     name: Conector Drupal 11 (calidad y PHPUnit)
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
         with:
           php-version: "8.3"
@@ -156,7 +156,7 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [drupal]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -184,7 +184,7 @@ jobs:
     name: Seguridad (SAST y dependencias)
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v6
         with:
           version: ${{ env.UV_VERSION }}
@@ -210,7 +210,7 @@ jobs:
     runs-on: ubuntu-24.04
     container: alpine/k8s:1.33.4
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: kustomize + kubeconform (staging y producción)
         run: |
           for env in staging production; do
@@ -227,7 +227,7 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [python, node]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Construir y levantar la plataforma
         run: docker compose up -d --build --wait --wait-timeout 300
         env:
