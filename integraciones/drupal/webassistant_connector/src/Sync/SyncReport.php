@@ -48,6 +48,26 @@ final class SyncReport {
   private int $skipped = 0;
 
   /**
+   * Documents not sent because the map shows them up to date (A8).
+   */
+  private int $unchanged = 0;
+
+  /**
+   * Claimed events given back unprocessed (time budget or suspension).
+   */
+  private int $released = 0;
+
+  /**
+   * Whether the run stopped early because the platform is unavailable (A5).
+   */
+  private bool $suspended = FALSE;
+
+  /**
+   * Seconds to wait before the next run when suspended.
+   */
+  private ?int $suspendDelay = NULL;
+
+  /**
    * Error entries.
    *
    * @var list<array{message: string, item_id: int|null, correlation_id: string|null}>
@@ -103,6 +123,38 @@ final class SyncReport {
   }
 
   /**
+   * Adds documents skipped because they are up to date.
+   */
+  public function addUnchanged(int $count = 1): self {
+    $this->unchanged += $count;
+    return $this;
+  }
+
+  /**
+   * Adds claimed events released without processing.
+   */
+  public function addReleased(int $count = 1): self {
+    $this->released += $count;
+    return $this;
+  }
+
+  /**
+   * Stops the run: the platform is unavailable (circuit breaker, A5).
+   *
+   * @param int|null $delay
+   *   Seconds to wait before the next run, if known.
+   *
+   * @return $this
+   */
+  public function suspend(?int $delay = NULL): self {
+    $this->suspended = TRUE;
+    if ($delay !== NULL) {
+      $this->suspendDelay = max($this->suspendDelay ?? 0, $delay);
+    }
+    return $this;
+  }
+
+  /**
    * Records an error (no secrets).
    *
    * @param string $message
@@ -135,6 +187,11 @@ final class SyncReport {
     $this->failed += $other->getFailed();
     $this->dead += $other->getDead();
     $this->skipped += $other->getSkipped();
+    $this->unchanged += $other->getUnchanged();
+    $this->released += $other->getReleased();
+    if ($other->isSuspended()) {
+      $this->suspend($other->getSuspendDelay());
+    }
     foreach ($other->getErrors() as $error) {
       $this->addError($error['message'], $error['item_id'], $error['correlation_id']);
     }
@@ -184,6 +241,34 @@ final class SyncReport {
   }
 
   /**
+   * Returns the documents skipped because they are up to date.
+   */
+  public function getUnchanged(): int {
+    return $this->unchanged;
+  }
+
+  /**
+   * Returns the claimed events released without processing.
+   */
+  public function getReleased(): int {
+    return $this->released;
+  }
+
+  /**
+   * Whether the run stopped because the platform is unavailable.
+   */
+  public function isSuspended(): bool {
+    return $this->suspended;
+  }
+
+  /**
+   * Returns the seconds to wait before the next run, if known.
+   */
+  public function getSuspendDelay(): ?int {
+    return $this->suspendDelay;
+  }
+
+  /**
    * Returns the error entries.
    *
    * @return list<array{message: string, item_id: int|null, correlation_id: string|null}>
@@ -203,7 +288,7 @@ final class SyncReport {
   /**
    * Returns the counters and errors.
    *
-   * @return array{processed: int, upserted: int, deleted: int, failed: int, dead: int, skipped: int, errors: list<array{message: string, item_id: int|null, correlation_id: string|null}>}
+   * @return array{processed: int, upserted: int, deleted: int, failed: int, dead: int, skipped: int, unchanged: int, released: int, suspended: bool, errors: list<array{message: string, item_id: int|null, correlation_id: string|null}>}
    *   The report.
    */
   public function toArray(): array {
@@ -214,6 +299,9 @@ final class SyncReport {
       'failed' => $this->failed,
       'dead' => $this->dead,
       'skipped' => $this->skipped,
+      'unchanged' => $this->unchanged,
+      'released' => $this->released,
+      'suspended' => $this->suspended,
       'errors' => $this->errors,
     ];
   }

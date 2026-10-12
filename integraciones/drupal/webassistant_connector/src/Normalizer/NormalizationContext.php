@@ -61,8 +61,9 @@ final class NormalizationContext {
    *   The metadata.drupal map: entity_type, bundle, id, uuid, langcode,
    *   source and mapping (first 12 characters of the mapping hash).
    * @param list<\Drupal\Core\Session\AccountInterface> $principalAccounts
-   *   One synthetic account per ACL principal (AclResolver::principalAccounts()).
-   *   Empty only for contexts built outside DocumentBuilder.
+   *   One synthetic account per ACL principal (see
+   *   AclResolver::principalAccounts()). Empty only for contexts built
+   *   outside DocumentBuilder.
    */
   public function __construct(
     public readonly array $acl,

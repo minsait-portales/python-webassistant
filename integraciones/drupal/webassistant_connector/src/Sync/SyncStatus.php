@@ -22,6 +22,8 @@ final class SyncStatus {
    *   The database connection.
    * @param \Drupal\webassistant_connector\Sync\Outbox $outbox
    *   The outbox.
+   * @param \Drupal\webassistant_connector\Sync\DocumentMap $documentMap
+   *   The document map.
    * @param \Drupal\Core\State\StateInterface $state
    *   The state service.
    * @param \Drupal\Component\Datetime\TimeInterface $time
@@ -30,6 +32,7 @@ final class SyncStatus {
   public function __construct(
     private readonly Connection $database,
     private readonly Outbox $outbox,
+    private readonly DocumentMap $documentMap,
     private readonly StateInterface $state,
     private readonly TimeInterface $time,
   ) {}
@@ -37,12 +40,21 @@ final class SyncStatus {
   /**
    * Returns every metric.
    *
-   * @return array{counts: array<string, int>, last_success: int|null, average_latency: float|null, backlog: int, recent_errors: list<array<string, mixed>>}
+   * @return array{counts: array<string, int>, last_success: int|null, average_latency: float|null, backlog: int, recent_errors: list<array<string, mixed>>, documents: int, due: int}
    *   Counts per status, last successful delivery timestamp, average latency
-   *   in seconds over 24 h, overdue events and recent errors.
+   *   in seconds over 24 h, overdue events, recent errors, mapped documents
+   *   and events a worker could claim now.
    */
   public function summary(): array {
-    throw new \LogicException('Not implemented yet.');
+    return [
+      'counts' => $this->counts(),
+      'last_success' => $this->lastSuccess(),
+      'average_latency' => $this->averageLatency(),
+      'backlog' => $this->backlog(),
+      'recent_errors' => $this->recentErrors(),
+      'documents' => $this->documentMap->count(),
+      'due' => $this->outbox->countDue(),
+    ];
   }
 
   /**
@@ -52,14 +64,15 @@ final class SyncStatus {
    *   Counts keyed by every OutboxItem::STATUSES value.
    */
   public function counts(): array {
-    throw new \LogicException('Not implemented yet.');
+    return $this->outbox->countByStatus();
   }
 
   /**
    * Returns the timestamp of the last successful delivery, if any.
    */
   public function lastSuccess(): ?int {
-    throw new \LogicException('Not implemented yet.');
+    $value = $this->state->get(SyncProcessor::STATE_LAST_SUCCESS);
+    return is_numeric($value) ? (int) $value : NULL;
   }
 
   /**
@@ -72,7 +85,16 @@ final class SyncStatus {
    *   Seconds, or NULL when there are no events in the window.
    */
   public function averageLatency(int $window = 86400): ?float {
-    throw new \LogicException('Not implemented yet.');
+    $query = $this->database->select(Outbox::TABLE, 'o')
+      ->condition('status', OutboxItem::STATUS_DONE)
+      ->condition('changed', $this->time->getCurrentTime() - $window, '>=');
+    $query->addExpression('AVG([changed] - [created])', 'latency');
+    $query->addExpression('COUNT(*)', 'total');
+    $row = $query->execute()->fetchAssoc();
+    if (!is_array($row) || (int) ($row['total'] ?? 0) === 0) {
+      return NULL;
+    }
+    return round(max(0.0, (float) $row['latency']), 1);
   }
 
   /**
@@ -85,7 +107,12 @@ final class SyncStatus {
    *   The number of overdue events.
    */
   public function backlog(int $olderThan = 3600): int {
-    throw new \LogicException('Not implemented yet.');
+    return (int) $this->database->select(Outbox::TABLE, 'o')
+      ->condition('status', [OutboxItem::STATUS_PENDING, OutboxItem::STATUS_FAILED, OutboxItem::STATUS_PROCESSING], 'IN')
+      ->condition('created', $this->time->getCurrentTime() - $olderThan, '<')
+      ->countQuery()
+      ->execute()
+      ->fetchField();
   }
 
   /**
@@ -94,11 +121,28 @@ final class SyncStatus {
    * @param int $limit
    *   Maximum number of entries.
    *
-   * @return list<array{id: int, source: string, entity_type: string, entity_id: string, langcode: string, operation: string, status: string, attempts: int, last_error: string|null, correlation_id: string|null, changed: int}>
+   * @return list<array{id: int, source: string, entity_type: string, entity_id: string, langcode: string, operation: string, status: string, attempts: int, last_error: string|null, correlation_id: string|null, changed: int, next_attempt: int}>
    *   The entries, most recent first.
    */
   public function recentErrors(int $limit = 10): array {
-    throw new \LogicException('Not implemented yet.');
+    $entries = [];
+    foreach ($this->outbox->recent($limit, [OutboxItem::STATUS_FAILED, OutboxItem::STATUS_DEAD]) as $item) {
+      $entries[] = [
+        'id' => $item->id,
+        'source' => $item->source,
+        'entity_type' => $item->entityType,
+        'entity_id' => $item->entityId,
+        'langcode' => $item->langcode,
+        'operation' => $item->operation,
+        'status' => $item->status,
+        'attempts' => $item->attempts,
+        'last_error' => $item->lastError,
+        'correlation_id' => $item->correlationId,
+        'changed' => $item->changed,
+        'next_attempt' => $item->nextAttempt,
+      ];
+    }
+    return $entries;
   }
 
 }

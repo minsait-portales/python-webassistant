@@ -74,7 +74,7 @@ final class DocumentBuildResult {
   /**
    * Builds a result with documents.
    *
-   * @param list<\Drupal\webassistant_connector\Normalizer\CanonicalDocument> $documents
+   * @param array<mixed> $documents
    *   The documents, main document first (at least one).
    * @param list<string> $warnings
    *   (optional) Warnings for administrators.
@@ -89,12 +89,14 @@ final class DocumentBuildResult {
     if ($documents === []) {
       throw new \InvalidArgumentException('A build result needs at least one document; use skip() instead.');
     }
+    $list = [];
     foreach ($documents as $document) {
       if (!$document instanceof CanonicalDocument) {
         throw new \InvalidArgumentException('Build results only contain CanonicalDocument objects.');
       }
+      $list[] = $document;
     }
-    return new self(array_values($documents), NULL, self::warningList($warnings));
+    return new self($list, NULL, self::warningList($warnings));
   }
 
   /**

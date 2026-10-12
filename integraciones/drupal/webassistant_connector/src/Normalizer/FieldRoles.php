@@ -68,7 +68,13 @@ final class FieldRoles {
     $type = $definition->getType();
     $targetType = (string) $definition->getSetting('target_type');
     $text = array_merge(self::FORMATTED_TEXT_TYPES, ['string', 'string_long']);
-    $scalar = array_merge(self::STRING_TYPES, self::LIST_TYPES, self::NUMBER_TYPES, self::DATE_TYPES, ['boolean', 'link', 'language']);
+    $scalar = array_merge(
+      self::STRING_TYPES,
+      self::LIST_TYPES,
+      self::NUMBER_TYPES,
+      self::DATE_TYPES,
+      ['boolean', 'link', 'language'],
+    );
     $roles = [];
     if (in_array($type, $text, TRUE)) {
       $roles[] = SourceInterface::ROLE_TITLE;
@@ -88,7 +94,8 @@ final class FieldRoles {
     if (in_array($type, self::DATE_TYPES, TRUE)) {
       $roles[] = SourceInterface::ROLE_DATE;
     }
-    if (in_array($type, ['string', 'list_string'], TRUE) || ($type === 'entity_reference' && in_array($targetType, ['user_role', 'group', 'user'], TRUE))) {
+    $principalTargets = ['user_role', 'group', 'user'];
+    if (in_array($type, ['string', 'list_string'], TRUE) || ($type === 'entity_reference' && in_array($targetType, $principalTargets, TRUE))) {
       $roles[] = SourceInterface::ROLE_ACL;
     }
     if (in_array($type, ['boolean', 'integer', 'list_integer', 'list_string'], TRUE)) {

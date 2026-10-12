@@ -194,24 +194,36 @@ final class DocumentBuilder {
 
     $this->accountSwitcher->switchTo($this->aclResolver->renderAccount($acl));
     try {
-      $documents = array_values($normalizer->normalize($translation, $source, $context));
+      $documents = [];
+      foreach ($normalizer->normalize($translation, $source, $context) as $document) {
+        $documents[] = $this->finalize($document, $context, $documents === []);
+      }
       if ($documents === []) {
         return DocumentBuildResult::skip(DocumentBuildResult::SKIP_EMPTY, $context->getWarnings());
       }
-      foreach ($documents as $index => $document) {
-        $documents[$index] = $this->finalize($document, $context, $index === 0);
-      }
       $main = $documents[0];
       foreach ($this->contributors as $contributor) {
-        if ($contributor->applies($source)) {
-          foreach ($contributor->contribute($translation, $source, $context, $main) as $document) {
-            $documents[] = $document;
+        if (!$contributor->applies($source)) {
+          continue;
+        }
+        foreach ($contributor->contribute($translation, $source, $context, $main) as $document) {
+          if ($document->acl === [] || ($document->text === NULL) === ($document->reference === NULL)) {
+            // Never send such documents: an empty ACL defaults to public on
+            // the platform.
+            $context->addWarning(sprintf('Document %s dropped: it has an empty ACL or no content.', $document->sourceId));
+            continue;
           }
+          $documents[] = $document;
         }
       }
     }
     finally {
       $this->accountSwitcher->switchBack();
+    }
+    foreach ($documents as $document) {
+      foreach ($document->violations() as $violation) {
+        $context->addWarning(sprintf('Document %s is invalid and will be rejected: %s', $document->sourceId, $violation));
+      }
     }
     return DocumentBuildResult::fromDocuments($documents, $context->getWarnings());
   }

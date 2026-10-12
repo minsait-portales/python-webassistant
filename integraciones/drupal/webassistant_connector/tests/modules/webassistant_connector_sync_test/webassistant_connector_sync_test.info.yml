@@ -1,0 +1,8 @@
+name: 'WebAssistant connector sync test'
+type: module
+description: 'Test helpers of the WebAssistant synchronization: a scripted platform client, a failing entity hook and an outbox handler.'
+package: Testing
+hidden: true
+core_version_requirement: ^11.2
+dependencies:
+  - webassistant_connector:webassistant_connector

@@ -11,8 +11,12 @@ declare(strict_types=1);
  * Implements hook_schema().
  */
 function webassistant_connector_schema(): array {
+  // State-based outbox (design section 9.1, amendment A1): one row per
+  // source, entity type, entity ID and langcode. Every capture merges into
+  // the row and increments "seq"; a worker claims the row with a lease and
+  // only finishes it when "seq" still equals the claimed value.
   $schema['webassistant_connector_outbox'] = [
-    'description' => 'Pending synchronization events (transactional outbox) for the WebAssistant platform.',
+    'description' => 'Synchronization events (state-based transactional outbox) for the WebAssistant platform.',
     'fields' => [
       'id' => [
         'type' => 'serial',
@@ -25,21 +29,21 @@ function webassistant_connector_schema(): array {
         'length' => 36,
         'not null' => TRUE,
         'default' => '',
-        'description' => 'Event UUID.',
+        'description' => 'UUID of the row (stable across captures).',
       ],
       'operation' => [
         'type' => 'varchar_ascii',
         'length' => 16,
         'not null' => TRUE,
         'default' => 'upsert',
-        'description' => 'Operation: upsert or delete.',
+        'description' => 'Operation hint (upsert or delete); the worker decides from the current state.',
       ],
       'source' => [
         'type' => 'varchar_ascii',
         'length' => 64,
         'not null' => TRUE,
         'default' => '',
-        'description' => 'ID of the webassistant_source config entity.',
+        'description' => 'ID of the webassistant_source config entity, or a pseudo-source starting with "_".',
       ],
       'entity_type' => [
         'type' => 'varchar_ascii',
@@ -50,7 +54,7 @@ function webassistant_connector_schema(): array {
       ],
       'entity_id' => [
         'type' => 'varchar',
-        'length' => 64,
+        'length' => 128,
         'not null' => TRUE,
         'default' => '',
         'description' => 'Entity ID.',
@@ -81,6 +85,32 @@ function webassistant_connector_schema(): array {
         'not null' => TRUE,
         'default' => 'pending',
         'description' => 'Status: pending, processing, done, failed or dead.',
+      ],
+      'seq' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Incremented on every capture.',
+      ],
+      'claimed_seq' => [
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Value of seq when the row was claimed.',
+      ],
+      'claim_token' => [
+        'type' => 'varchar_ascii',
+        'length' => 36,
+        'not null' => FALSE,
+        'description' => 'Token of the worker that claimed the row.',
+      ],
+      'lease_until' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Timestamp until which the claim is valid (0: no lease).',
       ],
       'attempts' => [
         'type' => 'int',
@@ -116,7 +146,7 @@ function webassistant_connector_schema(): array {
         'type' => 'int',
         'not null' => TRUE,
         'default' => 0,
-        'description' => 'Timestamp of creation.',
+        'description' => 'Timestamp of the first capture not delivered yet.',
       ],
       'changed' => [
         'type' => 'int',
@@ -128,10 +158,13 @@ function webassistant_connector_schema(): array {
     'primary key' => ['id'],
     'unique keys' => [
       'event_id' => ['event_id'],
+      'entity_key' => ['source', 'entity_type', 'entity_id', 'langcode'],
     ],
     'indexes' => [
       'status_next_attempt' => ['status', 'next_attempt'],
-      'entity_key' => ['source', 'entity_type', 'entity_id', 'langcode'],
+      'status_lease' => ['status', 'lease_until'],
+      'claim_token' => ['claim_token'],
+      'status_changed' => ['status', 'changed'],
     ],
   ];
 
@@ -168,7 +201,7 @@ function webassistant_connector_schema(): array {
       ],
       'entity_id' => [
         'type' => 'varchar',
-        'length' => 64,
+        'length' => 128,
         'not null' => TRUE,
         'default' => '',
         'description' => 'Entity ID.',
@@ -200,6 +233,13 @@ function webassistant_connector_schema(): array {
         'default' => '',
         'description' => 'SHA-256 of the content sent.',
       ],
+      'payload_hash' => [
+        'type' => 'varchar_ascii',
+        'length' => 64,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'SHA-256 of the document sent, without volatile reference fields (amendment A8).',
+      ],
       'acl' => [
         'type' => 'text',
         'size' => 'normal',
@@ -211,7 +251,7 @@ function webassistant_connector_schema(): array {
         'length' => 16,
         'not null' => TRUE,
         'default' => '',
-        'description' => 'Last remote status (queued, ready, failed...).',
+        'description' => 'Last remote status (sending, queued, ready, failed, stale...).',
       ],
       'synced' => [
         'type' => 'int',
@@ -219,15 +259,44 @@ function webassistant_connector_schema(): array {
         'default' => 0,
         'description' => 'Timestamp of the last synchronization.',
       ],
+      'reconciled' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Start timestamp of the last reconciliation that found the document remotely.',
+      ],
     ],
     'primary key' => ['knowledge_base', 'remote_id'],
     'indexes' => [
       'entity_key' => ['source', 'entity_type', 'entity_id', 'langcode'],
       'attachment' => ['attachment'],
+      'source_remote' => ['source', 'remote_id'],
     ],
   ];
 
   return $schema;
+}
+
+/**
+ * Implements hook_install().
+ *
+ * Gives the installation its own remote source_id prefix (amendment A10):
+ * "drupal-" plus the first 8 hexadecimal characters of the site UUID, so two
+ * Drupal sites sharing a knowledge base never overwrite each other.
+ */
+function webassistant_connector_install(bool $is_syncing): void {
+  if ($is_syncing) {
+    return;
+  }
+  $config = \Drupal::configFactory()->getEditable('webassistant_connector.settings');
+  if ($config->isNew()) {
+    return;
+  }
+  $uuid = strtolower((string) \Drupal::config('system.site')->get('uuid'));
+  $hex = substr((string) preg_replace('/[^0-9a-f]/', '', $uuid), 0, 8);
+  if (strlen($hex) === 8) {
+    $config->set('sync.source_id_prefix', 'drupal-' . $hex)->save();
+  }
 }
 
 /**
@@ -250,7 +319,7 @@ function webassistant_connector_uninstall(bool $is_syncing): void {
   }
 
   // Queues.
-  foreach (['webassistant_connector_dispatch', 'webassistant_connector_reconcile'] as $queue) {
+  foreach (['webassistant_connector_dispatch', 'webassistant_connector_reconcile', 'webassistant_connector_index'] as $queue) {
     \Drupal::queue($queue)->deleteQueue();
   }
 }

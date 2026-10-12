@@ -147,25 +147,21 @@ final class SourceIdGenerator {
     if ($count !== 3 && !($count === 5 && $parts[3] === self::ATTACHMENT_SEGMENT)) {
       return NULL;
     }
-    $decoded = [];
-    foreach ($parts as $index => $part) {
-      if ($index === 3) {
-        continue;
-      }
-      $value = self::decode($part);
-      if ($value === NULL || $value === '') {
-        return NULL;
-      }
-      $decoded[$index] = $value;
+    $entityType = self::decode($parts[0]);
+    $entityId = self::decode($parts[1]);
+    $langcode = self::decode($parts[2]);
+    $attachment = $count === 5 ? self::decode($parts[4]) : NULL;
+    if ($entityType === NULL || $entityId === NULL || $entityId === '' || $langcode === NULL || ($count === 5 && ($attachment === NULL || $attachment === ''))) {
+      return NULL;
     }
-    if (!preg_match('/^[a-z][a-z0-9_]*$/', $decoded[0]) || !preg_match('/^[a-zA-Z0-9_-]+$/', $decoded[2])) {
+    if (!preg_match('/^[a-z][a-z0-9_]*$/', $entityType) || !preg_match('/^[a-zA-Z0-9_-]+$/', $langcode)) {
       return NULL;
     }
     return [
-      'entity_type' => $decoded[0],
-      'entity_id' => $decoded[1],
-      'langcode' => $decoded[2],
-      'attachment' => $decoded[4] ?? NULL,
+      'entity_type' => $entityType,
+      'entity_id' => $entityId,
+      'langcode' => $langcode,
+      'attachment' => $attachment,
     ];
   }
 

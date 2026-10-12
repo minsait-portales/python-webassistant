@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Drupal\webassistant_connector\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\Attribute\ConfigEntityType;
 use Drupal\Core\Entity\EntityDeleteForm;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\Routing\AdminHtmlRouteProvider;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\webassistant_connector\Form\SourceForm;
@@ -150,9 +152,9 @@ class Source extends ConfigEntityBase implements SourceInterface {
   protected $mapping_version = 1;
 
   /**
-   * Field roles.
+   * Field roles (see getFields()).
    *
-   * @var array<int, array<string, mixed>>
+   * @var array<int|string, mixed>
    */
   protected $fields = [];
 
@@ -224,7 +226,7 @@ class Source extends ConfigEntityBase implements SourceInterface {
    */
   public function getFields(): array {
     $fields = [];
-    foreach (is_array($this->fields) ? $this->fields : [] as $row) {
+    foreach ($this->fields as $row) {
       if (!is_array($row) || empty($row['field']) || empty($row['role'])) {
         continue;
       }
@@ -292,7 +294,7 @@ class Source extends ConfigEntityBase implements SourceInterface {
       'site_scoped' => $this->isSiteScoped(),
       'mapping_version' => $this->getMappingVersion(),
       'fields' => $fields,
-      'third_party_settings' => self::sortRecursive($this->third_party_settings ?? []),
+      'third_party_settings' => self::sortRecursive($this->third_party_settings),
     ];
     return hash('sha256', json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
   }
@@ -307,14 +309,16 @@ class Source extends ConfigEntityBase implements SourceInterface {
   /**
    * {@inheritdoc}
    *
-   * Adds the provider of the indexed entity type, the bundle config entities
-   * and the provider of the normalizer plugin, so that uninstalling them
-   * removes the source.
+   * Adds the provider of the indexed entity type, the bundle config entities,
+   * the field storages of the mapped configurable fields and the provider of
+   * the normalizer plugin (amendment A9), so that removing them updates or
+   * removes the source (see onDependencyRemoval()).
    */
   public function calculateDependencies() {
     parent::calculateDependencies();
     $entityTypeManager = \Drupal::entityTypeManager();
-    $entityType = $entityTypeManager->getDefinition($this->getTargetEntityTypeId(), FALSE);
+    $entityTypeId = $this->getTargetEntityTypeId();
+    $entityType = $entityTypeManager->getDefinition($entityTypeId, FALSE);
     if ($entityType !== NULL) {
       $this->addDependency('module', $entityType->getProvider());
       $bundleEntityType = $entityType->getBundleEntityType();
@@ -323,12 +327,72 @@ class Source extends ConfigEntityBase implements SourceInterface {
           $this->addDependency($bundle->getConfigDependencyKey(), $bundle->getConfigDependencyName());
         }
       }
+      if ($entityType->entityClassImplements(FieldableEntityInterface::class)) {
+        $storages = \Drupal::service('entity_field.manager')->getFieldStorageDefinitions($entityTypeId);
+        foreach ($this->getFields() as $mapping) {
+          $storage = $storages[$mapping['field']] ?? NULL;
+          if ($storage instanceof ConfigEntityInterface) {
+            $this->addDependency($storage->getConfigDependencyKey(), $storage->getConfigDependencyName());
+          }
+        }
+      }
     }
     $normalizer = \Drupal::service('plugin.manager.webassistant_connector.normalizer')->getDefinition($this->getNormalizerId(), FALSE);
     if (is_array($normalizer) && isset($normalizer['provider']) && $normalizer['provider'] !== 'webassistant_connector') {
       $this->addDependency('module', $normalizer['provider']);
     }
     return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * Strips the removed bundles and mapped fields, falls back to the default
+   * normalizer when its provider is uninstalled, and disables the source so
+   * an administrator reviews it (amendment A9). When every listed bundle is
+   * removed the source is not changed (an empty list would mean "all
+   * bundles"), so it is deleted with its dependencies.
+   */
+  public function onDependencyRemoval(array $dependencies) {
+    $changed = parent::onDependencyRemoval($dependencies);
+    $entityTypeId = $this->getTargetEntityTypeId();
+    $bundleEntityType = \Drupal::entityTypeManager()->getDefinition($entityTypeId, FALSE)?->getBundleEntityType();
+    $removedBundles = [];
+    $removedFields = [];
+    foreach ($dependencies['config'] ?? [] as $dependency) {
+      if (!$dependency instanceof ConfigEntityInterface) {
+        continue;
+      }
+      if ($bundleEntityType !== NULL && $dependency->getEntityTypeId() === $bundleEntityType) {
+        $removedBundles[] = (string) $dependency->id();
+      }
+      elseif ($dependency->getEntityTypeId() === 'field_storage_config' && $dependency->get('entity_type') === $entityTypeId) {
+        $removedFields[] = (string) $dependency->get('field_name');
+      }
+    }
+
+    $bundles = $this->getBundles();
+    $remaining = array_values(array_diff($bundles, $removedBundles));
+    if ($remaining !== $bundles && $remaining !== []) {
+      $this->bundles = $remaining;
+      $changed = TRUE;
+    }
+    if ($removedFields !== []) {
+      $fields = array_values(array_filter($this->getFields(), static fn (array $mapping): bool => !in_array($mapping['field'], $removedFields, TRUE)));
+      if (count($fields) !== count($this->getFields())) {
+        $this->fields = $fields;
+        $changed = TRUE;
+      }
+    }
+    $normalizer = \Drupal::service('plugin.manager.webassistant_connector.normalizer')->getDefinition($this->getNormalizerId(), FALSE);
+    if (is_array($normalizer) && in_array($normalizer['provider'] ?? NULL, $dependencies['module'] ?? [], TRUE)) {
+      $this->normalizer = 'content_entity';
+      $changed = TRUE;
+    }
+    if ($changed) {
+      $this->setStatus(FALSE);
+    }
+    return $changed;
   }
 
   /**

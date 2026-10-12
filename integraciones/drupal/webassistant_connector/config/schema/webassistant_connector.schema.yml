@@ -249,10 +249,11 @@ webassistant_connector.source.*:
       label: 'ACL mode'
       constraints:
         Choice:
-          - access
-          - public
-          - authenticated
-          - field
+          choices:
+            - access
+            - public
+            - authenticated
+            - field
     site_scoped:
       type: boolean
       label: 'Limit documents to this site'
@@ -277,16 +278,17 @@ webassistant_connector.source.*:
             label: 'Role'
             constraints:
               Choice:
-                - title
-                - main_content
-                - context
-                - metadata
-                - filter
-                - url
-                - image
-                - date
-                - acl
-                - exclusion
+                choices:
+                  - title
+                  - main_content
+                  - context
+                  - metadata
+                  - filter
+                  - url
+                  - image
+                  - date
+                  - acl
+                  - exclusion
           key:
             type: string
             label: 'Metadata key'

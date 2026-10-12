@@ -102,8 +102,13 @@ services:
     class: Drupal\webassistant_connector\Sync\DocumentMap
   Drupal\webassistant_connector\Sync\DocumentMap: '@webassistant_connector.document_map'
 
+  # Rows of pseudo-sources (e.g. _attachment of the Documents submodule) are
+  # processed by services tagged webassistant_connector.outbox_handler that
+  # implement Sync\OutboxHandlerInterface.
   webassistant_connector.sync_processor:
     class: Drupal\webassistant_connector\Sync\SyncProcessor
+    arguments:
+      $handlers: !tagged_iterator webassistant_connector.outbox_handler
   Drupal\webassistant_connector\Sync\SyncProcessor: '@webassistant_connector.sync_processor'
 
   webassistant_connector.indexer:
@@ -117,3 +122,14 @@ services:
   webassistant_connector.sync_status:
     class: Drupal\webassistant_connector\Sync\SyncStatus
   Drupal\webassistant_connector\Sync\SyncStatus: '@webassistant_connector.sync_status'
+
+  # Access epoch: reindexes access-controlled sources when permissions or
+  # access modules change (amendment A12).
+  webassistant_connector.access_epoch:
+    class: Drupal\webassistant_connector\Sync\AccessEpoch
+  Drupal\webassistant_connector\Sync\AccessEpoch: '@webassistant_connector.access_epoch'
+
+  # Migration from the legacy webassistant_ai module (section 14).
+  webassistant_connector.legacy_migrator:
+    class: Drupal\webassistant_connector\Migration\LegacyMigrator
+  Drupal\webassistant_connector\Migration\LegacyMigrator: '@webassistant_connector.legacy_migrator'

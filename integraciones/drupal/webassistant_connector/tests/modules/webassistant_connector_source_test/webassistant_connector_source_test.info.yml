@@ -1,0 +1,9 @@
+name: 'WebAssistant connector source test'
+type: module
+description: 'Access rules and an ACL subscriber for the WebAssistant source and normalization tests.'
+package: Testing
+hidden: true
+core_version_requirement: ^11.2
+dependencies:
+  - drupal:node
+  - webassistant_connector:webassistant_connector

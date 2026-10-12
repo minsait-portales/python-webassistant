@@ -45,6 +45,11 @@ final class OutboxItem {
   public const STATUS_DEAD = 'dead';
 
   /**
+   * Statuses a capture or a retry may move to pending (terminal or waiting).
+   */
+  public const RETRYABLE_STATUSES = [self::STATUS_FAILED, self::STATUS_DEAD];
+
+  /**
    * All statuses.
    */
   public const STATUSES = [
@@ -92,6 +97,14 @@ final class OutboxItem {
    *   Creation timestamp.
    * @param int $changed
    *   Last change timestamp.
+   * @param int $seq
+   *   Capture counter (incremented on every capture, amendment A1).
+   * @param int $claimedSeq
+   *   Value of seq when the row was claimed.
+   * @param string|null $claimToken
+   *   Token of the worker that claimed the row.
+   * @param int $leaseUntil
+   *   Timestamp until which the claim is valid (0: no lease).
    */
   public function __construct(
     public readonly int $id,
@@ -111,6 +124,10 @@ final class OutboxItem {
     public readonly array $remote,
     public readonly int $created,
     public readonly int $changed,
+    public readonly int $seq = 0,
+    public readonly int $claimedSeq = 0,
+    public readonly ?string $claimToken = NULL,
+    public readonly int $leaseUntil = 0,
   ) {}
 
   /**
@@ -148,6 +165,10 @@ final class OutboxItem {
       remote: $remote,
       created: (int) ($row['created'] ?? 0),
       changed: (int) ($row['changed'] ?? 0),
+      seq: (int) ($row['seq'] ?? 0),
+      claimedSeq: (int) ($row['claimed_seq'] ?? 0),
+      claimToken: $nullable('claim_token'),
+      leaseUntil: (int) ($row['lease_until'] ?? 0),
     );
   }
 
@@ -176,6 +197,10 @@ final class OutboxItem {
       'remote' => $this->remote === [] ? NULL : json_encode($this->remote, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR),
       'created' => $this->created,
       'changed' => $this->changed,
+      'seq' => $this->seq,
+      'claimed_seq' => $this->claimedSeq,
+      'claim_token' => $this->claimToken,
+      'lease_until' => $this->leaseUntil,
     ];
     if ($this->id === 0) {
       unset($row['id']);
@@ -202,6 +227,16 @@ final class OutboxItem {
    */
   public function getKey(): string {
     return implode(':', [$this->source, $this->entityType, $this->entityId, $this->langcode]);
+  }
+
+  /**
+   * Whether the row belongs to a pseudo-source (e.g. _orphan, _attachment).
+   *
+   * Pseudo-sources start with "_" (source config entity IDs never do) and
+   * are handled by SyncProcessor or by an OutboxHandlerInterface service.
+   */
+  public function isPseudoSource(): bool {
+    return str_starts_with($this->source, '_');
   }
 
   /**

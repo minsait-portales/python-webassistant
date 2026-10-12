@@ -45,8 +45,8 @@ final class ModuleInstallTest extends KernelTestBase {
 
     $routes = $this->container->get('router.route_provider');
     $this->assertSame('/webassistant/token', $routes->getRouteByName('webassistant_connector.token')->getPath());
-    $this->assertNotNull($routes->getRouteByName('entity.webassistant_source.collection'));
-    $this->assertNotNull($routes->getRouteByName('entity.webassistant_source.preview_form'));
+    $this->assertSame('/admin/config/services/webassistant-connector/sources', $routes->getRouteByName('entity.webassistant_source.collection')->getPath());
+    $this->assertSame('/admin/config/services/webassistant-connector/sources/{webassistant_source}/preview', $routes->getRouteByName('entity.webassistant_source.preview_form')->getPath());
   }
 
 }

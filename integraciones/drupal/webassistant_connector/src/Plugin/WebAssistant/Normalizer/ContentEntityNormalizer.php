@@ -11,6 +11,7 @@ use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -56,12 +57,12 @@ final class ContentEntityNormalizer extends NormalizerPluginBase {
   /**
    * Maximum text length accepted by the platform.
    */
-  public const MAX_TEXT_LENGTH = 2000000;
+  public const MAX_TEXT_LENGTH = CanonicalDocument::MAX_TEXT_LENGTH;
 
   /**
    * Maximum number of metadata keys accepted by the platform.
    */
-  public const MAX_METADATA_KEYS = 60;
+  public const MAX_METADATA_KEYS = CanonicalDocument::MAX_METADATA_KEYS;
 
   /**
    * Maximum length of a metadata string value.
@@ -93,14 +94,17 @@ final class ContentEntityNormalizer extends NormalizerPluginBase {
    *   The entity repository (translations of referenced entities).
    * @param \Drupal\webassistant_connector\Sync\AclResolver $aclResolver
    *   The ACL resolver (field and entity access per principal).
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The entity type manager (fresh copies of referenced entities).
    */
   public function __construct(
     array $configuration,
     $plugin_id,
     $plugin_definition,
-    private readonly UrlResolver $urlResolver,
-    private readonly EntityRepositoryInterface $entityRepository,
-    private readonly AclResolver $aclResolver,
+    protected UrlResolver $urlResolver,
+    protected EntityRepositoryInterface $entityRepository,
+    protected AclResolver $aclResolver,
+    protected EntityTypeManagerInterface $entityTypeManager,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
@@ -319,7 +323,8 @@ final class ContentEntityNormalizer extends NormalizerPluginBase {
         continue;
       }
       try {
-        $sections[] = '<section><h3>' . Html::escape($label) . '</h3>' . $this->renderNested($entity, $context, $accounts, $hop + 1) . '</section>';
+        $fresh = $items->getFieldDefinition()->getType() === 'entity_reference' ? $this->freshTranslation($entity, $context) : $entity;
+        $sections[] = '<section><h3>' . Html::escape($label) . '</h3>' . $this->renderNested($fresh, $context, $accounts, $hop + 1) . '</section>';
       }
       finally {
         $context->leave($entity->getEntityTypeId(), (string) $entity->id());
@@ -327,6 +332,31 @@ final class ContentEntityNormalizer extends NormalizerPluginBase {
     }
     $html = $labels !== [] ? '<ul>' . implode('', $labels) . '</ul>' : '';
     return trim($html . implode("\n", $sections));
+  }
+
+  /**
+   * Reloads a referenced entity before rendering its content.
+   *
+   * Processed text is cached on field items: an entity object already used
+   * in this request (e.g. rendered for another user) could carry a value
+   * computed with other access. The default revision is reloaded without
+   * the static cache (amendment B1). Revision references are not reloaded:
+   * they point to a specific revision.
+   *
+   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   *   The referenced entity.
+   * @param \Drupal\webassistant_connector\Normalizer\NormalizationContext $context
+   *   The context (language).
+   *
+   * @return \Drupal\Core\Entity\ContentEntityInterface
+   *   A fresh copy in the language of the context, or the entity itself.
+   */
+  private function freshTranslation(ContentEntityInterface $entity, NormalizationContext $context): ContentEntityInterface {
+    $fresh = $this->entityTypeManager->getStorage($entity->getEntityTypeId())->loadUnchanged($entity->id());
+    if (!$fresh instanceof ContentEntityInterface) {
+      return $entity;
+    }
+    return $this->entityRepository->getTranslationFromContext($fresh, $context->langcode);
   }
 
   /**
@@ -352,9 +382,18 @@ final class ContentEntityNormalizer extends NormalizerPluginBase {
       $definition = $items->getFieldDefinition();
       $type = $definition->getType();
       $base = $definition->getFieldStorageDefinition()->isBaseField();
-      $text = in_array($type, FieldRoles::FORMATTED_TEXT_TYPES, TRUE) || (!$base && in_array($type, ['string', 'string_long'], TRUE));
+      $textTypes = FieldRoles::FORMATTED_TEXT_TYPES;
+      if (!$base) {
+        $textTypes = array_merge($textTypes, ['string', 'string_long']);
+      }
+      $text = in_array($type, $textTypes, TRUE);
       $reference = !$base && in_array($type, FieldRoles::REFERENCE_TYPES, TRUE);
       if ($name === $labelKey || (!$text && !$reference) || $items->isEmpty()) {
+        continue;
+      }
+      // Fields of referenced entities are not mapped by the administrator:
+      // the ones that usually hold personal data are never emitted.
+      if (FieldRoles::isSensitive($definition)) {
         continue;
       }
       if (!$this->aclResolver->fieldViewableByAll($items, $accounts)) {
@@ -494,11 +533,12 @@ final class ContentEntityNormalizer extends NormalizerPluginBase {
       $raw = $property !== NULL ? $item->get($property)->getValue() : NULL;
       $value = match (TRUE) {
         $type === 'boolean' => (bool) $raw,
+        // Metadata shows the labels of lists; filters keep the stored keys.
+        in_array($type, FieldRoles::LIST_TYPES, TRUE) && $mapping['role'] === SourceInterface::ROLE_METADATA => $this->plainValue($item),
         in_array($type, ['integer', 'list_integer'], TRUE) && is_numeric($raw) => (int) $raw,
         in_array($type, ['decimal', 'float', 'list_float'], TRUE) && is_numeric($raw) => (float) $raw,
         in_array($type, FieldRoles::DATE_TYPES, TRUE) => $this->dateString($item),
         $item instanceof LinkItemInterface => $this->linkUrl($item),
-        in_array($type, FieldRoles::LIST_TYPES, TRUE) && $mapping['role'] === SourceInterface::ROLE_METADATA => $this->plainValue($item),
         default => is_scalar($raw) ? self::plain(in_array($type, FieldRoles::FORMATTED_TEXT_TYPES, TRUE) ? strip_tags((string) $raw) : (string) $raw) : NULL,
       };
       if (is_string($value)) {
@@ -612,7 +652,11 @@ final class ContentEntityNormalizer extends NormalizerPluginBase {
    *   ISO 8601 date, or NULL.
    */
   private function createdAt(ContentEntityInterface $translation): ?string {
-    if (!$translation->hasField('created') || !in_array($translation->get('created')->getFieldDefinition()->getType(), ['created', 'timestamp'], TRUE)) {
+    if (!$translation->hasField('created')) {
+      return NULL;
+    }
+    $type = $translation->get('created')->getFieldDefinition()->getType();
+    if (!in_array($type, ['created', 'timestamp'], TRUE)) {
       return NULL;
     }
     $value = $translation->get('created')->value;

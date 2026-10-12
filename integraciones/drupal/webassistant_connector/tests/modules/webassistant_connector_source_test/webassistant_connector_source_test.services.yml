@@ -1,0 +1,5 @@
+services:
+  webassistant_connector_source_test.acl_subscriber:
+    class: Drupal\webassistant_connector_source_test\EventSubscriber\AclSubscriber
+    tags:
+      - { name: event_subscriber }

@@ -57,6 +57,8 @@ final class SourceMatcher {
    *
    * @return array<string, \Drupal\webassistant_connector\Entity\SourceInterface>
    *   Sources keyed by ID.
+   *
+   * @phpstan-impure
    */
   public function forEntity(EntityInterface $entity): array {
     if (!$entity instanceof ContentEntityInterface) {
@@ -75,6 +77,8 @@ final class SourceMatcher {
    *
    * @return array<string, \Drupal\webassistant_connector\Entity\SourceInterface>
    *   Sources keyed by ID, sorted by ID.
+   *
+   * @phpstan-impure
    */
   public function getActiveSources(): array {
     $cached = $this->memoryCache->get(self::CID);
@@ -102,6 +106,8 @@ final class SourceMatcher {
    *
    * @return array<string, \Drupal\webassistant_connector\Entity\SourceInterface>
    *   Sources keyed by ID.
+   *
+   * @phpstan-impure
    */
   public function forKnowledgeBase(string $knowledgeBase): array {
     return array_filter($this->getActiveSources(), static fn (SourceInterface $source): bool => $source->getKnowledgeBase() === $knowledgeBase);
@@ -116,6 +122,8 @@ final class SourceMatcher {
    *
    * @return list<string>
    *   Sorted knowledge base keys.
+   *
+   * @phpstan-impure
    */
   public function getKnowledgeBases(): array {
     $keys = [];
@@ -133,7 +141,7 @@ final class SourceMatcher {
     }
     $keys = array_filter(array_map('strval', array_keys($keys)), static fn (string $key): bool => (bool) preg_match('/^[a-z][a-z0-9_-]{1,62}$/', $key));
     sort($keys);
-    return array_values($keys);
+    return $keys;
   }
 
   /**
@@ -144,6 +152,8 @@ final class SourceMatcher {
    *
    * @return bool
    *   TRUE if at least one source targets it.
+   *
+   * @phpstan-impure
    */
   public function hasSourcesFor(string $entityTypeId): bool {
     foreach ($this->getActiveSources() as $source) {

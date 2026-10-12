@@ -14,6 +14,9 @@ use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\Session\UserSession;
+use Drupal\media\MediaAccessControlHandler;
+use Drupal\node\NodeAccessControlHandler;
+use Drupal\taxonomy\TermAccessControlHandler;
 use Drupal\webassistant_connector\Entity\SourceInterface;
 use Drupal\webassistant_connector\Event\AclAlterEvent;
 use Drupal\webassistant_connector\Identity\IdentityMapper;
@@ -41,10 +44,12 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  * reset before every check and every check is wrapped in try/catch (errors
  * deny and are logged). Only roles that can hold the base view permission of
  * the entity type are checked, and results are memoized per (entity type,
- * bundle, published) while no module implements node_grants, entity_access
- * or {entity_type}_access (besides core implementations that are neutral for
- * viewing). Subscribers of AclAlterEvent may then alter the list; principals
- * that do not match PRINCIPAL_PATTERN are dropped, never widened.
+ * bundle, published) for core access handlers that only look at those
+ * (node, taxonomy term, media) while no module implements node_grants,
+ * entity_access or {entity_type}_access (besides core implementations that
+ * are neutral for viewing). Subscribers of AclAlterEvent may then alter the
+ * list; principals that do not match PRINCIPAL_PATTERN are dropped, never
+ * widened.
  *
  * The same synthetic accounts are used to render documents as the least
  * privileged principal (amendment B1, renderAccount()) and to check field
@@ -90,14 +95,35 @@ final class AclResolver {
 
   /**
    * Core hook implementations that are neutral for viewing published content.
+   *
+   * Workspaces only acts inside an active workspace, and documents are always
+   * built outside of any workspace (DocumentBuilder, amendment A13).
    */
   private const NEUTRAL_IMPLEMENTATIONS = [
     'node_access' => ['node'],
-    'entity_access' => ['media', 'content_moderation'],
+    'entity_access' => ['media', 'content_moderation', 'workspaces'],
   ];
 
   /**
-   * Memoized ACLs keyed by "entity_type:bundle:published".
+   * Access handlers whose view result only depends on simple data.
+   *
+   * For published entities they only look at the bundle, the publication
+   * status and permissions (no owner nor field checks). Other entity types
+   * are never memoized: their access handlers may look at any field.
+   */
+  private const MEMOIZABLE_HANDLERS = [
+    NodeAccessControlHandler::class,
+    TermAccessControlHandler::class,
+    MediaAccessControlHandler::class,
+  ];
+
+  /**
+   * Maximum number of memoized ACLs (the memo is cleared when reached).
+   */
+  private const MEMO_LIMIT = 1000;
+
+  /**
+   * Memoized ACLs keyed by "entity_type:bundle:published:permissions".
    *
    * @var array<string, list<string>>
    */
@@ -358,7 +384,9 @@ final class AclResolver {
     $key = NULL;
     if ($this->isMemoizable($entity->getEntityTypeId())) {
       $published = !$entity instanceof EntityPublishedInterface || $entity->isPublished();
-      $key = $entity->getEntityTypeId() . ':' . $entity->bundle() . ':' . (int) $published;
+      // Permissions are part of the key, so role changes made earlier in
+      // the same process (e.g. a long Drush run) are never masked.
+      $key = $entity->getEntityTypeId() . ':' . $entity->bundle() . ':' . (int) $published . ':' . $this->permissionsFingerprint();
       if (isset($this->memo[$key])) {
         return $this->memo[$key];
       }
@@ -385,6 +413,9 @@ final class AclResolver {
     }
 
     if ($key !== NULL) {
+      if (count($this->memo) >= self::MEMO_LIMIT) {
+        $this->memo = [];
+      }
       $this->memo[$key] = $acl;
     }
     return $acl;
@@ -474,6 +505,25 @@ final class AclResolver {
   }
 
   /**
+   * Returns a hash of the permissions and admin flag of every role.
+   *
+   * @return string
+   *   A short hash; it changes whenever a role or its permissions change.
+   */
+  private function permissionsFingerprint(): string {
+    $data = [];
+    /** @var array<string, \Drupal\user\RoleInterface> $roles */
+    $roles = $this->entityTypeManager->getStorage('user_role')->loadMultiple();
+    foreach ($roles as $roleId => $role) {
+      $permissions = $role->getPermissions();
+      sort($permissions);
+      $data[(string) $roleId] = [$role->isAdmin(), $permissions];
+    }
+    ksort($data);
+    return hash('xxh128', (string) json_encode($data));
+  }
+
+  /**
    * Returns the IDs of the roles worth checking for an entity type.
    *
    * @param string $entityTypeId
@@ -526,17 +576,19 @@ final class AclResolver {
    *   The entity type ID.
    *
    * @return bool
-   *   TRUE when no module (besides neutral core implementations) implements
-   *   entity_access, {entity_type}_access or, for nodes, node_grants.
+   *   TRUE for the core access handlers of MEMOIZABLE_HANDLERS when no
+   *   module (besides neutral core implementations) implements entity_access,
+   *   {entity_type}_access or, for nodes, node_grants.
    */
   private function isMemoizable(string $entityTypeId): bool {
     if (!isset($this->memoizable[$entityTypeId])) {
-      $memoizable = TRUE;
+      $handler = $this->entityTypeManager->getDefinition($entityTypeId, FALSE)?->getAccessControlClass();
+      $memoizable = is_string($handler) && in_array(ltrim($handler, '\\'), self::MEMOIZABLE_HANDLERS, TRUE);
       $hooks = ['entity_access', $entityTypeId . '_access'];
       if ($entityTypeId === 'node') {
         $hooks[] = 'node_grants';
       }
-      foreach ($hooks as $hook) {
+      foreach ($memoizable ? $hooks : [] as $hook) {
         $modules = [];
         $this->moduleHandler->invokeAllWith($hook, static function (callable $implementation, string $module) use (&$modules): void {
           $modules[] = $module;

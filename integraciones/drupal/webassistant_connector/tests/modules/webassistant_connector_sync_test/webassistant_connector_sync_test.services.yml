@@ -1,0 +1,5 @@
+services:
+  webassistant_connector_sync_test.outbox_handler:
+    class: Drupal\webassistant_connector_sync_test\TestOutboxHandler
+    tags:
+      - { name: webassistant_connector.outbox_handler }
