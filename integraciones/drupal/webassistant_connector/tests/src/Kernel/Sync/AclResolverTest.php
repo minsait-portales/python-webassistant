@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\webassistant_connector\Kernel\Sync;
 
 use Drupal\Core\Session\AccountInterface;
+use Drupal\filter\Entity\FilterFormat;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\node\Entity\Node;
 use Drupal\node\NodeInterface;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\user\Entity\Role;
+use Drupal\user\Entity\User;
 use Drupal\user\RoleInterface;
 use Drupal\webassistant_connector\Entity\Source;
 use Drupal\webassistant_connector\Entity\SourceInterface;
@@ -109,12 +112,30 @@ final class AclResolverTest extends KernelTestBase {
     $this->assertTrue($anonymous->isAnonymous());
 
     $authenticated = $this->resolver->renderAccount(['authenticated']);
-    $this->assertSame(AclResolver::SYNTHETIC_UID, (int) $authenticated->id());
     $this->assertSame([AccountInterface::AUTHENTICATED_ROLE], $authenticated->getRoles());
+    $this->assertGreaterThan(AclResolver::SYNTHETIC_UID - AclResolver::SYNTHETIC_UID_SPAN, (int) $authenticated->id());
 
-    $editor = $this->resolver->renderAccount(['group:4', 'role:editor']);
-    $this->assertSame([AccountInterface::AUTHENTICATED_ROLE, 'editor'], $editor->getRoles());
-    $this->assertNotSame(1, (int) $editor->id());
+    // Group and user principals: an authenticated account without roles.
+    $this->assertSame([AccountInterface::AUTHENTICATED_ROLE], $this->resolver->renderAccount(['group:4', 'role:editor'])->getRoles());
+
+    // Roles: the one with the fewest permissions, admin roles last.
+    Role::create(['id' => 'admin', 'label' => 'Admin', 'is_admin' => TRUE])->save();
+    Role::create(['id' => 'editor', 'label' => 'Editor'])->grantPermission('access content')->grantPermission('access user profiles')->save();
+    Role::create(['id' => 'reviewer', 'label' => 'Reviewer'])->grantPermission('access content')->save();
+    $reviewer = $this->resolver->renderAccount(['role:admin', 'role:editor', 'role:reviewer']);
+    $this->assertSame([AccountInterface::AUTHENTICATED_ROLE, 'reviewer'], $reviewer->getRoles());
+    $this->assertSame(['authenticated', 'editor'], $this->resolver->renderAccount(['role:admin', 'role:editor'])->getRoles());
+    $this->assertNotSame(1, (int) $reviewer->id());
+
+    // Every role set has its own stable user ID.
+    $ids = array_map(static fn (AccountInterface $account): int => (int) $account->id(), [
+      $authenticated,
+      $reviewer,
+      $this->resolver->authenticatedAccount(['editor']),
+      $this->resolver->authenticatedAccount(['admin']),
+    ]);
+    $this->assertCount(4, array_unique($ids));
+    $this->assertSame((int) $reviewer->id(), (int) $this->resolver->authenticatedAccount(['reviewer', 'authenticated'])->id());
 
     $accounts = $this->resolver->principalAccounts(['public', 'role:editor', 'role:reviewer', 'group:4', 'user:dabc']);
     $this->assertCount(4, $accounts);
@@ -123,6 +144,64 @@ final class AclResolverTest extends KernelTestBase {
     $this->assertSame([AccountInterface::AUTHENTICATED_ROLE, 'reviewer'], $accounts[2]->getRoles());
     $this->assertSame([AccountInterface::AUTHENTICATED_ROLE], $accounts[3]->getRoles());
     $this->assertCount(1, $this->resolver->principalAccounts([]));
+  }
+
+  /**
+   * Each principal is checked with its own permissions while rendering.
+   *
+   * Core only recomputes the permissions of an account whose user ID differs
+   * from the current user's: with a shared ID, the render account (current
+   * user while normalizing) would lend its permissions to the others.
+   */
+  public function testPrincipalsKeepTheirPermissionsWhileRendering(): void {
+    Role::create(['id' => 'administrator', 'label' => 'Admin', 'is_admin' => TRUE])->save();
+    Role::create(['id' => 'staff', 'label' => 'Staff'])->grantPermission('access content')->save();
+    $switcher = $this->container->get('account_switcher');
+    $switcher->switchTo($this->resolver->authenticatedAccount(['administrator']));
+    try {
+      $this->assertFalse($this->resolver->authenticatedAccount(['staff'])->hasPermission('access user profiles'));
+      $this->assertFalse($this->resolver->authenticatedAccount()->hasPermission('access content'));
+    }
+    finally {
+      $switcher->switchBack();
+    }
+
+    // Private site: a reference that staff cannot view never reaches a
+    // document whose ACL includes role:staff (amendment B3).
+    FilterFormat::create(['format' => 'full_html', 'name' => 'Full HTML', 'filters' => []])->save();
+    $this->config('webassistant_connector.settings')->set('sync.public_base_url', 'https://www.example.com/')->save();
+    User::create(['uid' => 1, 'name' => 'root', 'status' => 1])->save();
+    $author = User::create(['name' => 'hidden_author_name', 'status' => 1]);
+    $author->save();
+    $node = Node::create([
+      'type' => 'article',
+      'title' => 'Internal document',
+      'uid' => $author->id(),
+      'status' => NodeInterface::PUBLISHED,
+      'body' => ['value' => '<p>Internal body</p>', 'format' => 'full_html'],
+    ]);
+    $node->save();
+    $source = Source::create([
+      'id' => 'internal',
+      'label' => 'Internal',
+      'entity_type' => 'node',
+      'bundles' => ['article'],
+      'knowledge_base' => 'ayuda',
+      'document_type' => 'guide',
+      'acl_mode' => SourceInterface::ACL_ACCESS,
+      'fields' => [
+        ['field' => 'title', 'role' => 'title'],
+        ['field' => 'body', 'role' => 'main_content'],
+        ['field' => 'uid', 'role' => 'context', 'depth' => 2],
+      ],
+    ]);
+    $source->save();
+    $result = $this->container->get('webassistant_connector.document_builder')->build($source, 'node', $node->id(), 'en');
+    $this->assertFalse($result->isSkipped(), (string) $result->getSkipReason());
+    $document = $result->getDocuments()[0];
+    $this->assertSame(['role:administrator', 'role:staff'], $document->acl);
+    $this->assertStringContainsString('Internal body', (string) $document->text);
+    $this->assertStringNotContainsString('hidden_author_name', (string) $document->text);
   }
 
   /**

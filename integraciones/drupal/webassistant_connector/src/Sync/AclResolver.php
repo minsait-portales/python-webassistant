@@ -39,22 +39,25 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  *   else role:<rid> for each role that can view.
  *
  * Access is checked with synthetic accounts (amendment B4): uid 0 for the
- * anonymous user and uid SYNTHETIC_UID (never 1, never a real user) with the
- * roles [authenticated] or [authenticated, rid]. The access handler cache is
- * reset before every check and every check is wrapped in try/catch (errors
- * deny and are logged). Only roles that can hold the base view permission of
- * the entity type are checked, and results are memoized per (entity type,
- * bundle, published) for core access handlers that only look at those
- * (node, taxonomy term, media) while no module implements node_grants,
- * entity_access or {entity_type}_access (besides core implementations that
- * are neutral for viewing). Subscribers of AclAlterEvent may then alter the
- * list; principals that do not match PRINCIPAL_PATTERN are dropped, never
- * widened.
+ * anonymous user and, for the roles [authenticated] or [authenticated, rid], a
+ * uid derived from the role set just below SYNTHETIC_UID (never 1, never a real
+ * user). Core computes permissions and caches access results per user ID, so
+ * every role set needs its own ID: while a document is rendered as one
+ * principal, the others must not be checked with its permissions. The access
+ * handler cache is reset before every check and every check is wrapped in
+ * try/catch (errors deny and are logged). Only roles that can hold the base
+ * view permission of the entity type are checked, and results are memoized per
+ * (entity type, bundle, published) for core access handlers that only look at
+ * those (node, taxonomy term, media) while no module implements node_grants,
+ * entity_access or {entity_type}_access (besides core implementations that are
+ * neutral for viewing). Subscribers of AclAlterEvent may then alter the list;
+ * principals that do not match PRINCIPAL_PATTERN are dropped, never widened.
  *
  * The same synthetic accounts are used to render documents as the least
- * privileged principal (amendment B1, renderAccount()) and to check field
- * and reference access for every principal (amendments B2/B3,
- * principalAccounts()).
+ * privileged principal (amendment B1, renderAccount(): public, then
+ * authenticated, then the role with the fewest permissions, admin roles
+ * last) and to check field and reference access for every principal
+ * (amendments B2/B3, principalAccounts()).
  *
  * Service: webassistant_connector.acl_resolver.
  */
@@ -66,9 +69,17 @@ final class AclResolver {
   public const PRINCIPAL_PATTERN = '/^(public|authenticated|(role|user|group):[A-Za-z0-9_.@-]{1,128})$/';
 
   /**
-   * User ID of the synthetic authenticated accounts.
+   * Upper bound of the user IDs of the synthetic authenticated accounts.
+   *
+   * Each role set gets the ID SYNTHETIC_UID - SYNTHETIC_UID_SPAN * h, with h
+   * in [0, 1) taken from a hash of the sorted roles (syntheticUid()).
    */
   public const SYNTHETIC_UID = PHP_INT_MAX;
+
+  /**
+   * Width of the range of synthetic user IDs below SYNTHETIC_UID (2^48).
+   */
+  public const SYNTHETIC_UID_SPAN = 281474976710656;
 
   /**
    * Principal: everybody.
@@ -216,7 +227,7 @@ final class AclResolver {
   }
 
   /**
-   * Returns a synthetic authenticated account (uid SYNTHETIC_UID).
+   * Returns a synthetic authenticated account (uid syntheticUid()).
    *
    * @param list<string> $extraRoles
    *   Roles added to "authenticated".
@@ -225,13 +236,34 @@ final class AclResolver {
    *   The account; it does not exist in the database.
    */
   public function authenticatedAccount(array $extraRoles = []): AccountInterface {
+    $roles = array_values(array_unique(array_merge([AccountInterface::AUTHENTICATED_ROLE], $extraRoles)));
     return new UserSession([
-      'uid' => self::SYNTHETIC_UID,
+      'uid' => self::syntheticUid($roles),
       'name' => 'webassistant_connector_principal',
-      'roles' => array_values(array_unique(array_merge([AccountInterface::AUTHENTICATED_ROLE], $extraRoles))),
+      'roles' => $roles,
       'preferred_langcode' => '',
       'timezone' => 'UTC',
     ]);
+  }
+
+  /**
+   * Returns the user ID of the synthetic account of a role set.
+   *
+   * Stable across processes (persistent caches may vary by user ID) and
+   * distinct per role set: core only recomputes the permissions of an
+   * account whose ID differs from the current user's, and access results are
+   * cached per user ID.
+   *
+   * @param list<string> $roles
+   *   The roles of the account, in any order.
+   *
+   * @return int
+   *   An ID in (SYNTHETIC_UID - SYNTHETIC_UID_SPAN, SYNTHETIC_UID].
+   */
+  public static function syntheticUid(array $roles): int {
+    $roles = array_values(array_unique(array_map('strval', $roles)));
+    sort($roles);
+    return self::SYNTHETIC_UID - (int) hexdec(substr(hash('xxh64', implode("\n", $roles)), 0, 12));
   }
 
   /**
@@ -241,23 +273,29 @@ final class AclResolver {
    *   The principals.
    *
    * @return \Drupal\Core\Session\AccountInterface
-   *   Anonymous for public; authenticated without roles for authenticated;
-   *   authenticated plus the role for the first role:x; authenticated
-   *   without roles for group/user principals.
+   *   Anonymous for public; authenticated without roles for authenticated
+   *   and for group/user principals; otherwise authenticated plus the role
+   *   of a role:x principal with the fewest permissions (admin roles last,
+   *   ties by principal).
    */
   public function renderAccount(array $acl): AccountInterface {
     if ($acl === [] || in_array(self::PUBLIC, $acl, TRUE)) {
       return $this->anonymousAccount();
     }
-    if (in_array(self::AUTHENTICATED, $acl, TRUE)) {
-      return $this->authenticatedAccount();
-    }
+    $roleIds = [];
     foreach ($acl as $principal) {
-      if (str_starts_with($principal, 'role:')) {
-        return $this->authenticatedAccount([substr($principal, 5)]);
+      if (!str_starts_with($principal, 'role:')) {
+        return $this->authenticatedAccount();
       }
+      $roleIds[] = substr($principal, 5);
     }
-    return $this->authenticatedAccount();
+    /** @var array<string, \Drupal\user\RoleInterface> $roles */
+    $roles = $this->entityTypeManager->getStorage('user_role')->loadMultiple($roleIds);
+    $rank = static fn (string $roleId): array => isset($roles[$roleId])
+      ? [(int) $roles[$roleId]->isAdmin(), count($roles[$roleId]->getPermissions()), $roleId]
+      : [0, 0, $roleId];
+    usort($roleIds, static fn (string $a, string $b): int => $rank($a) <=> $rank($b));
+    return $this->authenticatedAccount([$roleIds[0]]);
   }
 
   /**
@@ -302,8 +340,8 @@ final class AclResolver {
    */
   public function canAccess(EntityInterface $entity, AccountInterface $account, string $operation = 'view'): bool {
     try {
-      // Access results are cached by account ID, which every synthetic
-      // authenticated account shares.
+      // Access results are cached by account ID: drop the results of an
+      // earlier state of the entity or of its permissions.
       $this->entityTypeManager->getAccessControlHandler($entity->getEntityTypeId())->resetCache();
       return $entity->access($operation, $account);
     }

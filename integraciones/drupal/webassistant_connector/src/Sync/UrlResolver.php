@@ -9,6 +9,7 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Exception\UndefinedLinkTemplateException;
 use Drupal\Core\File\FileUrlGeneratorInterface;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -17,6 +18,10 @@ use Symfony\Component\HttpFoundation\RequestStack;
  *
  * Uses sync.public_base_url when set (mandatory in CLI/cron when the public
  * host differs), otherwise the current request scheme, host and base path.
+ * Synchronization only relies on the request host when it can be trusted
+ * (hasTrustedBaseUrl()): any visitor may trigger automated cron with a forged
+ * Host header, and signed download URLs must never point to a host chosen
+ * by a visitor.
  *
  * Service: webassistant_connector.url_resolver.
  */
@@ -59,6 +64,24 @@ final class UrlResolver {
       return self::FALLBACK_BASE_URL;
     }
     return rtrim($request->getSchemeAndHttpHost() . $request->getBasePath(), '/');
+  }
+
+  /**
+   * Whether the base URL of synchronized documents can be trusted.
+   *
+   * @param bool $commandLine
+   *   Whether the code runs in the command line, where the host comes from
+   *   the operator (e.g. drush --uri). Defaults to the current SAPI.
+   *
+   * @return bool
+   *   TRUE when sync.public_base_url is set, in the command line or when
+   *   settings.php restricts the accepted hosts (trusted_host_patterns);
+   *   FALSE for a web request whose Host header nobody validated.
+   */
+  public function hasTrustedBaseUrl(bool $commandLine = PHP_SAPI === 'cli'): bool {
+    return $this->getPublicBaseUrl() !== NULL
+      || $commandLine
+      || Settings::get('trusted_host_patterns', []) !== [];
   }
 
   /**

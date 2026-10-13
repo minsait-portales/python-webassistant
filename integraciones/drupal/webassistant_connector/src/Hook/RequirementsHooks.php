@@ -13,13 +13,15 @@ use Drupal\webassistant_connector\Form\SettingsForm;
 use Drupal\webassistant_connector\Platform\Credentials;
 use Drupal\webassistant_connector\Sync\OutboxItem;
 use Drupal\webassistant_connector\Sync\SyncStatus;
+use Drupal\webassistant_connector\Sync\UrlResolver;
 
 /**
  * Status report requirements (design section 10).
  *
- * Checks credentials, an https API URL outside localhost, dead events and
- * the backlog. No request to the platform is made here (the status page of
- * the connector runs the live checks).
+ * Checks credentials (and that the API URL is as protected as the client
+ * secret), an https API URL outside localhost, a trusted public base URL,
+ * dead events and the backlog. No request to the platform is made here (the
+ * status page of the connector runs the live checks).
  */
 final class RequirementsHooks {
 
@@ -39,11 +41,14 @@ final class RequirementsHooks {
    *   The credentials.
    * @param \Drupal\webassistant_connector\Sync\SyncStatus $syncStatus
    *   The synchronization status.
+   * @param \Drupal\webassistant_connector\Sync\UrlResolver $urlResolver
+   *   The URL resolver.
    */
   public function __construct(
     private readonly ConfigFactoryInterface $configFactory,
     private readonly Credentials $credentials,
     private readonly SyncStatus $syncStatus,
+    private readonly UrlResolver $urlResolver,
   ) {}
 
   /**
@@ -93,6 +98,16 @@ final class RequirementsHooks {
         'severity' => $config->get('enabled') ? RequirementSeverity::Error : RequirementSeverity::Warning,
       ];
 
+    $secretSource = $this->credentials->source('client_secret');
+    if ($secretSource !== Credentials::SOURCE_MISSING && $this->credentials->source('api_base_url') === Credentials::SOURCE_CONFIG) {
+      $requirements['webassistant_connector_api_url_source'] = [
+        'title' => $this->t('WebAssistant API URL'),
+        'value' => $this->t('Stored in configuration'),
+        'description' => $this->t("Set the API URL next to the client secret, in settings.php (\$settings['webassistant_connector']['api_base_url']) or in WEBASSISTANT_API_URL: whoever can change it in the connector settings can make Drupal send the client secret to another server."),
+        'severity' => RequirementSeverity::Warning,
+      ];
+    }
+
     $apiUrl = $this->credentials->apiBaseUrl();
     if ($apiUrl !== '' && !SettingsForm::isSecureUrl($apiUrl)) {
       $requirements['webassistant_connector_https'] = [
@@ -111,6 +126,15 @@ final class RequirementsHooks {
         'severity' => RequirementSeverity::Info,
       ];
       return $requirements;
+    }
+
+    if (!$this->urlResolver->hasTrustedBaseUrl(FALSE)) {
+      $requirements['webassistant_connector_public_url'] = [
+        'title' => $this->t('WebAssistant public URL'),
+        'value' => $this->t('Not set'),
+        'description' => $this->t("Set the public base URL in the synchronization settings or \$settings['trusted_host_patterns'] in settings.php. Until then cron does not send documents: their URLs, including signed download URLs, would take the Host header of the visit that runs cron."),
+        'severity' => $config->get('enabled') ? RequirementSeverity::Error : RequirementSeverity::Warning,
+      ];
     }
 
     $counts = $this->syncStatus->counts();

@@ -32,7 +32,7 @@ final class AccessEpochHooks {
    */
   #[Hook('user_role_insert')]
   public function roleInsert(): void {
-    $this->accessEpoch->check();
+    $this->check();
   }
 
   /**
@@ -40,7 +40,7 @@ final class AccessEpochHooks {
    */
   #[Hook('user_role_update')]
   public function roleUpdate(): void {
-    $this->accessEpoch->check();
+    $this->check();
   }
 
   /**
@@ -48,7 +48,7 @@ final class AccessEpochHooks {
    */
   #[Hook('user_role_delete')]
   public function roleDelete(): void {
-    $this->accessEpoch->check();
+    $this->check();
   }
 
   /**
@@ -56,7 +56,7 @@ final class AccessEpochHooks {
    */
   #[Hook('modules_installed')]
   public function modulesInstalled(): void {
-    $this->accessEpoch->check();
+    $this->check();
   }
 
   /**
@@ -64,7 +64,16 @@ final class AccessEpochHooks {
    */
   #[Hook('modules_uninstalled')]
   public function modulesUninstalled(): void {
-    $this->accessEpoch->check();
+    $this->check();
+  }
+
+  /**
+   * Checks the epoch, unless the connector itself is being uninstalled.
+   */
+  private function check(): void {
+    if (!UninstallHooks::isUninstalling()) {
+      $this->accessEpoch->check();
+    }
   }
 
 }

@@ -131,6 +131,31 @@ final class SourceFormDocumentsTest extends BrowserTestBase {
       'download_base_url' => 'http://drupal.internal:8080',
     ], $this->loadSource('manuals')->getThirdPartySettings(DocumentsSettings::MODULE));
 
+    // Two enabled sources never send the attachments of the same items to
+    // the same knowledge base (their remote documents would collide).
+    $this->drupalGet('admin/config/services/webassistant-connector/sources/manuals');
+    $this->submitForm(['status' => TRUE], 'Save');
+    $this->assertTrue($this->loadSource('manuals')->status());
+    $faq = [
+      'label' => 'FAQ',
+      'id' => 'faq',
+      'status' => TRUE,
+      'entity_type' => 'node',
+      'knowledge_base' => 'faq',
+      'document_type' => 'faq',
+      'acl_mode' => SourceInterface::ACL_ACCESS,
+      'field_roles[title][roles][title]' => TRUE,
+      'webassistant_connector_documents[enabled]' => TRUE,
+      'webassistant_connector_documents[fields][field_document]' => TRUE,
+      'webassistant_connector_documents[knowledge_base]' => 'manuals',
+    ];
+    $this->drupalGet('admin/config/services/webassistant-connector/sources/add');
+    $this->submitForm($faq, 'Save');
+    $this->assertSession()->pageTextContains('The enabled source Manuals already sends the attached documents of some of these items to the knowledge base manuals.');
+    $faq['webassistant_connector_documents[knowledge_base]'] = 'faq-documents';
+    $this->submitForm($faq, 'Save');
+    $this->assertSession()->pageTextContains('Created the source FAQ.');
+
     // The preview form has no attachment settings.
     $this->drupalGet('admin/config/services/webassistant-connector/sources/manuals/preview');
     $this->assertSession()->statusCodeEquals(200);

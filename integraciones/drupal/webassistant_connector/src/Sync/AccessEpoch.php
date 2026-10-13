@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\webassistant_connector\Sync;
 
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\State\StateInterface;
@@ -15,8 +16,9 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  * Detects changes that may alter computed ACLs (amendment A12).
  *
  * The epoch is a hash of the permissions of every role, the modules that
- * implement node_grants, entity_access or {entity_type}_access for the
- * entity types of the sources, and node.node_access_needs_rebuild. When it
+ * implement node_grants, entity_access or {entity_type}_access for any
+ * content entity type, and node.node_access_needs_rebuild (never the
+ * sources themselves). When it
  * changes, every source with acl_mode "access" is reindexed in the
  * background; the payload hash (amendment A8) makes sure only documents
  * whose ACL really changed are sent again.
@@ -72,9 +74,13 @@ final class AccessEpoch {
       }
       ksort($roles);
     }
+    // Every content entity type, not only those of the sources: creating or
+    // disabling a source must not look like an access change.
     $hooks = ['node_grants', 'node_grants_alter', 'node_access_records', 'entity_access', 'entity_access_alter'];
-    foreach ($this->sourceMatcher->getActiveSources() as $source) {
-      $hooks[] = $source->getTargetEntityTypeId() . '_access';
+    foreach ($this->entityTypeManager->getDefinitions() as $entityTypeId => $definition) {
+      if ($definition->entityClassImplements(ContentEntityInterface::class)) {
+        $hooks[] = $entityTypeId . '_access';
+      }
     }
     $implementations = [];
     foreach (array_unique($hooks) as $hook) {
@@ -82,8 +88,10 @@ final class AccessEpoch {
       $this->moduleHandler->invokeAllWith($hook, static function (callable $callback, string $module) use (&$modules): void {
         $modules[] = $module;
       });
-      sort($modules);
-      $implementations[$hook] = array_values(array_unique($modules));
+      if ($modules !== []) {
+        sort($modules);
+        $implementations[$hook] = array_values(array_unique($modules));
+      }
     }
     ksort($implementations);
     $data = [

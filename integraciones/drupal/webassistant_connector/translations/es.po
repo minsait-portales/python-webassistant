@@ -618,6 +618,9 @@ msgstr "No comprobado"
 msgid "Not indexed: @reason (@code). The synchronization would delete its documents from the platform."
 msgstr "No se indexa: @reason (@code). La sincronización eliminaría sus documentos de la plataforma."
 
+msgid "Not set"
+msgstr "Sin definir"
+
 msgid "Notes"
 msgstr "Notas"
 
@@ -939,8 +942,14 @@ msgstr "Token de servidor"
 msgid "Server token scopes"
 msgstr "Scopes del token de servidor"
 
-msgid "Set them in settings.php (\\$settings['webassistant_connector']) or in the environment (WEBASSISTANT_CLIENT_ID, WEBASSISTANT_CLIENT_SECRET, WEBASSISTANT_API_URL). The client secret is never stored in configuration."
-msgstr "Defínelos en settings.php (\\$settings['webassistant_connector']) o en el entorno (WEBASSISTANT_CLIENT_ID, WEBASSISTANT_CLIENT_SECRET, WEBASSISTANT_API_URL). El secreto del cliente nunca se guarda en la configuración."
+msgid "Set the API URL next to the client secret, in settings.php ($settings['webassistant_connector']['api_base_url']) or in WEBASSISTANT_API_URL: whoever can change it in the connector settings can make Drupal send the client secret to another server."
+msgstr "Define la URL de la API junto al secreto del cliente, en settings.php ($settings['webassistant_connector']['api_base_url']) o en WEBASSISTANT_API_URL: quien pueda cambiarla en los ajustes del conector puede hacer que Drupal envíe el secreto del cliente a otro servidor."
+
+msgid "Set the public base URL in the synchronization settings or $settings['trusted_host_patterns'] in settings.php. Until then cron does not send documents: their URLs, including signed download URLs, would take the Host header of the visit that runs cron."
+msgstr "Define la URL pública base en los ajustes de sincronización o $settings['trusted_host_patterns'] en settings.php. Hasta entonces cron no envía documentos: sus URL, incluidas las URL de descarga firmadas, tomarían la cabecera Host de la visita que ejecuta cron."
+
+msgid "Set them in settings.php ($settings['webassistant_connector']) or in the environment (WEBASSISTANT_CLIENT_ID, WEBASSISTANT_CLIENT_SECRET, WEBASSISTANT_API_URL). The client secret is never stored in configuration."
+msgstr "Defínelos en settings.php ($settings['webassistant_connector']) o en el entorno (WEBASSISTANT_CLIENT_ID, WEBASSISTANT_CLIENT_SECRET, WEBASSISTANT_API_URL). El secreto del cliente nunca se guarda en la configuración."
 
 msgid "Settings"
 msgstr "Ajustes"
@@ -1001,6 +1010,9 @@ msgstr "Fuentes"
 
 msgid "Status"
 msgstr "Estado"
+
+msgid "Stored in configuration"
+msgstr "Guardada en la configuración"
 
 msgid "Synchronization"
 msgstr "Sincronización"
@@ -1082,6 +1094,9 @@ msgstr "La URL base de descarga debe ser absoluta (http o https) sin query, frag
 
 msgid "The enabled source %other already sends some of these items to the knowledge base %kb. Choose another knowledge base, other bundles or languages, or disable one of the sources."
 msgstr "La fuente activa %other ya envía algunos de estos elementos a la base de conocimiento %kb. Elige otra base de conocimiento, otros bundles o idiomas, o desactiva una de las fuentes."
+
+msgid "The enabled source %other already sends the attached documents of some of these items to the knowledge base %kb. Choose another knowledge base for the attached documents, other bundles or languages, or disable one of the sources."
+msgstr "La fuente activa %other ya envía los documentos adjuntos de algunos de estos elementos a la base de conocimiento %kb. Elige otra base de conocimiento para los documentos adjuntos, otros tipos o idiomas, o desactiva una de las fuentes."
 
 msgid "The entity type of a source cannot be changed: add another source instead."
 msgstr "El tipo de entidad de una fuente no se puede cambiar: añade otra fuente."
@@ -1346,6 +1361,9 @@ msgstr "Credenciales de WebAssistant"
 
 msgid "WebAssistant outbox dispatch"
 msgstr "Envío de la outbox de WebAssistant"
+
+msgid "WebAssistant public URL"
+msgstr "URL pública de WebAssistant"
 
 msgid "WebAssistant reconciliation"
 msgstr "Reconciliación de WebAssistant"

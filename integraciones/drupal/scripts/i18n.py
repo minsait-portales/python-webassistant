@@ -35,10 +35,15 @@ YAML = re.compile(
 PLACEHOLDER = re.compile(r"[@%:][a-z_]+")
 
 
+ESCAPES = {"n": "\n", "t": "\t", '"': '"', "\\": "\\", "$": "$"}
+
+
 def unquote(quote: str, value: str) -> str:
+    """Valor en tiempo de ejecución de un literal PHP o JavaScript sin sus comillas."""
     if quote == "'":
-        return value.replace("\\'", "'")
-    return value.replace('\\"', '"').replace("\\n", "\n")
+        return re.sub(r"\\([\\'])", r"\1", value)
+    # Entre comillas dobles: \n, \t, \", \\ y \$ (PHP); cualquier otra barra se conserva.
+    return re.sub(r"\\(.)", lambda m: ESCAPES.get(m.group(1), m.group(0)), value, flags=re.S)
 
 
 def extract() -> tuple[set[str], set[tuple[str, str]]]:
@@ -94,8 +99,8 @@ def read_po(path: Path) -> tuple[dict[str, str], dict[str, tuple[str, list[str]]
             else:
                 singles[msgid] = str(entry.get("msgstr", ""))
 
-    for line in path.read_text(encoding="utf-8").splitlines():
-        line = line.strip()
+    for raw in path.read_text(encoding="utf-8").splitlines():
+        line = raw.strip()
         if not line:
             flush()
             entry, current = {}, None

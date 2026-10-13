@@ -64,6 +64,12 @@ final class HostActionRegistryTest extends KernelTestBase {
     $this->assertSame(['user.profile'], $available['names']);
     $this->assertContains('user.permissions', $available['cacheability']->getCacheContexts());
     $this->assertContains('webassistant_connector_host_action_plugins', $available['cacheability']->getCacheTags());
+    // Clearing the plugin definitions (e.g. a module adds a host action)
+    // invalidates the pages that list them.
+    $checksum = $this->container->get('cache_tags.invalidator.checksum');
+    $before = $checksum->getCurrentChecksum(['webassistant_connector_host_action_plugins']);
+    $this->container->get('plugin.manager.webassistant_connector.host_action')->clearCachedDefinitions();
+    $this->assertNotSame($before, $checksum->getCurrentChecksum(['webassistant_connector_host_action_plugins']));
 
     // Without the endpoint permission nothing is offered.
     $noEndpoint = $this->createUser(['use webassistant profile actions', 'use webassistant content actions']);

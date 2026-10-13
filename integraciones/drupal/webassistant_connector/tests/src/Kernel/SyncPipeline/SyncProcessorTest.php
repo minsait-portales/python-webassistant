@@ -131,6 +131,28 @@ final class SyncProcessorTest extends SyncKernelTestBase {
   }
 
   /**
+   * A translation removed without an original to compare is still deleted.
+   *
+   * Publishing a workspace saves the entity with itself as the original, so
+   * hook_entity_update() cannot see the removed translation.
+   */
+  public function testTranslationRemovedWithoutOriginalIsDeleted(): void {
+    $this->processor()->process(100, 0);
+    $this->assertCount(2, $this->mapRows());
+
+    $this->node->removeTranslation('es');
+    $this->node->setTitle('Hello again');
+    $this->node->setOriginal(clone $this->node);
+    $this->node->save();
+    $this->assertSame(OutboxItem::STATUS_DONE, $this->outboxRows()[$this->key($this->node, 'es')]->status, 'The hook saw no removed translation.');
+
+    $this->processor()->process(100, 0);
+    $this->assertSame([['help', $this->remoteId($this->node, 'es')]], ScriptedPlatformClient::callsOf('deleteDocument'));
+    $this->assertSame([$this->remoteId($this->node, 'en')], array_keys($this->mapRows()));
+    $this->assertSame('translation_missing', $this->outboxRows()[$this->key($this->node, 'es')]->remote['skip_reason']);
+  }
+
+  /**
    * A mapped document that is not generated anymore is deleted.
    */
   public function testRemovedAttachmentIsDeleted(): void {

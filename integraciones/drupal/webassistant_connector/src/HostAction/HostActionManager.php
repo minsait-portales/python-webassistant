@@ -33,7 +33,9 @@ final class HostActionManager extends DefaultPluginManager {
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
     parent::__construct('Plugin/WebAssistant/HostAction', $namespaces, $module_handler, HostActionInterface::class, HostAction::class);
     $this->alterInfo('webassistant_host_action_info');
-    $this->setCacheBackend($cache_backend, 'webassistant_connector_host_action_plugins');
+    // The tag also marks the pages whose widget lists the host actions
+    // (HostActionRegistry): clearing the definitions invalidates them.
+    $this->setCacheBackend($cache_backend, 'webassistant_connector_host_action_plugins', ['webassistant_connector_host_action_plugins']);
   }
 
 }

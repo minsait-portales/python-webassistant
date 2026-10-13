@@ -317,7 +317,8 @@ $preview = FALSE): DocumentBuildResult` (`documents`, `skipReason`):
 4. ACL (`Sync\AclResolver`, DR-04.7): `acl_mode=public` → `['public']`; `authenticated` →
    `['authenticated']`; `access` → `['public']` si el anónimo puede ver; si no, `['authenticated']` si
    un autenticado sin roles extra puede; si no, `role:<rid>` de cada rol que puede ver (cuentas
-   `UserSession` sintéticas, `resetCache()` del access handler entre comprobaciones). Vacío → `no_access`.
+   `UserSession` sintéticas con un uid distinto por conjunto de roles, `resetCache()` del access handler
+   entre comprobaciones). Vacío → `no_access`.
 5. `source_id = {prefix}:{entity_type}:{id}:{langcode}` (`Sync\SourceIdGenerator`).
 6. `locale` con `Locale\LocaleMapper` (`es`, `pt-br`→`pt-BR`, `zh-hans`→`zh`, `und`/`zxx`→`default_locale`).
 7. `version = {changed YmdHis}.r{revision}.m{mapping_version}` (≤64). `content_hash = sha256(text)`.

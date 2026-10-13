@@ -19,6 +19,9 @@ use Drupal\webassistant_connector\Sync\SourceMatcher;
  * document of the source (the worker deletes what is out of scope).
  * Disabling or deleting a source records events for its mapped documents,
  * which the worker deletes because the source is disabled or missing.
+ * Nothing is scheduled while the connector itself is being uninstalled
+ * (UninstallHooks): run drush webassistant:purge before to delete the remote
+ * documents.
  */
 final class SourceLifecycleHooks {
 
@@ -52,6 +55,9 @@ final class SourceLifecycleHooks {
   #[Hook('webassistant_source_update')]
   public function sourceUpdate(SourceInterface $source): void {
     $this->sourceMatcher->reset();
+    if (UninstallHooks::isUninstalling()) {
+      return;
+    }
     $original = $source->getOriginal();
     if ($original instanceof SourceInterface && !self::scopeChanged($original, $source)) {
       return;
@@ -65,6 +71,9 @@ final class SourceLifecycleHooks {
   #[Hook('webassistant_source_delete')]
   public function sourceDelete(SourceInterface $source): void {
     $this->sourceMatcher->reset();
+    if (UninstallHooks::isUninstalling()) {
+      return;
+    }
     $this->indexer->scheduleReindex((string) $source->id(), FALSE, TRUE, 'source deleted');
   }
 

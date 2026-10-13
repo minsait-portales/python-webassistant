@@ -48,7 +48,10 @@ Formato breve: contexto, decisión y consecuencias. Complementan las ADR de la p
   el texto no puede incluir datos más restringidos que esa ACL.
 - **Decisión.** Modo `access` por defecto: anónimo → `public`; autenticado sin roles extra →
   `authenticated`; si no, `role:<id>` de cada rol que puede verlo. El texto se renderiza con la cuenta menos
-  privilegiada de la ACL, y los campos y referencias sin acceso se descartan. Modos `public`,
+  privilegiada de la ACL (el rol con menos permisos; los de administrador, los últimos), y los campos y
+  referencias que algún principal no puede ver se descartan. Cada conjunto de roles usa una cuenta sintética
+  con su propio uid (por debajo de `PHP_INT_MAX`): core calcula los permisos y cachea el acceso por uid,
+  así que un uid compartido evaluaría cada principal con los permisos de la cuenta de render. Modos `public`,
   `authenticated` y `field` para casos especiales. Un cambio de permisos recalcula las ACL.
 - **Consecuencias.** Los permisos por usuario o grupo que no se expresan con roles (p. ej. el módulo Group)
   necesitan un suscriptor de `AclAlterEvent`; mientras tanto ese contenido no se indexa (falla cerrado).

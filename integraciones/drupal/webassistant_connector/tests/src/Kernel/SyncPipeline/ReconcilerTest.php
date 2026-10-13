@@ -7,6 +7,7 @@ namespace Drupal\Tests\webassistant_connector\Kernel\SyncPipeline;
 use Drupal\Core\Queue\DelayedRequeueException;
 use Drupal\node\NodeInterface;
 use Drupal\user\Entity\Role;
+use Drupal\webassistant_connector\Entity\Source;
 use Drupal\webassistant_connector\Hook\AccessEpochHooks;
 use Drupal\webassistant_connector\Hook\RequirementsHooks;
 use Drupal\webassistant_connector\Hook\SyncCronHooks;
@@ -254,6 +255,17 @@ final class ReconcilerTest extends SyncKernelTestBase {
     Role::load('anonymous')->grantPermission('access content')->save();
     $this->assertSame(1, $this->queueCount(Indexer::INDEX_QUEUE));
     $this->assertFalse($this->container->get('webassistant_connector.access_epoch')->check(), 'Nothing changed since.');
+    // Sources are not part of the access rules.
+    Source::create([
+      'id' => 'people',
+      'label' => 'People',
+      'status' => TRUE,
+      'entity_type' => 'user',
+      'knowledge_base' => 'people',
+      'document_type' => 'page',
+      'acl_mode' => 'public',
+    ])->save();
+    $this->assertFalse($this->container->get('webassistant_connector.access_epoch')->check(), 'A new source changes no access rule.');
   }
 
   /**
@@ -264,6 +276,9 @@ final class ReconcilerTest extends SyncKernelTestBase {
     $this->assertSame('OK', $requirements['webassistant_connector_credentials']['severity']->name);
     $this->assertArrayNotHasKey('webassistant_connector_https', $requirements, 'http://localhost needs no https.');
     $this->assertArrayHasKey('webassistant_connector_outbox', $requirements);
+    // The secret comes from the environment but the API URL from config.
+    $this->assertSame('Warning', $requirements['webassistant_connector_api_url_source']['severity']->name);
+    $this->assertArrayNotHasKey('webassistant_connector_public_url', $requirements);
 
     $this->updateOutbox(['status' => OutboxItem::STATUS_DEAD], $this->key($this->node, 'en'));
     $this->updateOutbox(['status' => OutboxItem::STATUS_PENDING, 'created' => time() - 7200], $this->key($this->node, 'es'));
@@ -275,6 +290,20 @@ final class ReconcilerTest extends SyncKernelTestBase {
     $this->assertSame('Warning', $requirements['webassistant_connector_https']['severity']->name);
     $this->assertSame('Warning', $requirements['webassistant_connector_dead']['severity']->name);
     $this->assertSame('Warning', $requirements['webassistant_connector_backlog']['severity']->name);
+    $this->assertArrayNotHasKey('webassistant_connector_api_url_source', $requirements, 'No secret to protect.');
+
+    // Without a public base URL nor trusted hosts, cron run by a web request
+    // would build document URLs from its Host header: processing waits.
+    $this->config('webassistant_connector.settings')->set('sync.public_base_url', '')->save();
+    $requirements = $this->container->get(RequirementsHooks::class)->runtimeRequirements();
+    $this->assertSame('Error', $requirements['webassistant_connector_public_url']['severity']->name);
+    $urlResolver = $this->container->get('webassistant_connector.url_resolver');
+    $this->assertFalse($urlResolver->hasTrustedBaseUrl(FALSE));
+    $this->assertTrue($urlResolver->hasTrustedBaseUrl(TRUE), 'Drush takes the host from the operator.');
+    $this->setSetting('trusted_host_patterns', ['^www\.example\.com$']);
+    $this->assertTrue($urlResolver->hasTrustedBaseUrl(FALSE));
+    $this->assertArrayNotHasKey('webassistant_connector_public_url', $this->container->get(RequirementsHooks::class)->runtimeRequirements());
+    $this->config('webassistant_connector.settings')->set('sync.public_base_url', 'https://www.example.com')->save();
 
     $summary = $this->container->get('webassistant_connector.sync_status')->summary();
     $this->assertSame(1, $summary['counts'][OutboxItem::STATUS_DEAD]);

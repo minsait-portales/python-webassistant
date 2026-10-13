@@ -8,6 +8,7 @@ use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\State\StateInterface;
+use Drupal\Core\TypedData\TranslatableInterface;
 use Drupal\webassistant_connector\Entity\SourceInterface;
 use Drupal\webassistant_connector\Normalizer\CanonicalDocument;
 use Drupal\webassistant_connector\Platform\Credentials;
@@ -83,6 +84,8 @@ final class SyncProcessor {
    *   The platform client.
    * @param \Drupal\webassistant_connector\Platform\Credentials $credentials
    *   The credentials (processing waits while they are missing).
+   * @param \Drupal\webassistant_connector\Sync\UrlResolver $urlResolver
+   *   The URL resolver (processing waits while the base URL is untrusted).
    * @param \Drupal\webassistant_connector\Sync\SourceMatcher $sourceMatcher
    *   The source matcher (orphan checks).
    * @param \Drupal\webassistant_connector\Sync\SourceIdGenerator $sourceIdGenerator
@@ -106,6 +109,7 @@ final class SyncProcessor {
     private readonly DocumentBuilder $documentBuilder,
     private readonly PlatformClientInterface $platformClient,
     private readonly Credentials $credentials,
+    private readonly UrlResolver $urlResolver,
     private readonly SourceMatcher $sourceMatcher,
     private readonly SourceIdGenerator $sourceIdGenerator,
     private readonly EntityTypeManagerInterface $entityTypeManager,
@@ -144,10 +148,10 @@ final class SyncProcessor {
    *    non-retryable errors or attempts >= sync.max_attempts: dead.
    * 4. Network errors, 5xx, 429 or 401 stop the run (circuit breaker, A5):
    *    the remaining claimed events are released and the report is
-   *    suspended. A 401 or missing configuration does not count as an
-   *    attempt of the event (it never dies of it). The time budget is
-   *    checked before every event; events whose lease ran out meanwhile are
-   *    skipped.
+   *    suspended. A 401 or missing configuration (credentials, or a trusted
+   *    base URL in web requests) does not count as an attempt of the event
+   *    (it never dies of it). The time budget is checked before every event;
+   *    events whose lease ran out meanwhile are skipped.
    *
    * @param int $limit
    *   Maximum number of events.
@@ -164,6 +168,13 @@ final class SyncProcessor {
     }
     if (!$this->credentials->isConfigured()) {
       $report->addError('The platform credentials or API URL are not configured.');
+      $report->suspend();
+      return $report;
+    }
+    if (!$this->urlResolver->hasTrustedBaseUrl()) {
+      // Canonical and signed download URLs would take the Host header of the
+      // request running cron, which any visitor controls.
+      $report->addError('Set the public base URL of the site (sync.public_base_url) or trusted_host_patterns in settings.php: document URLs are never built from an unvalidated Host header.');
       $report->suspend();
       return $report;
     }
@@ -336,6 +347,9 @@ final class SyncProcessor {
     $result = $source === NULL
       ? DocumentBuildResult::skip(DocumentBuildResult::SKIP_NOT_APPLICABLE)
       : $this->documentBuilder->build($source, $item->entityType, $item->entityId, $item->langcode);
+    if ($source !== NULL) {
+      $this->recordRemovedTranslations($item);
+    }
 
     if ($result->isSkipped()) {
       $report->addSkipped();
@@ -413,6 +427,37 @@ final class SyncProcessor {
       ],
       'rejected' => $rejected,
     ];
+  }
+
+  /**
+   * Records events for mapped translations that the entity no longer has.
+   *
+   * The entity update hook finds removed translations by comparing with the
+   * original entity, which some saves reset (publishing a workspace sets the
+   * original to the entity being saved): such a translation would stay on
+   * the platform. Comparing the map with the default revision catches it on
+   * the next event of any other translation of the entity.
+   *
+   * @param \Drupal\webassistant_connector\Sync\OutboxItem $item
+   *   The claimed item.
+   */
+  private function recordRemovedTranslations(OutboxItem $item): void {
+    $langcodes = [];
+    foreach ($this->documentMap->find($item->source, $item->entityType, $item->entityId) as $row) {
+      if ((string) $row['langcode'] !== $item->langcode) {
+        $langcodes[(string) $row['langcode']] = TRUE;
+      }
+    }
+    if ($langcodes === [] || !$this->entityTypeManager->hasDefinition($item->entityType)) {
+      return;
+    }
+    $entity = $this->entityTypeManager->getStorage($item->entityType)->load($item->entityId);
+    foreach (array_keys($langcodes) as $langcode) {
+      $langcode = (string) $langcode;
+      if (!$entity instanceof TranslatableInterface || !$entity->hasTranslation($langcode)) {
+        $this->outbox->recordKey(OutboxItem::OPERATION_DELETE, $item->source, $item->entityType, $item->entityId, $langcode);
+      }
+    }
   }
 
   /**

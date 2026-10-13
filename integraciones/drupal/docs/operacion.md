@@ -52,6 +52,15 @@ $settings['webassistant_connector'] = [
 ];
 ```
 
+Define `api_base_url` en el mismo sitio que el secreto: si la URL viene de la configuración, quien pueda
+cambiarla en *Ajustes* puede hacer que Drupal envíe el secreto a otro servidor (el informe de estado lo
+avisa).
+
+Fija también la **URL pública base** (*Sincronización*) o `$settings['trusted_host_patterns']`: sin ninguna
+de las dos, el cron que dispara una visita tomaría las URL de los documentos (incluidas las de descarga
+firmadas) de su cabecera `Host`, así que la outbox no se procesa desde la web hasta que se define (el
+informe de estado lo marca como error; `drush` usa el host de `--uri`).
+
 La configuración exportable (`drush cex`) nunca contiene el secreto ni la clave de firma. Cambiar
 `hash_salt` o la clave de firma cambia los identificadores opacos de usuario: los usuarios dejan de ver sus
 conversaciones anteriores.
@@ -128,6 +137,8 @@ Drupal (si difiere de la pública, p. ej. una red interna).
   igual que los públicos: los sirve el conector).
 - Las citas enlazan la página que publica el fichero, nunca la URL firmada.
 - Sustituir, borrar o despublicar el fichero o la entidad retira el documento y revoca la URL.
+- Dos fuentes activas que cubren los mismos bundles e idiomas no pueden enviar sus adjuntos a la misma base
+  de conocimiento (sus documentos tendrían el mismo `source_id`).
 
 ### 4.4 Catálogo y carrito (extensión Commerce)
 
@@ -170,7 +181,7 @@ Crea una fuente de `commerce_product` con el normalizador **Producto de Commerce
 | `drush webassistant:reconcile [kb]` (`wa-reconcile`) | Reconciliación (`--dry-run`) |
 | `drush webassistant:retry` (`wa-retry`) | Reintenta eventos `failed`/`dead` (`--status`, `--id`) |
 | `drush webassistant:preview <tipo> <id> [idioma]` (`wa-preview`) | JSON canónico que se enviaría |
-| `drush webassistant:purge` | Retira de la plataforma todos los documentos de esta instalación |
+| `drush webassistant:purge` | Retira de la plataforma todos los documentos de esta instalación (ejecútalo antes de desinstalar: la desinstalación no borra nada remoto) |
 | `drush webassistant:migrate-legacy` (`wa-migrate-legacy`) | Migra ajustes y bloques de `webassistant_ai` (`--rollback`) |
 
 ## 7. Runbooks

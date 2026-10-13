@@ -220,6 +220,57 @@ final class SourceFormHooks {
     if ($baseUrl !== '' && !DocumentsSettings::isValidBaseUrl($baseUrl)) {
       $form_state->setError($element['download_base_url'], new TranslatableMarkup('The download base URL must be an absolute http or https URL without query string, fragment nor credentials.'));
     }
+    $other = $form_state->getValue('status') ? self::overlappingSource($form_state, $knowledgeBase) : NULL;
+    if ($other !== NULL) {
+      $form_state->setError($element['knowledge_base'], new TranslatableMarkup('The enabled source %other already sends the attached documents of some of these items to the knowledge base %kb. Choose another knowledge base for the attached documents, other bundles or languages, or disable one of the sources.', [
+        '%other' => $other->label(),
+        '%kb' => DocumentsSettings::fromSource($other)->knowledgeBaseFor($other),
+      ]));
+    }
+  }
+
+  /**
+   * Returns an enabled source whose attachments would collide with these.
+   *
+   * Attachment source IDs do not contain the source (amendment A10 only
+   * checks the main knowledge base): two sources sending the attachments of
+   * the same entity to the same knowledge base would write the same remote
+   * documents, and removing one source would delete the other's.
+   *
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state of the source form.
+   * @param string $knowledgeBase
+   *   The knowledge base of the attachments ('' for the main one).
+   *
+   * @return \Drupal\webassistant_connector\Entity\SourceInterface|null
+   *   The other source, or NULL.
+   */
+  private static function overlappingSource(FormStateInterface $form_state, string $knowledgeBase): ?SourceInterface {
+    $formObject = $form_state->getFormObject();
+    $source = $formObject instanceof EntityFormInterface ? $formObject->getEntity() : NULL;
+    $id = $source instanceof SourceInterface && !$source->isNew() ? (string) $source->id() : (string) $form_state->getValue('id');
+    $entityTypeId = (string) $form_state->getValue('entity_type');
+    if ($knowledgeBase === '') {
+      $knowledgeBase = trim((string) $form_state->getValue('knowledge_base'));
+    }
+    $bundles = self::checked($form_state->getValue('bundles'));
+    $langcodes = self::checked($form_state->getValue('langcodes'));
+    foreach (\Drupal::entityTypeManager()->getStorage('webassistant_source')->loadMultiple() as $other) {
+      if (!$other instanceof SourceInterface || (string) $other->id() === $id || !$other->status() || $other->getTargetEntityTypeId() !== $entityTypeId) {
+        continue;
+      }
+      $settings = DocumentsSettings::fromSource($other);
+      if (!$settings->isActive() || $settings->knowledgeBaseFor($other) !== $knowledgeBase) {
+        continue;
+      }
+      $otherBundles = $other->getBundles();
+      $otherLangcodes = $other->getLangcodes();
+      if (($bundles === [] || $otherBundles === [] || array_intersect($bundles, $otherBundles) !== [])
+        && ($langcodes === [] || $otherLangcodes === [] || array_intersect($langcodes, $otherLangcodes) !== [])) {
+        return $other;
+      }
+    }
+    return NULL;
   }
 
   /**
