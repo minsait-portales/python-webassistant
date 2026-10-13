@@ -5,7 +5,14 @@ parameters:
   level: 5
   paths:
     - %env.DRUPAL_ROOT%/web/modules/custom/webassistant_connector
+  # Drupal Commerce no se instala en el entorno de verificación: los stubs del
+  # submódulo Commerce (mismos espacios de nombres y firmas que Commerce 3.x)
+  # se escanean para resolver los símbolos, pero no se analizan.
+  scanDirectories:
+    - %env.DRUPAL_ROOT%/web/modules/custom/webassistant_connector/modules/webassistant_connector_commerce/tests/stubs
   excludePaths:
+    analyse:
+      - %env.DRUPAL_ROOT%/web/modules/custom/webassistant_connector/modules/webassistant_connector_commerce/tests/stubs/*
     analyseAndScan:
       - %env.DRUPAL_ROOT%/web/modules/custom/webassistant_connector/tests/stubs/*
   reportUnmatchedIgnoredErrors: false

@@ -59,5 +59,7 @@ Formato breve: contexto, decisión y consecuencias. Complementan las ADR de la p
   (DR-06.7 pendiente de la API).
 - Las host actions no van firmadas por la plataforma: Drupal las trata como entrada no confiable y vuelve a
   comprobar permisos, acceso, parámetros e idempotencia.
-- La plataforma descarga los originales sin *query*: la firma va en la ruta y, por defecto, no caduca; se
-  revoca cuando el fichero deja de estar indexado (borrado, despublicado o sustituido).
+- La plataforma descarga los originales sin *query*: la firma (HMAC de uuid, caducidad y fecha del fichero)
+  va en la ruta, caduca a los 7 días por defecto (configurable entre 30 minutos y 30 días) y se revoca en
+  cuanto el fichero deja de estar indexado o cambia. Una reindexación manual en la plataforma tras la
+  caducidad falla y la reconciliación reenvía el documento con una URL nueva.

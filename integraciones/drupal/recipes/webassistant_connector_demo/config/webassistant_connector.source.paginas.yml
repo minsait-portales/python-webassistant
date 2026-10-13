@@ -18,7 +18,7 @@ third_party_settings:
       - application/pdf
       - application/vnd.openxmlformats-officedocument.wordprocessingml.document
     max_bytes: 50000000
-    url_ttl: 0
+    url_ttl: 604800
     download_base_url: ''
 id: paginas
 label: 'Páginas y artículos'

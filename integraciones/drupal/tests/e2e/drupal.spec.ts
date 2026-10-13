@@ -136,9 +136,10 @@ test.describe('Conector Drupal 11', () => {
 
   test('la búsqueda server-to-server cita las URL de Drupal, nunca la URL firmada', async ({ request }) => {
     const pages = await search(request, 'horario de la oficina de Zaragoza', 'ayuda');
-    expect(pages[0]?.url).toBe(`${DRUPAL}/node/1`);
+    // La plataforma añade el ancla del encabezado del fragmento citado (#cita-previa…).
+    expect(pages[0]?.url).toMatch(new RegExp(`^${DRUPAL}/node/1(#[\\w-]+)?$`));
     const documents = await search(request, 'garantía GAR-DRUPAL-2026 servicio técnico', 'documentos');
-    expect(documents[0]?.url).toBe(`${DRUPAL}/node/2`);
+    expect(documents[0]?.url).toMatch(new RegExp(`^${DRUPAL}/node/2(#[\\w=-]+)?$`));
     expect(documents.map((item) => item.url).join(' ')).not.toContain('/webassistant/document/');
   });
 
@@ -146,10 +147,15 @@ test.describe('Conector Drupal 11', () => {
     const problems = await freshPage(page, `${DRUPAL}/node/1`);
     await expect(page.locator('script[src$="/widget/v1/loader.js"]')).toHaveCount(1);
     await launcher(page).click();
-    await ask(page, '¿Cuál es el horario de la oficina de Zaragoza?');
+    await ask(page, '¿Hay alguna guía de ayuda sobre la cita previa en la oficina de Zaragoza?');
     const citation = page.getByRole('link', { name: /Horario de la oficina de Zaragoza/ }).first();
     await expect(citation).toBeVisible();
     expect(await citation.getAttribute('href')).toMatch(new RegExp(`^${DRUPAL}/node/1`));
+    // El PDF privado se cita con la página que lo publica, nunca con la URL firmada.
+    await ask(page, '¿Qué dice el documento de garantía GAR-DRUPAL-2026?');
+    const pdfCitation = page.getByRole('link', { name: /Guía de garantía/ }).first();
+    await expect(pdfCitation).toBeVisible();
+    expect(await pdfCitation.getAttribute('href')).toMatch(new RegExp(`^${DRUPAL}/node/2`));
     const results = await new AxeBuilder({ page })
       .include('webassistant-chat')
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
@@ -174,14 +180,17 @@ test.describe('Conector Drupal 11', () => {
     expect((await (await session).json()).subject_type).toBe('user');
 
     await ask(page, 'Quiero crear una página nueva en el portal');
+    // La host action content.create la ejecuta Drupal (permiso y acceso de creación) y navega al formulario.
+    await page.getByRole('button', { name: 'Abrir formulario' }).click();
     await page.waitForURL(/\/node\/add\/page/, { timeout: 30_000 });
+    await expect(page.locator('#edit-title-0-value')).toBeVisible();
   });
 
   test('despublicar en Drupal retira el documento de la plataforma', async ({ request }) => {
     drush('php:eval', '$n = \\Drupal\\node\\Entity\\Node::load(1); $n->setUnpublished(); $n->save();');
     await waitForDocument(request, 'ayuda', `${PREFIX}:node:1:${LANG}`, 'deleted');
     const pages = await search(request, 'horario de la oficina de Zaragoza', 'ayuda');
-    expect(pages.map((item) => item.url)).not.toContain(`${DRUPAL}/node/1`);
+    expect(pages.filter((item) => item.url.startsWith(`${DRUPAL}/node/1`))).toEqual([]);
     drush('php:eval', '$n = \\Drupal\\node\\Entity\\Node::load(1); $n->setPublished(); $n->save();');
     await waitForDocument(request, 'ayuda', `${PREFIX}:node:1:${LANG}`, 'ready');
   });

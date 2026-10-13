@@ -9,12 +9,15 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: '.',
+  outputDir: 'test-results',
   timeout: 180_000,
   expect: { timeout: 20_000 },
   fullyParallel: false,
   workers: 1,
   retries: process.env.CI ? 1 : 0,
-  reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
+  reporter: process.env.CI
+    ? [['list'], ['html', { open: 'never', outputFolder: 'playwright-report' }]]
+    : 'list',
   use: {
     baseURL: process.env.DRUPAL_URL || 'http://localhost:8080',
     trace: 'retain-on-failure',

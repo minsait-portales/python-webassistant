@@ -39,6 +39,9 @@ if [ ! -f "$MARKER" ]; then
     drush language:add "$LANGCODE"
     drush config:set system.site default_langcode "$LANGCODE" -y
     drush config:set language.negotiation selected_langcode "$LANGCODE" -y || true
+    # El idioma por defecto sin prefijo en la URL (/node/1) y el inglés con /en.
+    drush config:set language.negotiation url.prefixes."$LANGCODE" '' -y
+    drush config:set language.negotiation url.prefixes.en en -y
   fi
 
   echo "[drupal] Receta del conector WebAssistant..."
