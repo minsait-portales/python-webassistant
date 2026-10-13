@@ -90,7 +90,7 @@ functional() {
   local server=$!
   trap 'kill $server 2>/dev/null || true; rm -f "$log"' RETURN
   for _ in $(seq 1 50); do
-    curl -s -o /dev/null "http://127.0.0.1:$FUNCTIONAL_PORT/" && break
+    curl -s -o /dev/null "http://127.0.0.1:$FUNCTIONAL_PORT/core/misc/drupal.js" && break
     sleep 0.2
   done
   SIMPLETEST_BASE_URL="http://127.0.0.1:$FUNCTIONAL_PORT" phpunit Functional "$@"

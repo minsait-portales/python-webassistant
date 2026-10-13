@@ -385,7 +385,7 @@ final class Outbox {
   }
 
   /**
-   * Marks a claimed item as failed (retryable); attempts is incremented.
+   * Marks a claimed item as failed (retryable).
    *
    * @param \Drupal\webassistant_connector\Sync\OutboxItem $item
    *   The claimed item.
@@ -395,14 +395,18 @@ final class Outbox {
    *   Timestamp of the next attempt.
    * @param string|null $correlationId
    *   The X-Request-Id of the failed request.
+   * @param bool $countAttempt
+   *   (optional) FALSE for errors that are not caused by the item (invalid
+   *   credentials, missing configuration): attempts is not incremented, so
+   *   the item never reaches sync.max_attempts because of them.
    *
    * @return bool
    *   FALSE if a capture happened meanwhile (the row went back to pending).
    */
-  public function markFailed(OutboxItem $item, string $error, int $nextAttempt, ?string $correlationId = NULL): bool {
+  public function markFailed(OutboxItem $item, string $error, int $nextAttempt, ?string $correlationId = NULL, bool $countAttempt = TRUE): bool {
     return $this->finish($item, [
       'status' => OutboxItem::STATUS_FAILED,
-      'attempts' => $item->attempts + 1,
+      'attempts' => $item->attempts + ($countAttempt ? 1 : 0),
       'next_attempt' => $nextAttempt,
       'last_error' => self::truncateError($error),
       'correlation_id' => $correlationId === NULL ? NULL : substr($correlationId, 0, 64),

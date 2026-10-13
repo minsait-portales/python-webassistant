@@ -13,16 +13,23 @@ use Drupal\webassistant_connector\Sync\OutboxItem;
 use Drupal\webassistant_connector_sync_test\ScriptedPlatformClient;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Drush commands by calling the command methods.
+ *
+ * Deprecations are ignored: loading Drush\Commands\DrushCommands in a
+ * Drupal test triggers a DebugClassLoader notice about vendor code
+ * (SavableState::currentState() return type) that this module cannot fix.
+ * DrushCommandsFunctionalTest runs the real drush executable.
  *
  * @group webassistant_connector
  */
 #[CoversClass(WebAssistantCommands::class)]
 #[CoversClass(LegacyMigrator::class)]
 #[Group('webassistant_connector')]
+#[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 final class DrushCommandsTest extends SyncKernelTestBase {
 
@@ -130,6 +137,42 @@ final class DrushCommandsTest extends SyncKernelTestBase {
     $reconcile = $this->commands->reconcile('help', ['dry-run' => FALSE, 'format' => 'table']);
     $this->assertSame(1, $reconcile->getExitCode());
     $this->assertStringContainsString('corr-404', self::data($reconcile)[0]['errors']);
+  }
+
+  /**
+   * Long loops empty the entity caches when memory runs low (A13).
+   */
+  public function testMemoryCheckAndRedaction(): void {
+    $original = (string) ini_get('memory_limit');
+    $cache = $this->container->get('entity.memory_cache');
+    $cache->set('webassistant_test', 'cached');
+    try {
+      ini_set('memory_limit', '-1');
+      $this->assertSame(0, WebAssistantCommands::memoryLimit());
+      $this->assertFalse($this->commands->checkMemory());
+      ini_set('memory_limit', '2048M');
+      $this->assertSame(2048 * 1024 * 1024, WebAssistantCommands::memoryLimit());
+      $this->assertFalse($this->commands->checkMemory());
+      $this->assertNotFalse($cache->get('webassistant_test'));
+      // A limit close to the current usage triggers the reset.
+      ini_set('memory_limit', (string) (int) (memory_get_usage() * 1.3));
+      $this->assertTrue($this->commands->checkMemory());
+      $this->assertFalse($cache->get('webassistant_test'));
+    }
+    finally {
+      ini_set('memory_limit', $original);
+    }
+
+    $document = [
+      'source_id' => 'x',
+      'reference' => [
+        'download_url' => 'https://example.com/f',
+        'access_token' => 'secret-token',
+      ],
+    ];
+    $this->assertSame('[redacted]', WebAssistantCommands::redact($document)['reference']['access_token']);
+    $this->assertSame('https://example.com/f', WebAssistantCommands::redact($document)['reference']['download_url']);
+    $this->assertSame(['text' => 'a'], WebAssistantCommands::redact(['text' => 'a']));
   }
 
   /**

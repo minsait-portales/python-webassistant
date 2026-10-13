@@ -1,0 +1,18 @@
+# Signed download of an indexed original (design section 11). The platform
+# removes the query string of reference.download_url, so the signature and the
+# expiry travel in the path. Anonymous access: the signature is the
+# authorization; no session, no cookies, no redirects, never cached.
+webassistant_connector_documents.download:
+  path: '/webassistant/document/{uuid}/{expires}/{signature}'
+  methods: [GET]
+  defaults:
+    _controller: '\Drupal\webassistant_connector_documents\Controller\DownloadController::download'
+  requirements:
+    uuid: '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+    expires: '[0-9]{1,12}'
+    signature: '[A-Za-z0-9_-]{43}'
+    # Open on purpose: the platform has no Drupal session; the controller
+    # checks the HMAC signature, the expiry and that the file is indexed.
+    _access: 'TRUE'
+  options:
+    no_cache: TRUE

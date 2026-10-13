@@ -253,11 +253,19 @@ final class SyncProcessorTest extends SyncKernelTestBase {
    * A 401 or missing credentials never kill events.
    */
   public function testGlobalErrorsKeepEventsAlive(): void {
-    ScriptedPlatformClient::failNext('ingest', new PlatformException('WebAssistant API error 401 (unauthorized)', 401, 'unauthorized'));
+    // Even with a single attempt allowed, a 401 does not kill the event nor
+    // count as an attempt.
+    $this->config('webassistant_connector.settings')->set('sync.max_attempts', 1)->save();
+    ScriptedPlatformClient::failNext('ingest', new PlatformException('WebAssistant API error 401 (unauthorized)', 401, 'unauthorized', FALSE, NULL, 'corr-401'));
     $report = $this->processor()->process(100, 0);
     $this->assertTrue($report->isSuspended());
     $this->assertSame(1, $report->getFailed());
-    $this->assertSame(OutboxItem::STATUS_FAILED, $this->outboxRows()[$this->key($this->node, 'en')]->status);
+    $this->assertSame(0, $report->getDead());
+    $english = $this->outboxRows()[$this->key($this->node, 'en')];
+    $this->assertSame(OutboxItem::STATUS_FAILED, $english->status);
+    $this->assertSame(0, $english->attempts);
+    $this->assertSame('corr-401', $english->correlationId);
+    $this->assertGreaterThan(time(), $english->nextAttempt);
 
     putenv('WEBASSISTANT_CLIENT_SECRET');
     $this->updateOutbox(['next_attempt' => 0]);
@@ -360,6 +368,46 @@ final class SyncProcessorTest extends SyncKernelTestBase {
     $report = $this->processor()->process(100, 0);
     $this->assertSame(2, $report->getUpserted());
     $this->assertCount(2, $this->mapRows());
+  }
+
+  /**
+   * Narrowing or deleting a source deletes what falls out of scope (A9).
+   */
+  public function testNarrowedAndDeletedSource(): void {
+    $this->processor()->process(100, 0);
+    $this->assertCount(2, $this->mapRows());
+    $this->clearQueues();
+
+    // A label change does not touch the documents.
+    $this->source->set('label', 'Renamed')->save();
+    $this->assertSame(0, $this->queueCount(Indexer::INDEX_QUEUE));
+
+    // Only Spanish from now on: the English document is deleted.
+    $this->source->set('langcodes', ['es'])->save();
+    $this->assertSame(2, $this->queueCount(Indexer::INDEX_QUEUE), 'Entities and mapped documents are refreshed.');
+    $this->runQueue(Indexer::INDEX_QUEUE);
+    $report = $this->processor()->process(100, 0);
+    $this->assertSame(1, $report->getDeleted());
+    $this->assertSame(1, $report->getUpserted(), 'The Spanish document carries the new mapping hash.');
+    $this->assertSame([['help', $this->remoteId($this->node, 'en')]], ScriptedPlatformClient::callsOf('deleteDocument'));
+    $this->assertSame([$this->remoteId($this->node, 'es')], array_keys($this->mapRows()));
+
+    // A newer job of the same source supersedes the pending one.
+    $this->source->set('langcodes', [])->save();
+    $this->source->set('langcodes', ['es'])->save();
+    $this->assertSame(4, $this->queueCount(Indexer::INDEX_QUEUE));
+    $this->runQueue(Indexer::INDEX_QUEUE);
+    $recorded = array_filter($this->outboxRows(), static fn (OutboxItem $item): bool => $item->status === OutboxItem::STATUS_PENDING);
+    $this->assertSame([$this->key($this->node, 'es')], array_keys($recorded), 'Only the latest jobs ran.');
+    $this->processor()->process(100, 0);
+
+    // Deleting the source deletes its remaining documents.
+    $this->source->delete();
+    $this->runQueue(Indexer::INDEX_QUEUE);
+    $report = $this->processor()->process(100, 0);
+    $this->assertSame(1, $report->getDeleted());
+    $this->assertSame([], $this->mapRows());
+    $this->assertSame('not_applicable', $this->outboxRows()[$this->key($this->node, 'es')]->remote['skip_reason']);
   }
 
   /**

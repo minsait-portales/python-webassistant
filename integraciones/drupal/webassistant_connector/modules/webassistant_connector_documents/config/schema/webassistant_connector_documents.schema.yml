@@ -1,0 +1,56 @@
+# Third-party settings of a WebAssistant source (design section 11).
+webassistant_connector.source.*.third_party.webassistant_connector_documents:
+  type: mapping
+  label: 'Attached documents'
+  mapping:
+    enabled:
+      type: boolean
+      label: 'Index the attached documents'
+    fields:
+      type: sequence
+      label: 'File fields and media references'
+      sequence:
+        type: string
+        label: 'Field name'
+        constraints:
+          Regex:
+            pattern: '/^[a-z0-9_]{1,128}$/'
+            message: 'The field name is not a machine name.'
+    knowledge_base:
+      type: string
+      label: 'Knowledge base (empty: the one of the source)'
+      constraints:
+        Regex:
+          pattern: '/^([a-z][a-z0-9_-]{1,62})?$/'
+          message: 'The knowledge base key must be empty or match ^[a-z][a-z0-9_-]{1,62}$.'
+    mime_types:
+      type: sequence
+      label: 'Media types'
+      sequence:
+        type: string
+        label: 'Media type'
+        constraints:
+          Choice:
+            choices:
+              - 'application/pdf'
+              - 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+              - 'text/html'
+              - 'text/plain'
+              - 'text/markdown'
+    max_bytes:
+      type: integer
+      label: 'Maximum file size in bytes'
+      constraints:
+        Range:
+          min: 1
+          max: 50000000
+    url_ttl:
+      type: integer
+      label: 'Lifetime of the signed download URLs in seconds'
+      constraints:
+        Range:
+          min: 1800
+          max: 2592000
+    download_base_url:
+      type: string
+      label: 'Base URL with which the platform reaches Drupal (empty: the public base URL)'

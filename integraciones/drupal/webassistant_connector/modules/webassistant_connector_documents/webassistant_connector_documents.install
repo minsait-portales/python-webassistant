@@ -1,0 +1,40 @@
+<?php
+
+/**
+ * @file
+ * Install and uninstall functions of the WebAssistant documents extension.
+ */
+
+declare(strict_types=1);
+
+use Drupal\webassistant_connector\Entity\SourceInterface;
+use Drupal\webassistant_connector\Sync\Outbox;
+
+/**
+ * Implements hook_uninstall().
+ *
+ * Runs before the configuration of the module is removed: the attachment
+ * settings are stripped from the sources here, so the sources stay enabled
+ * (a dependency removal would disable them). Saving them reindexes their
+ * content, which deletes the attachment documents from the platform. The
+ * pending "_attachment" rows of the outbox are dropped: no handler would
+ * process them any more.
+ */
+function webassistant_connector_documents_uninstall(bool $is_syncing): void {
+  if (!$is_syncing) {
+    $module = 'webassistant_connector_documents';
+    $storage = \Drupal::entityTypeManager()->getStorage('webassistant_source');
+    foreach ($storage->loadMultiple() as $source) {
+      if (!$source instanceof SourceInterface || $source->getThirdPartySettings($module) === []) {
+        continue;
+      }
+      foreach (array_keys($source->getThirdPartySettings($module)) as $key) {
+        $source->unsetThirdPartySetting($module, (string) $key);
+      }
+      $source->save();
+    }
+  }
+  \Drupal::database()->delete(Outbox::TABLE)
+    ->condition('source', Outbox::SOURCE_ATTACHMENT)
+    ->execute();
+}

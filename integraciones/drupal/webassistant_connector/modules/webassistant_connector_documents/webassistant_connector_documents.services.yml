@@ -1,0 +1,29 @@
+# Services of the Documents extension (design section 11, amendments A14, B6).
+#
+# Every service is autowired. Hook classes (src/Hook) are registered by core.
+services:
+  _defaults:
+    autowire: true
+
+  webassistant_connector_documents.field_inspector:
+    class: Drupal\webassistant_connector_documents\AttachmentFieldInspector
+  Drupal\webassistant_connector_documents\AttachmentFieldInspector: '@webassistant_connector_documents.field_inspector'
+
+  webassistant_connector_documents.signed_url_generator:
+    class: Drupal\webassistant_connector_documents\Download\SignedUrlGenerator
+  Drupal\webassistant_connector_documents\Download\SignedUrlGenerator: '@webassistant_connector_documents.signed_url_generator'
+
+  # One reference document per allowed file of the indexed translations.
+  webassistant_connector_documents.attachment_contributor:
+    class: Drupal\webassistant_connector_documents\Contributor\AttachmentContributor
+    tags:
+      - { name: webassistant_connector.document_contributor }
+  Drupal\webassistant_connector_documents\Contributor\AttachmentContributor: '@webassistant_connector_documents.attachment_contributor'
+
+  # Fans out the "_attachment" outbox rows recorded when a file or a media
+  # entity changes to the entities that reference them (amendment A14).
+  webassistant_connector_documents.attachment_handler:
+    class: Drupal\webassistant_connector_documents\Sync\AttachmentOutboxHandler
+    tags:
+      - { name: webassistant_connector.outbox_handler }
+  Drupal\webassistant_connector_documents\Sync\AttachmentOutboxHandler: '@webassistant_connector_documents.attachment_handler'

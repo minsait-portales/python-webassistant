@@ -1,0 +1,11 @@
+name: 'WebAssistant connector: documents'
+type: module
+description: 'Indexes the PDF, DOCX, HTML, text and Markdown files attached to synchronized content by reference, through signed download URLs.'
+package: Minsait
+core_version_requirement: ^11.2
+php: 8.3
+dependencies:
+  - webassistant_connector:webassistant_connector
+  - drupal:file
+'interface translation project': webassistant_connector
+'interface translation server pattern': modules/custom/webassistant_connector/translations/%language.po

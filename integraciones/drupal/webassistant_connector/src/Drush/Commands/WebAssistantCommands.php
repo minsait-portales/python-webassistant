@@ -8,6 +8,7 @@ use Consolidation\AnnotatedCommand\CommandResult;
 use Consolidation\OutputFormatters\StructuredData\PropertyList;
 use Consolidation\OutputFormatters\StructuredData\RowsOfFields;
 use Consolidation\OutputFormatters\StructuredData\UnstructuredData;
+use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -53,6 +54,11 @@ final class WebAssistantCommands extends DrushCommands {
   public const INDEX_PAGE = 100;
 
   /**
+   * Share of memory_limit above which the entity caches are emptied (A13).
+   */
+  public const MEMORY_THRESHOLD = 0.7;
+
+  /**
    * Constructs a WebAssistantCommands object.
    *
    * @param \Drupal\webassistant_connector\Sync\SyncStatus $syncStatus
@@ -81,6 +87,8 @@ final class WebAssistantCommands extends DrushCommands {
    *   The entity type manager.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   The config factory.
+   * @param \Drupal\Core\Cache\MemoryCache\MemoryCacheInterface $entityMemoryCache
+   *   The static cache of entity storages (emptied when memory runs low).
    */
   public function __construct(
     private readonly SyncStatus $syncStatus,
@@ -96,6 +104,7 @@ final class WebAssistantCommands extends DrushCommands {
     private readonly LegacyMigrator $legacyMigrator,
     private readonly EntityTypeManagerInterface $entityTypeManager,
     private readonly ConfigFactoryInterface $configFactory,
+    private readonly MemoryCacheInterface $entityMemoryCache,
   ) {
     parent::__construct();
   }
@@ -158,7 +167,7 @@ final class WebAssistantCommands extends DrushCommands {
    *   The checks and the exit code.
    */
   #[CLI\Command(name: 'webassistant:check', aliases: ['wa-check'])]
-  #[CLI\Option(name: 'origin', description: 'Origin (scheme://host[:port]) checked with the bootstrap endpoint. Default: the origin of sync.public_base_url.')]
+  #[CLI\Option(name: 'origin', description: 'Origin (scheme://host[:port]) checked with the bootstrap endpoint; when omitted, the origin of sync.public_base_url.')]
   #[CLI\FieldLabels(labels: ['check' => 'Check', 'status' => 'Status', 'details' => 'Details'])]
   #[CLI\Usage(name: 'drush webassistant:check --origin=https://www.example.com', description: 'Full diagnostics, including the site bootstrap for that origin.')]
   public function check(array $options = ['origin' => self::REQ, 'format' => 'table']): CommandResult {
@@ -179,7 +188,7 @@ final class WebAssistantCommands extends DrushCommands {
    *   The exit code.
    */
   #[CLI\Command(name: 'webassistant:index', aliases: ['wa-index'])]
-  #[CLI\Argument(name: 'source', description: 'Source ID. Default: every enabled source.')]
+  #[CLI\Argument(name: 'source', description: 'Source ID; when omitted, every enabled source.')]
   #[CLI\Option(name: 'bundle', description: 'Only this bundle.')]
   #[CLI\Option(name: 'langcode', description: 'Only this language.')]
   #[CLI\Option(name: 'process', description: 'Process the outbox afterwards (send the documents).')]
@@ -227,8 +236,8 @@ final class WebAssistantCommands extends DrushCommands {
    *   The report; exit code 1 when events failed or the platform is down.
    */
   #[CLI\Command(name: 'webassistant:sync', aliases: ['wa-sync'])]
-  #[CLI\Option(name: 'limit', description: 'Maximum number of events. Default: sync.process_limit.')]
-  #[CLI\Option(name: 'time', description: 'Maximum seconds. Default: no limit.')]
+  #[CLI\Option(name: 'limit', description: 'Maximum number of events; when omitted, sync.process_limit.')]
+  #[CLI\Option(name: 'time', description: 'Maximum seconds; when omitted, no limit.')]
   #[CLI\Usage(name: 'drush webassistant:sync --limit=500 --time=120', description: 'Process up to 500 events for at most two minutes.')]
   public function sync(array $options = ['limit' => self::REQ, 'time' => self::REQ, 'format' => 'table']): CommandResult {
     if (!$this->syncProcessor->isEnabled()) {
@@ -256,7 +265,7 @@ final class WebAssistantCommands extends DrushCommands {
    *   One row per knowledge base; exit code 1 on errors.
    */
   #[CLI\Command(name: 'webassistant:reconcile', aliases: ['wa-reconcile'])]
-  #[CLI\Argument(name: 'knowledgeBase', description: 'Knowledge base key. Default: every knowledge base of the map and of the enabled sources.')]
+  #[CLI\Argument(name: 'knowledgeBase', description: 'Knowledge base key; when omitted, every knowledge base of the map and of the enabled sources.')]
   #[CLI\Option(name: 'dry-run', description: 'Report only, record nothing.')]
   #[CLI\FieldLabels(labels: [
     'knowledge_base' => 'Knowledge base',
@@ -376,7 +385,7 @@ final class WebAssistantCommands extends DrushCommands {
   #[CLI\Command(name: 'webassistant:preview', aliases: ['wa-preview'])]
   #[CLI\Argument(name: 'entityType', description: 'Entity type ID, e.g. node.')]
   #[CLI\Argument(name: 'id', description: 'Entity ID.')]
-  #[CLI\Argument(name: 'langcode', description: 'Language code. Default: the default language of the entity.')]
+  #[CLI\Argument(name: 'langcode', description: 'Language code; when omitted, the default language of the entity.')]
   #[CLI\Option(name: 'source', description: 'Only this source (disabled sources too).')]
   #[CLI\Usage(name: 'drush webassistant:preview node 42 es', description: 'Canonical JSON of node 42 in Spanish.')]
   public function preview(
@@ -416,7 +425,7 @@ final class WebAssistantCommands extends DrushCommands {
       $warnings = $result->getWarnings();
       foreach ($result->getDocuments() as $document) {
         try {
-          $documents[] = $document->toArray();
+          $documents[] = self::redact($document->toArray());
         }
         catch (\LogicException $e) {
           $warnings[] = $e->getMessage();
@@ -586,6 +595,7 @@ final class WebAssistantCommands extends DrushCommands {
       $page = $this->indexer->enqueue($source, $bundle, $langcode, $lastId, self::INDEX_PAGE);
       $recorded += $page['count'];
       $lastId = $page['last_id'];
+      $this->checkMemory();
     } while ($page['entities'] === self::INDEX_PAGE);
     return $recorded;
   }
@@ -607,8 +617,61 @@ final class WebAssistantCommands extends DrushCommands {
     do {
       $report = $this->syncProcessor->process(500, $timeBudget);
       $total->merge($report);
+      $this->checkMemory();
     } while ($report->getProcessed() > 0 && !$report->isSuspended() && $this->outbox->hasDue() && ($timeBudget === 0 || time() - $start < $timeBudget));
     return $total;
+  }
+
+  /**
+   * Empties the entity static caches when memory runs low (amendment A13).
+   *
+   * Long Drush loops load many entities (and the entities they reference);
+   * the storages keep them in the entity memory cache.
+   *
+   * @return bool
+   *   TRUE if the caches were emptied.
+   */
+  public function checkMemory(): bool {
+    $limit = self::memoryLimit();
+    if ($limit <= 0 || memory_get_usage() < $limit * self::MEMORY_THRESHOLD) {
+      return FALSE;
+    }
+    $this->entityMemoryCache->deleteAll();
+    gc_collect_cycles();
+    return TRUE;
+  }
+
+  /**
+   * Returns memory_limit in bytes (0 when unlimited or unknown).
+   */
+  public static function memoryLimit(): int {
+    $value = trim((string) ini_get('memory_limit'));
+    if ($value === '' || $value === '-1') {
+      return 0;
+    }
+    $number = (int) $value;
+    return match (strtolower(substr($value, -1))) {
+      'g' => $number * 1024 * 1024 * 1024,
+      'm' => $number * 1024 * 1024,
+      'k' => $number * 1024,
+      default => $number,
+    };
+  }
+
+  /**
+   * Hides secrets of a canonical document shown by webassistant:preview.
+   *
+   * @param array<string, mixed> $document
+   *   The canonical document.
+   *
+   * @return array<string, mixed>
+   *   The document with reference.access_token redacted.
+   */
+  public static function redact(array $document): array {
+    if (isset($document['reference']) && is_array($document['reference']) && isset($document['reference']['access_token'])) {
+      $document['reference']['access_token'] = '[redacted]';
+    }
+    return $document;
   }
 
   /**

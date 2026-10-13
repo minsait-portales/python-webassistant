@@ -144,7 +144,10 @@ final class SyncProcessor {
    *    non-retryable errors or attempts >= sync.max_attempts: dead.
    * 4. Network errors, 5xx, 429 or 401 stop the run (circuit breaker, A5):
    *    the remaining claimed events are released and the report is
-   *    suspended. The time budget is checked before every event.
+   *    suspended. A 401 or missing configuration does not count as an
+   *    attempt of the event (it never dies of it). The time budget is
+   *    checked before every event; events whose lease ran out meanwhile are
+   *    skipped.
    *
    * @param int $limit
    *   Maximum number of events.
@@ -178,6 +181,13 @@ final class SyncProcessor {
             $report->addReleased();
           }
           break 2;
+        }
+        if ($item->leaseUntil <= $this->time->getCurrentTime()) {
+          // The lease ran out while earlier items were processed: another
+          // worker may have claimed the row, which is left alone (a later
+          // claim takes it if nobody did).
+          $report->addReleased();
+          continue;
         }
         $this->processItem($item, $report);
         $remaining--;
@@ -609,11 +619,18 @@ final class SyncProcessor {
     $correlationId = $e->getCorrelationId();
     $message = $e->getMessage();
     // A 401 after the client renewed its token, or missing configuration,
-    // affects every event: retry later instead of killing the event.
+    // affects every event and is not the event's fault: retry later without
+    // counting the attempt, so fixing the credentials resumes delivery
+    // without a manual retry of the dead letter.
     $global = $e->getStatus() === 401 || $e->getErrorCode() === PlatformException::CODE_NOT_CONFIGURED;
     $outage = $global || $e->getStatus() === 429 || ($e->getStatus() ?? 0) >= 500 || ($e->getStatus() === NULL && $e->getErrorCode() === PlatformException::CODE_NETWORK_ERROR);
     $delay = self::backoff($item->attempts, $e->getRetryAfter());
-    if (($e->isRetryable() || $global) && $item->attempts + 1 < $this->maxAttempts()) {
+    if ($global) {
+      $this->outbox->markFailed($item, $message, $this->time->getCurrentTime() + $delay, $correlationId, FALSE);
+      $report->addFailed();
+      $level = 'error';
+    }
+    elseif ($e->isRetryable() && $item->attempts + 1 < $this->maxAttempts()) {
       $this->outbox->markFailed($item, $message, $this->time->getCurrentTime() + $delay, $correlationId);
       $report->addFailed();
       $level = 'warning';
