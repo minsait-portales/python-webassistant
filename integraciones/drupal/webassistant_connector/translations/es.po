@@ -1,0 +1,1499 @@
+# Spanish translation of the WebAssistant connector for Drupal.
+# Generated from the module sources; check it with integraciones/drupal/scripts/i18n.py check.
+msgid ""
+msgstr ""
+"Project-Id-Version: webassistant_connector\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "\"@product\" cannot be purchased at the moment."
+msgstr "\"@product\" no se puede comprar en este momento."
+
+msgid "%kb: @remote remote documents, @orphans orphans, @outdated outdated, @missing missing; @recorded events recorded."
+msgstr "%kb: @remote documentos remotos, @orphans huérfanos, @outdated desactualizados, @missing ausentes; @recorded eventos registrados."
+
+msgid "%scope is not a valid scope (expected a value such as %example)."
+msgstr "%scope no es un scope válido (se espera un valor como %example)."
+
+msgid "- Original language -"
+msgstr "- Idioma original -"
+
+msgid "..."
+msgstr "..."
+
+msgid "@count events recorded in the outbox."
+msgstr "@count eventos registrados en la outbox."
+
+msgid "@description <strong>Overridden by an environment variable: the value below is ignored.</strong>"
+msgstr "@description <strong>Definido por una variable de entorno: el valor de abajo se ignora.</strong>"
+
+msgid "@description <strong>Overridden in settings.php: the value below is ignored.</strong>"
+msgstr "@description <strong>Definido en settings.php: el valor de abajo se ignora.</strong>"
+
+msgid "@failed events failed and will be retried; @dead events are in the dead letter."
+msgstr "@failed eventos han fallado y se reintentarán; @dead eventos están en la cola de descartados."
+
+msgid "@label (@name): files, in @bundles"
+msgstr "@label (@name): ficheros, en @bundles"
+
+msgid "@label (@name): media, in @bundles"
+msgstr "@label (@name): media, en @bundles"
+
+msgid "@label <small>(@name, @type)</small>"
+msgstr "@label <small>(@name, @type)</small>"
+
+msgid "@pending pending, @failed failed"
+msgstr "@pending pendientes, @failed fallidos"
+
+msgid "@permission (not defined)"
+msgstr "@permission (no definido)"
+
+msgid "@processed events processed: @upserted documents sent, @unchanged unchanged, @deleted deleted, @failed failed, @dead dead."
+msgstr "@processed eventos procesados: @upserted documentos enviados, @unchanged sin cambios, @deleted eliminados, @failed fallidos, @dead descartados."
+
+msgid "@seconds s"
+msgstr "@seconds s"
+
+msgid "@type (all bundles)"
+msgstr "@type (todos los bundles)"
+
+msgid "@type (missing)"
+msgstr "@type (no existe)"
+
+msgid "@type ID"
+msgstr "ID de @type"
+
+msgid "@upserted documents sent and @deleted deleted."
+msgstr "@upserted documentos enviados y @deleted eliminados."
+
+msgid "A field with the Exclusion role is set."
+msgstr "Un campo con el rol Exclusión está activado."
+
+msgid "A user gets the scope when they have the permission. Permissions that do not exist grant nothing. Leave the scope empty to remove a row."
+msgstr "El usuario recibe el scope si tiene el permiso. Los permisos inexistentes no conceden nada. Deja el scope vacío para quitar una fila."
+
+msgid "API URL"
+msgstr "URL de la API"
+
+msgid "API URL (server to server)"
+msgstr "URL de la API (servidor a servidor)"
+
+msgid "API URL for browsers"
+msgstr "URL de la API para los navegadores"
+
+msgid "API client ID"
+msgstr "ID del cliente API"
+
+msgid "API client secret"
+msgstr "Secreto del cliente API"
+
+msgid "Absolute URL used to build the canonical URL of documents, for example %example. Required when cron or Drush run without the public host name. Leave empty to use the current request."
+msgstr "URL absoluta con la que se construye la URL canónica de los documentos, por ejemplo %example. Obligatoria si cron o Drush se ejecutan sin el nombre de host público. Déjala vacía para usar la petición actual."
+
+msgid "Access"
+msgstr "Acceso"
+
+msgid "Add several products to cart"
+msgstr "Añadir varios productos al carrito"
+
+msgid "Add source"
+msgstr "Añadir fuente"
+
+msgid "Add to cart"
+msgstr "Añadir al carrito"
+
+msgid "Adds a product to the shopping cart of the user."
+msgstr "Añade un producto al carrito del usuario."
+
+msgid "Adds a selection of products to the shopping cart of the user."
+msgstr "Añade una selección de productos al carrito del usuario."
+
+msgid "Administer WebAssistant connector"
+msgstr "Administrar el conector WebAssistant"
+
+msgid "All"
+msgstr "Todos"
+
+msgid "Assistant ID"
+msgstr "ID del assistant"
+
+msgid "At most @max scopes are allowed."
+msgstr "Se admiten como máximo @max scopes."
+
+msgid "Attached documents"
+msgstr "Documentos adjuntos"
+
+msgid "Attempts"
+msgstr "Intentos"
+
+msgid "Authenticated users"
+msgstr "Usuarios autenticados"
+
+msgid "Average latency (24 h): @latency"
+msgstr "Latencia media (24 h): @latency"
+
+msgid "Behind a reverse proxy, configure the trusted proxy settings so that Drupal sees the public scheme and host."
+msgstr "Tras un proxy inverso, configura los proxies de confianza para que Drupal vea el esquema y el host públicos."
+
+msgid "Bind the token to the page origin"
+msgstr "Vincular el token al origen de la página"
+
+msgid "Browser API URL"
+msgstr "URL de la API para el navegador"
+
+msgid "Builds the documents of an item exactly as the synchronization would send them. Nothing is sent to the platform or stored."
+msgstr "Construye los documentos de un elemento exactamente como los enviaría la sincronización. No se envía nada a la plataforma ni se guarda nada."
+
+msgid "Bundle"
+msgstr "Bundle"
+
+msgid "Bundles"
+msgstr "Bundles"
+
+msgid "CSS selector of the element where the widget shows its results, for example %example. Leave empty to show them in the widget panel."
+msgstr "Selector CSS del elemento donde el widget muestra sus resultados, por ejemplo %example. Déjalo vacío para mostrarlos en el panel del widget."
+
+msgid "CSS selector of the element where the widget shows its results, for example %example. Leave empty to use the connector settings (or the widget panel)."
+msgstr "Selector CSS del elemento donde el widget muestra sus resultados, por ejemplo %example. Déjalo vacío para usar los ajustes del conector (o el panel del widget)."
+
+msgid "Changed"
+msgstr "Modificado"
+
+msgid "Changes the quantity of a product in the shopping cart of the user."
+msgstr "Cambia la cantidad de un producto en el carrito del usuario."
+
+msgid "Check"
+msgstr "Comprobación"
+
+msgid "Choose a content entity type that can be indexed."
+msgstr "Elige un tipo de entidad de contenido que se pueda indexar."
+
+msgid "Choose a valid language."
+msgstr "Elige un idioma válido."
+
+msgid "Choose an enabled source."
+msgstr "Elige una fuente activa."
+
+msgid "Choose at least one field with attached documents."
+msgstr "Elige al menos un campo con documentos adjuntos."
+
+msgid "Choose at least one format."
+msgstr "Elige al menos un formato."
+
+msgid "Choose how access is computed."
+msgstr "Elige cómo se calcula el acceso."
+
+msgid "Choose what each field contributes. <em>Title</em>: the document title (first non-empty; default the entity label). <em>Main content</em> and <em>Context</em>: the document text, in this order. <em>Metadata</em> and <em>Filter</em>: values under the metadata key (filters keep the stored keys of lists). <em>URL</em>: replaces the canonical URL. <em>Image</em>: metadata.image_url. <em>Date</em>: the update date. <em>Access</em>: principals for the \"field\" access mode. <em>Exclusion</em>: a true value removes the item from the index. Only fields every reader of the document can view are sent."
+msgstr "Elige qué aporta cada campo. <em>Título</em>: el título del documento (el primero no vacío; por defecto, la etiqueta de la entidad). <em>Contenido principal</em> y <em>Contexto</em>: el texto del documento, en este orden. <em>Metadatos</em> y <em>Filtro</em>: valores bajo la clave de metadatos (los filtros conservan las claves almacenadas de las listas). <em>URL</em>: sustituye la URL canónica. <em>Imagen</em>: metadata.image_url. <em>Fecha</em>: la fecha de actualización. <em>Acceso</em>: principales para el modo de acceso \"campo\". <em>Exclusión</em>: un valor verdadero retira el elemento del índice. Solo se envían los campos que todos los lectores del documento pueden ver."
+
+msgid "Client ID"
+msgstr "ID del cliente"
+
+msgid "Client secret"
+msgstr "Secreto del cliente"
+
+msgid "Commerce product"
+msgstr "Producto de Commerce"
+
+msgid "Computed from Drupal access"
+msgstr "Calculado con el acceso de Drupal"
+
+msgid "Configure the client ID, the client secret and the API URL first."
+msgstr "Configura primero el ID del cliente, el secreto y la URL de la API."
+
+msgid "Configure the platform connection, identity, synchronization sources and diagnostics, and run the Drush commands."
+msgstr "Configurar la conexión con la plataforma, la identidad, las fuentes de sincronización y el diagnóstico, y ejecutar los comandos Drush."
+
+msgid "Configured (@source)"
+msgstr "Configurado (@source)"
+
+msgid "Configured (client ID from @id_source, secret from @secret_source)"
+msgstr "Configurado (ID del cliente en @id_source, secreto en @secret_source)"
+
+msgid "Configured in settings.php"
+msgstr "Configurado en settings.php"
+
+msgid "Configured in the environment"
+msgstr "Configurado en el entorno"
+
+msgid "Configured in this form"
+msgstr "Configurado en este formulario"
+
+msgid "Connect the site with the WebAssistant platform: widget, identity, synchronization and status."
+msgstr "Conecta el sitio con la plataforma WebAssistant: widget, identidad, sincronización y estado."
+
+msgid "Connection"
+msgstr "Conexión"
+
+msgid "Connection timeout"
+msgstr "Tiempo de conexión"
+
+msgid "Connector settings"
+msgstr "Ajustes del conector"
+
+msgid "Connector: @state"
+msgstr "Conector: @state"
+
+msgid "Content"
+msgstr "Contenido"
+
+msgid "Content actions are not available on this site."
+msgstr "Las acciones de contenido no están disponibles en este sitio."
+
+msgid "Content changes are recorded but not sent to the platform."
+msgstr "Los cambios de contenido se registran pero no se envían a la plataforma."
+
+msgid "Content entity"
+msgstr "Entidad de contenido"
+
+msgid "Content entity type whose items become documents."
+msgstr "Tipo de entidad de contenido cuyos elementos se convierten en documentos."
+
+msgid "Content to index"
+msgstr "Contenido que se indexa"
+
+msgid "Context"
+msgstr "Contexto"
+
+msgid "Converts each translation into canonical documents."
+msgstr "Convierte cada traducción en documentos canónicos."
+
+msgid "Correlation ID"
+msgstr "ID de correlación"
+
+msgid "Create content"
+msgstr "Crear contenido"
+
+msgid "Created the source %label."
+msgstr "Se ha creado la fuente %label."
+
+msgid "Creates a WebAssistant widget block in the region of every legacy block (same theme, weight and visibility), copies the results selector and disables the legacy blocks. The rollback re-enables them and removes the new blocks."
+msgstr "Crea un bloque del widget WebAssistant en la región de cada bloque antiguo (mismo tema, peso y visibilidad), copia el selector de resultados y desactiva los bloques antiguos. La reversión los vuelve a activar y elimina los bloques nuevos."
+
+msgid "Credential sources"
+msgstr "Origen de las credenciales"
+
+msgid "Date"
+msgstr "Fecha"
+
+msgid "Days to keep delivered events"
+msgstr "Días que se conservan los eventos entregados"
+
+msgid "Dead letter"
+msgstr "Cola de descartados"
+
+msgid "Default assistant ID"
+msgstr "ID del assistant por defecto"
+
+msgid "Delete"
+msgstr "Eliminar"
+
+msgid "Delivery"
+msgstr "Entrega"
+
+msgid "Derived from the site hash salt"
+msgstr "Derivada del hash salt del sitio"
+
+msgid "Destination"
+msgstr "Destino"
+
+msgid "Details"
+msgstr "Detalles"
+
+msgid "Disabled"
+msgstr "Desactivado"
+
+msgid "Document type"
+msgstr "Tipo de documento"
+
+msgid "Documents mapped"
+msgstr "Documentos asociados"
+
+msgid "Documents mapped: @count"
+msgstr "Documentos asociados: @count"
+
+msgid "Documents per ingestion request"
+msgstr "Documentos por petición de ingesta"
+
+msgid "Documents that would be sent: @count."
+msgstr "Documentos que se enviarían: @count."
+
+msgid "Done"
+msgstr "Hecho"
+
+msgid "Download base URL"
+msgstr "URL base de descarga"
+
+msgid "Drupal access"
+msgstr "Acceso de Drupal"
+
+msgid "Edit"
+msgstr "Editar"
+
+msgid "Edit content"
+msgstr "Editar contenido"
+
+msgid "Enable the connector"
+msgstr "Activar el conector"
+
+msgid "Enabled"
+msgstr "Activado"
+
+msgid "Enter a valid ID."
+msgstr "Introduce un ID válido."
+
+msgid "Entity type"
+msgstr "Tipo de entidad"
+
+msgid "Error"
+msgstr "Error"
+
+msgid "Event"
+msgstr "Evento"
+
+msgid "Events"
+msgstr "Eventos"
+
+msgid "Events due now: @count"
+msgstr "Eventos pendientes ahora: @count"
+
+msgid "Events per queue or cron run"
+msgstr "Eventos por ejecución de cola o cron"
+
+msgid "Events that fail this many times move to the dead letter. Retries wait 30 seconds doubling up to one hour, or what the platform asks for."
+msgstr "Los eventos que fallan este número de veces pasan a la cola de descartados. Los reintentos esperan 30 segundos y se duplican hasta una hora, o lo que indique la plataforma."
+
+msgid "Events waiting for more than an hour: @count"
+msgstr "Eventos en espera desde hace más de una hora: @count"
+
+msgid "Everybody"
+msgstr "Todo el mundo"
+
+msgid "Everybody if anonymous users can view the item, else authenticated users if they can, else the roles that can view it. Items nobody can view are not indexed."
+msgstr "Todo el mundo si los anónimos pueden ver el elemento; si no, los autenticados si pueden; si no, los roles que pueden verlo. Lo que nadie puede ver no se indexa."
+
+msgid "Exclusion"
+msgstr "Exclusión"
+
+msgid "Failed (will be retried)"
+msgstr "Fallido (se reintentará)"
+
+msgid "Failed, next attempt @time"
+msgstr "Fallido, próximo intento @time"
+
+msgid "Field"
+msgstr "Campo"
+
+msgid "Field roles"
+msgstr "Roles de campo"
+
+msgid "Fields"
+msgstr "Campos"
+
+msgid "File fields, and references to media items whose source is a file (document, image, audio or video). Fields hidden from some readers are not indexed."
+msgstr "Campos de fichero y referencias a elementos media cuyo origen es un fichero (documento, imagen, audio o vídeo). Los campos ocultos para algunos lectores no se indexan."
+
+msgid "Filter"
+msgstr "Filtro"
+
+msgid "For example page, guide, faq or product: a lowercase letter followed by 1 to 40 lowercase letters, digits or underscores."
+msgstr "Por ejemplo page, guide, faq o product: una letra minúscula seguida de 1 a 40 minúsculas, dígitos o guiones bajos."
+
+msgid "Formats"
+msgstr "Formatos"
+
+msgid "From a field"
+msgstr "Desde un campo"
+
+msgid "Generic normalizer driven by the field roles of the source."
+msgstr "Normalizador genérico guiado por los roles de campo de la fuente."
+
+msgid "Get the cart"
+msgstr "Ver el carrito"
+
+msgid "Go to checkout"
+msgstr "Ir al pago"
+
+msgid "Grants the analytics:read scope and the analytics.sales_report host action, which also requires \"Use the commerce administration pages\"."
+msgstr "Concede el scope analytics:read y la host action analytics.sales_report, que además requiere \"Usar las páginas de administración de Commerce\"."
+
+msgid "Grants the cart:read and cart:write scopes and the cart.get, cart.add, cart.add_many, cart.update, cart.remove and cart.checkout host actions on the own shopping cart. Drupal Commerce access checks still apply."
+msgstr "Concede los scopes cart:read y cart:write y las host actions cart.get, cart.add, cart.add_many, cart.update, cart.remove y cart.checkout sobre el propio carrito. Se siguen aplicando las comprobaciones de acceso de Drupal Commerce."
+
+msgid "Grants the content:write scope and the content.create and content.edit host actions. Drupal access checks still apply."
+msgstr "Concede el scope content:write y las host actions content.create y content.edit. Se siguen aplicando las comprobaciones de acceso de Drupal."
+
+msgid "Grants the profile:read scope and the user.profile host action."
+msgstr "Concede el scope profile:read y la host action user.profile."
+
+msgid "HTML"
+msgstr "HTML"
+
+msgid "Hide on administration pages"
+msgstr "Ocultar en las páginas de administración"
+
+msgid "Identity"
+msgstr "Identidad"
+
+msgid "Ignores Drupal access: use it only for content that is public."
+msgstr "Ignora el acceso de Drupal: úsalo solo para contenido público."
+
+msgid "Image"
+msgstr "Imagen"
+
+msgid "Index a source"
+msgstr "Indexar una fuente"
+
+msgid "Index attached documents"
+msgstr "Indexar los documentos adjuntos"
+
+msgid "Index source"
+msgstr "Indexar fuente"
+
+msgid "Indexes the files attached to the content (PDF, Word, HTML, text or Markdown) as separate documents of type \"document\". The platform downloads each file from Drupal through a signed URL that expires; citations link to the content that publishes the file. Each file inherits the access of its content, restricted to the readers that may view its media item and download it."
+msgstr "Indexa los ficheros adjuntos al contenido (PDF, Word, HTML, texto o Markdown) como documentos independientes de tipo \"document\". La plataforma descarga cada fichero de Drupal con una URL firmada que caduca; las citas enlazan el contenido que publica el fichero. Cada fichero hereda el acceso de su contenido, restringido a los lectores que pueden ver su elemento media y descargarlo."
+
+msgid "Indexing the source %source"
+msgstr "Indexando la fuente %source"
+
+msgid "Informative, shown in diagnostics."
+msgstr "Informativo, se muestra en el diagnóstico."
+
+msgid "Issue widget tokens for authenticated users"
+msgstr "Emitir tokens de widget para usuarios autenticados"
+
+msgid "Key of the knowledge base of the platform: a lowercase letter followed by 1 to 62 lowercase letters, digits, hyphens or underscores."
+msgstr "Clave de la base de conocimiento de la plataforma: una letra minúscula seguida de 1 a 62 minúsculas, dígitos, guiones o guiones bajos."
+
+msgid "Knowledge base"
+msgstr "Base de conocimiento"
+
+msgid "Knowledge bases"
+msgstr "Bases de conocimiento"
+
+msgid "Label"
+msgstr "Etiqueta"
+
+msgid "Labels"
+msgstr "Etiquetas"
+
+msgid "Labels and content"
+msgstr "Etiquetas y contenido"
+
+msgid "Language"
+msgstr "Idioma"
+
+msgid "Language: @langcode. Translations of the item: @translations."
+msgstr "Idioma: @langcode. Traducciones del elemento: @translations."
+
+msgid "Languages"
+msgstr "Idiomas"
+
+msgid "Larger files are not indexed. The platform does not download files larger than @max bytes."
+msgstr "Los ficheros más grandes no se indexan. La plataforma no descarga ficheros de más de @max bytes."
+
+msgid "Last reconciliation"
+msgstr "Última reconciliación"
+
+msgid "Last successful delivery: @time"
+msgstr "Última entrega correcta: @time"
+
+msgid "Leave empty to index every bundle, including the ones created later."
+msgstr "Déjalo vacío para indexar todos los bundles, incluidos los que se creen después."
+
+msgid "Leave empty to index every translation."
+msgstr "Déjalo vacío para indexar todas las traducciones."
+
+msgid "Leave empty to send the files to the knowledge base of the source."
+msgstr "Déjalo vacío para enviar los ficheros a la base de conocimiento de la fuente."
+
+msgid "Leave empty to use the default assistant of the site."
+msgstr "Déjalo vacío para usar el assistant por defecto del site."
+
+msgid "Left"
+msgstr "Izquierda"
+
+msgid "Legacy widget (webassistant_ai)"
+msgstr "Widget antiguo (webassistant_ai)"
+
+msgid "Legacy widget migrated: @created blocks created, @disabled legacy blocks disabled, @settings settings copied."
+msgstr "Widget antiguo migrado: @created bloques creados, @disabled bloques antiguos desactivados, @settings ajustes copiados."
+
+msgid "Lifetime of the download URLs (seconds)"
+msgstr "Duración de las URL de descarga (segundos)"
+
+msgid "Limit the documents to this site"
+msgstr "Limitar los documentos a este site"
+
+msgid "Loading fields..."
+msgstr "Cargando campos..."
+
+msgid "Locale for content without language"
+msgstr "Idioma para el contenido sin idioma"
+
+msgid "Main content"
+msgstr "Contenido principal"
+
+msgid "Make sure cron runs (or run \"drush queue:run webassistant_connector_dispatch\") and check the platform on the <a href=\":url\">status page</a>."
+msgstr "Comprueba que cron se ejecuta (o ejecuta \"drush queue:run webassistant_connector_dispatch\") y revisa la plataforma en la <a href=\":url\">página de estado</a>."
+
+msgid "Map a field with the \"Access\" role: role references, or texts such as public, authenticated, role:editor or group:12. Items with an empty value are not indexed."
+msgstr "Asigna a un campo el rol \"Acceso\": referencias a roles o textos como public, authenticated, role:editor o group:12. Los elementos con el valor vacío no se indexan."
+
+msgid "Mapping version"
+msgstr "Versión del mapeo"
+
+msgid "Markdown"
+msgstr "Markdown"
+
+msgid "Maximum delivery attempts"
+msgstr "Intentos de entrega máximos"
+
+msgid "Maximum file size (bytes)"
+msgstr "Tamaño máximo de fichero (bytes)"
+
+msgid "May contain personal data."
+msgstr "Puede contener datos personales."
+
+msgid "Metadata"
+msgstr "Metadatos"
+
+msgid "Metadata key"
+msgstr "Clave de metadatos"
+
+msgid "Metadata key of @field"
+msgstr "Clave de metadatos de @field"
+
+msgid "Migrate legacy widget"
+msgstr "Migrar el widget antiguo"
+
+msgid "Migration rolled back: @removed blocks removed, @enabled legacy blocks enabled again."
+msgstr "Migración revertida: @removed bloques eliminados, @enabled bloques antiguos activados de nuevo."
+
+msgid "Minsait"
+msgstr "Minsait"
+
+msgid "Missing"
+msgstr "Falta"
+
+msgid "Missing scopes: @scopes"
+msgstr "Faltan scopes: @scopes"
+
+msgid "Missing: @names"
+msgstr "Faltan: @names"
+
+msgid "No content titled \"@title\" was found that you can edit."
+msgstr "No se ha encontrado ningún contenido titulado \"@title\" que puedas editar."
+
+msgid "No failed events."
+msgstr "No hay eventos fallidos."
+
+msgid "No field has the Main content or Context role: the documents will only contain the title."
+msgstr "Ningún campo tiene el rol Contenido principal o Contexto: los documentos solo contendrán el título."
+
+msgid "No knowledge base yet: add and enable a source."
+msgstr "Aún no hay bases de conocimiento: añade y activa una fuente."
+
+msgid "No mappings."
+msgstr "Sin asignaciones."
+
+msgid "No product could be added to the cart."
+msgstr "No se ha podido añadir ningún producto al carrito."
+
+msgid "Nobody can view this item: its access list is empty."
+msgstr "Nadie puede ver este elemento: su lista de acceso está vacía."
+
+msgid "None selected: all."
+msgstr "Ninguno seleccionado: todos."
+
+msgid "Normalizer"
+msgstr "Normalizador"
+
+msgid "Not checked"
+msgstr "No comprobado"
+
+msgid "Not indexed: @reason (@code). The synchronization would delete its documents from the platform."
+msgstr "No se indexa: @reason (@code). La sincronización eliminaría sus documentos de la plataforma."
+
+msgid "Notes"
+msgstr "Notas"
+
+msgid "OK"
+msgstr "Correcto"
+
+msgid "Obtain an authenticated widget token and execute host actions."
+msgstr "Obtener un token de widget autenticado y ejecutar host actions."
+
+msgid "On every page (subject to the visibility settings below)"
+msgstr "En todas las páginas (según los ajustes de visibilidad de abajo)"
+
+msgid "On every page except the listed pages"
+msgstr "En todas las páginas salvo las indicadas"
+
+msgid "One path per line, with a leading slash. The %wildcard character is a wildcard and %front is the front page. Paths and aliases are both checked. Leave empty to show the widget on every page."
+msgstr "Una ruta por línea, empezando por barra. El carácter %wildcard es un comodín y %front es la portada. Se comprueban rutas y alias. Déjalo vacío para mostrar el widget en todas las páginas."
+
+msgid "One product document per product translation, with its variations (SKU, attributes, price) and the catalog metadata used by the product skills."
+msgstr "Un documento de producto por traducción, con sus variaciones (SKU, atributos y precio) y los metadatos de catálogo que usan las skills de producto."
+
+msgid "One scope per line. Keep %scopes: without them the assistant cannot read the knowledge bases or run actions. The platform drops scopes the site does not allow."
+msgstr "Un scope por línea. Mantén %scopes: sin ellos el asistente no puede leer las bases de conocimiento ni ejecutar acciones. La plataforma descarta los scopes que el site no permite."
+
+msgid "Only enabled sources send documents to the platform. New sources start disabled: preview their documents first, then enable them."
+msgstr "Solo las fuentes activas envían documentos a la plataforma. Las fuentes nuevas empiezan desactivadas: previsualiza primero sus documentos y después actívalas."
+
+msgid "Only in: @bundles."
+msgstr "Solo en: @bundles."
+
+msgid "Only on the listed pages"
+msgstr "Solo en las páginas indicadas"
+
+msgid "Only the event type, instance, skill, action and status are published: no parameters and no personal data."
+msgstr "Solo se publican el tipo de evento, la instancia, la skill, la acción y el estado: ni parámetros ni datos personales."
+
+msgid "Only these formats are sent. The platform cannot read other formats."
+msgstr "Solo se envían estos formatos. La plataforma no puede leer otros."
+
+msgid "Only where a \"WebAssistant widget\" block is placed"
+msgstr "Solo donde se coloque un bloque \"Widget WebAssistant\""
+
+msgid "Open on load"
+msgstr "Abrir al cargar"
+
+msgid "Opening the checkout."
+msgstr "Abriendo el pago."
+
+msgid "Opening the edit form of \"@title\"."
+msgstr "Abriendo el formulario de edición de \"@title\"."
+
+msgid "Opening the form to create a new @label."
+msgstr "Abriendo el formulario para crear @label."
+
+msgid "Opening the order administration."
+msgstr "Abriendo la administración de pedidos."
+
+msgid "Opening your cart to complete the purchase."
+msgstr "Abriendo tu carrito para completar la compra."
+
+msgid "Opening your profile."
+msgstr "Abriendo tu perfil."
+
+msgid "Opens the checkout of the shopping cart, or the cart page."
+msgstr "Abre el pago del carrito o la página del carrito."
+
+msgid "Opens the order administration of Drupal Commerce."
+msgstr "Abre la administración de pedidos de Drupal Commerce."
+
+msgid "Operations"
+msgstr "Operaciones"
+
+msgid "Optional: only this bundle (machine name)."
+msgstr "Opcional: solo este bundle (nombre de máquina)."
+
+msgid "Options"
+msgstr "Opciones"
+
+msgid "Otherwise the outbox is processed by cron."
+msgstr "Si no, la outbox la procesa cron."
+
+msgid "Outbox"
+msgstr "Outbox"
+
+msgid "Outbox events per status"
+msgstr "Eventos de la outbox por estado"
+
+msgid "Outputs an empty results container after the widget mount point. The selector above must then be an ID selector (for example %example); when empty, %default is used."
+msgstr "Añade un contenedor de resultados vacío tras el punto de montaje del widget. El selector de arriba debe ser entonces un selector de ID (por ejemplo %example); si está vacío, se usa %default."
+
+msgid "PDF"
+msgstr "PDF"
+
+msgid "Pages"
+msgstr "Páginas"
+
+msgid "Part of the document version. Increase it to force the platform to process every document again."
+msgstr "Forma parte de la versión del documento. Increméntala para que la plataforma vuelva a procesar todos los documentos."
+
+msgid "Pending"
+msgstr "Pendiente"
+
+msgid "Permission"
+msgstr "Permiso"
+
+msgid "Placement"
+msgstr "Colocación"
+
+msgid "Plain text"
+msgstr "Texto plano"
+
+msgid "Platform"
+msgstr "Plataforma"
+
+msgid "Platform API health check failed: @error"
+msgstr "La comprobación de salud de la API de la plataforma ha fallado: @error"
+
+msgid "Platform API: @status."
+msgstr "API de la plataforma: @status."
+
+msgid "Platform connection"
+msgstr "Conexión con la plataforma"
+
+msgid "Platform default"
+msgstr "Valor de la plataforma"
+
+msgid "Platform health"
+msgstr "Salud de la plataforma"
+
+msgid "Platform locale (for example %es or %ptbr) of entities whose language is \"undefined\" or \"not applicable\"."
+msgstr "Idioma de la plataforma (por ejemplo %es o %ptbr) para las entidades con idioma \"indefinido\" o \"no aplicable\"."
+
+msgid "Please log in to see and edit your profile."
+msgstr "Inicia sesión para ver y editar tu perfil."
+
+msgid "Position"
+msgstr "Posición"
+
+msgid "Preview"
+msgstr "Previsualizar"
+
+msgid "Preview canonical document"
+msgstr "Previsualizar el documento canónico"
+
+msgid "Preview of %label"
+msgstr "Previsualización de %label"
+
+msgid "Price: @price"
+msgstr "Precio: @price"
+
+msgid "Principals stored in a field"
+msgstr "Principales guardados en un campo"
+
+msgid "Process now"
+msgstr "Procesar ahora"
+
+msgid "Processed @current of @total."
+msgstr "Procesados @current de @total."
+
+msgid "Processing"
+msgstr "Procesando"
+
+msgid "Processing stopped: the platform is not available or not configured. See the recent errors."
+msgstr "Procesado detenido: la plataforma no está disponible o no está configurada. Revisa los errores recientes."
+
+msgid "Product"
+msgstr "Producto"
+
+msgid "Public"
+msgstr "Público"
+
+msgid "Public ID of the assistant of this instance. Leave empty to use the one of the connector settings (or the site default)."
+msgstr "ID público del assistant de esta instancia. Déjalo vacío para usar el de los ajustes del conector (o el del site)."
+
+msgid "Public ID of the site in the WebAssistant platform (lowercase letters, digits, hyphens and underscores)."
+msgstr "ID público del site en la plataforma WebAssistant (minúsculas, dígitos, guiones y guiones bajos)."
+
+msgid "Public base URL"
+msgstr "URL pública base"
+
+msgid "Public identifier of the API client. The client secret is never stored in configuration: define it in settings.php (%setting) or in the %env environment variable."
+msgstr "Identificador público del cliente API. El secreto nunca se guarda en la configuración: defínelo en settings.php (%setting) o en la variable de entorno %env."
+
+msgid "Publish widget events in window.dataLayer"
+msgstr "Publicar los eventos del widget en window.dataLayer"
+
+msgid "Recent errors"
+msgstr "Errores recientes"
+
+msgid "Reconcile"
+msgstr "Reconciliar"
+
+msgid "Reconciliation interval"
+msgstr "Intervalo de reconciliación"
+
+msgid "Recorded @count events for @progress of @total entities."
+msgstr "Registrados @count eventos para @progress de @total entidades."
+
+msgid "Recording the entities of the source."
+msgstr "Registrando las entidades de la fuente."
+
+msgid "Records an event for every entity covered by the source. Documents that did not change are not sent again."
+msgstr "Registra un evento por cada entidad que cubre la fuente. Los documentos que no han cambiado no se vuelven a enviar."
+
+msgid "Redirects to the creation form of a content type the user can create."
+msgstr "Redirige al formulario de creación de un tipo de contenido que el usuario puede crear."
+
+msgid "Redirects to the edit form of a content item the user can update."
+msgstr "Redirige al formulario de edición de un contenido que el usuario puede modificar."
+
+msgid "Redirects to the profile form of the current user."
+msgstr "Redirige al formulario de perfil del usuario actual."
+
+msgid "Reference depth"
+msgstr "Profundidad de referencias"
+
+msgid "Reference depth of @field"
+msgstr "Profundidad de referencias de @field"
+
+msgid "Referenced bundles"
+msgstr "Bundles referenciados"
+
+msgid "Referenced bundles of @field"
+msgstr "Bundles referenciados de @field"
+
+msgid "Remote documents are identified as %example. It must be unique per Drupal installation sharing a knowledge base (lowercase letters, digits, dots, hyphens and underscores; up to 32 characters)."
+msgstr "Los documentos remotos se identifican como %example. Debe ser único por instalación de Drupal que comparta una base de conocimiento (minúsculas, dígitos, puntos, guiones y guiones bajos; hasta 32 caracteres)."
+
+msgid "Remote documents are identified as %example. The prefix cannot change while @count documents are mapped: run \"drush webassistant:purge\" first, change it, then index the sources again."
+msgstr "Los documentos remotos se identifican como %example. El prefijo no puede cambiar mientras haya @count documentos asociados: ejecuta primero \"drush webassistant:purge\", cámbialo y vuelve a indexar las fuentes."
+
+msgid "Remove from cart"
+msgstr "Quitar del carrito"
+
+msgid "Removes a product from the shopping cart of the user."
+msgstr "Quita un producto del carrito del usuario."
+
+msgid "Render the results container in this block"
+msgstr "Mostrar el contenedor de resultados en este bloque"
+
+msgid "Request timeout"
+msgstr "Tiempo máximo de petición"
+
+msgid "Result"
+msgstr "Resultado"
+
+msgid "Results container selector"
+msgstr "Selector del contenedor de resultados"
+
+msgid "Retry"
+msgstr "Reintentar"
+
+msgid "Retry failed"
+msgstr "Reintentar fallidos"
+
+msgid "Returns the products, quantities and total of the shopping cart."
+msgstr "Devuelve los productos, las cantidades y el total del carrito."
+
+msgid "Right"
+msgstr "Derecha"
+
+msgid "Roles"
+msgstr "Roles"
+
+msgid "Roles let the platform filter documents whose access list contains role principals."
+msgstr "Los roles permiten a la plataforma filtrar documentos cuya lista de acceso contiene principales de rol."
+
+msgid "Roles of @field"
+msgstr "Roles de @field"
+
+msgid "Roll back the migration"
+msgstr "Revertir la migración"
+
+msgid "SKU: @sku"
+msgstr "SKU: @sku"
+
+msgid "Sales report"
+msgstr "Informe de ventas"
+
+msgid "Same as the server URL"
+msgstr "Igual que la URL del servidor"
+
+msgid "Saved the source %label."
+msgstr "Se ha guardado la fuente %label."
+
+msgid "Scope"
+msgstr "Scope"
+
+msgid "Scopes granted by Drupal permissions"
+msgstr "Scopes concedidos por permisos de Drupal"
+
+msgid "Scopes granted to every authenticated user"
+msgstr "Scopes concedidos a todo usuario autenticado"
+
+msgid "Seconds between automatic reconciliations of each knowledge base (0 disables them). Large sites should run \"drush webassistant:reconcile\" from system cron instead."
+msgstr "Segundos entre reconciliaciones automáticas de cada base de conocimiento (0 las desactiva). En sitios grandes es mejor ejecutar \"drush webassistant:reconcile\" desde el cron del sistema."
+
+msgid "Select the permission that grants the scope %scope."
+msgstr "Selecciona el permiso que concede el scope %scope."
+
+msgid "Send content changes to the platform"
+msgstr "Enviar los cambios de contenido a la plataforma"
+
+msgid "Send the documents while indexing"
+msgstr "Enviar los documentos mientras se indexa"
+
+msgid "Send the interface language to the widget"
+msgstr "Enviar el idioma de la interfaz al widget"
+
+msgid "Send the user roles"
+msgstr "Enviar los roles del usuario"
+
+msgid "Sends the site ID of the connector settings: other sites of the tenant will not find these documents."
+msgstr "Envía el ID de site de los ajustes del conector: los demás sites del tenant no encontrarán estos documentos."
+
+msgid "Server token"
+msgstr "Token de servidor"
+
+msgid "Server token scopes"
+msgstr "Scopes del token de servidor"
+
+msgid "Set them in settings.php (\\$settings['webassistant_connector']) or in the environment (WEBASSISTANT_CLIENT_ID, WEBASSISTANT_CLIENT_SECRET, WEBASSISTANT_API_URL). The client secret is never stored in configuration."
+msgstr "Defínelos en settings.php (\\$settings['webassistant_connector']) o en el entorno (WEBASSISTANT_CLIENT_ID, WEBASSISTANT_CLIENT_SECRET, WEBASSISTANT_API_URL). El secreto del cliente nunca se guarda en la configuración."
+
+msgid "Settings"
+msgstr "Ajustes"
+
+msgid "Several content items match \"@title\". Please choose one."
+msgstr "Varios contenidos coinciden con \"@title\". Elige uno."
+
+msgid "Several content types match \"@type\". Please choose one."
+msgstr "Varios tipos de contenido coinciden con \"@type\". Elige uno."
+
+msgid "Several options of this product are in your cart. Please choose one."
+msgstr "Hay varias opciones de este producto en tu carrito. Elige una."
+
+msgid "Show the widget"
+msgstr "Mostrar el widget"
+
+msgid "Signing key"
+msgstr "Clave de firma"
+
+msgid "Site"
+msgstr "Site"
+
+msgid "Site %site accepts the origin %origin (assistant %assistant)."
+msgstr "El site %site acepta el origen %origin (assistant %assistant)."
+
+msgid "Site @site, assistant @assistant"
+msgstr "Site @site, assistant @assistant"
+
+msgid "Site ID"
+msgstr "ID del site"
+
+msgid "Site bootstrap for @origin"
+msgstr "Bootstrap del site para @origin"
+
+msgid "Site bootstrap for the origin %origin failed: @error"
+msgstr "El bootstrap del site para el origen %origin ha fallado: @error"
+
+msgid "Some bundles do not exist."
+msgstr "Algunos bundles no existen."
+
+msgid "Some languages do not exist."
+msgstr "Algunos idiomas no existen."
+
+msgid "Some referenced bundles of %field do not exist."
+msgstr "Algunos bundles referenciados de %field no existen."
+
+msgid "Source"
+msgstr "Fuente"
+
+msgid "Source ID prefix"
+msgstr "Prefijo de source_id"
+
+msgid "Source ID prefix: @prefix"
+msgstr "Prefijo de source_id: @prefix"
+
+msgid "Sources"
+msgstr "Fuentes"
+
+msgid "Status"
+msgstr "Estado"
+
+msgid "Synchronization"
+msgstr "Sincronización"
+
+msgid "Synchronization is disabled."
+msgstr "La sincronización está desactivada."
+
+msgid "Synchronization: @state"
+msgstr "Sincronización: @state"
+
+msgid "Tenant ID"
+msgstr "ID del tenant"
+
+msgid "Test connection"
+msgstr "Probar conexión"
+
+msgid "Tests the saved configuration: save your changes first."
+msgstr "Prueba la configuración guardada: guarda antes tus cambios."
+
+msgid "The \"field\" access mode needs a field with the Access role."
+msgstr "El modo de acceso \"campo\" necesita un campo con el rol Acceso."
+
+msgid "The API URL %url does not use https. Use https outside local development."
+msgstr "La URL de la API %url no usa https. Usa https fuera del desarrollo local."
+
+msgid "The API URL does not use https. Use https outside local development: the connection carries the client secret and user tokens."
+msgstr "La URL de la API no usa https. Usa https fuera del desarrollo local: la conexión transporta el secreto del cliente y los tokens de usuario."
+
+msgid "The API URL is required unless it is defined in settings.php or in the environment."
+msgstr "La URL de la API es obligatoria salvo que esté definida en settings.php o en el entorno."
+
+msgid "The API client credentials are valid (scopes: @scopes)."
+msgstr "Las credenciales del cliente API son válidas (scopes: @scopes)."
+
+msgid "The API client credentials were rejected: @error"
+msgstr "Las credenciales del cliente API se han rechazado: @error"
+
+msgid "The URL must be an absolute http or https URL without credentials, query string or fragment."
+msgstr "La URL debe ser absoluta (http o https) sin credenciales, query ni fragmento."
+
+msgid "The action could not be completed."
+msgstr "No se ha podido completar la acción."
+
+msgid "The action could not be completed. Please try again later."
+msgstr "No se ha podido completar la acción. Inténtalo más tarde."
+
+msgid "The action is already in progress."
+msgstr "La acción ya está en curso."
+
+msgid "The action is not available."
+msgstr "La acción no está disponible."
+
+msgid "The assistant ID must start with a lowercase letter and contain only lowercase letters, digits, hyphens and underscores (2 to 64 characters)."
+msgstr "El ID del assistant debe empezar por una letra minúscula y contener solo minúsculas, dígitos, guiones y guiones bajos (de 2 a 64 caracteres)."
+
+msgid "The bundle is not covered by the source."
+msgstr "La fuente no cubre el bundle."
+
+msgid "The connector is disabled: the widget is not shown and the outbox is not processed (changes are still recorded)."
+msgstr "El conector está desactivado: no se muestra el widget ni se procesa la outbox (los cambios se siguen registrando)."
+
+msgid "The content type \"@type\" does not exist or you are not allowed to create it."
+msgstr "El tipo de contenido \"@type\" no existe o no puedes crearlo."
+
+msgid "The content type \"@type\" was not found."
+msgstr "No se ha encontrado el tipo de contenido \"@type\"."
+
+msgid "The default revision of this translation is not published."
+msgstr "La revisión por defecto de esta traducción no está publicada."
+
+msgid "The document type must start with a lowercase letter followed by 1 to 40 lowercase letters, digits or underscores."
+msgstr "El tipo de documento debe empezar por una letra minúscula seguida de 1 a 40 minúsculas, dígitos o guiones bajos."
+
+msgid "The documents could not be built. The details were logged."
+msgstr "No se han podido construir los documentos. Los detalles están en el registro."
+
+msgid "The download base URL must be an absolute http or https URL without query string, fragment nor credentials."
+msgstr "La URL base de descarga debe ser absoluta (http o https) sin query, fragmento ni credenciales."
+
+msgid "The enabled source %other already sends some of these items to the knowledge base %kb. Choose another knowledge base, other bundles or languages, or disable one of the sources."
+msgstr "La fuente activa %other ya envía algunos de estos elementos a la base de conocimiento %kb. Elige otra base de conocimiento, otros bundles o idiomas, o desactiva una de las fuentes."
+
+msgid "The entity type of a source cannot be changed: add another source instead."
+msgstr "El tipo de entidad de una fuente no se puede cambiar: añade otra fuente."
+
+msgid "The entity type of this source does not exist."
+msgstr "El tipo de entidad de esta fuente no existe."
+
+msgid "The event is no longer in error."
+msgstr "El evento ya no está en error."
+
+msgid "The event will be retried."
+msgstr "El evento se reintentará."
+
+msgid "The field %field cannot be both Metadata and Filter: both use the same metadata key."
+msgstr "El campo %field no puede ser a la vez Metadatos y Filtro: ambos usan la misma clave de metadatos."
+
+msgid "The field %field cannot take the role %role."
+msgstr "El campo %field no puede tener el rol %role."
+
+msgid "The indexing did not finish. Events recorded so far stay in the outbox."
+msgstr "La indexación no ha terminado. Los eventos registrados hasta ahora siguen en la outbox."
+
+msgid "The indexing stopped because of an error."
+msgstr "La indexación se ha detenido por un error."
+
+msgid "The item does not exist."
+msgstr "El elemento no existe."
+
+msgid "The item has no translation in this language."
+msgstr "El elemento no tiene traducción en este idioma."
+
+msgid "The item is not indexed (@reason)."
+msgstr "El elemento no se indexa (@reason)."
+
+msgid "The item is not valid."
+msgstr "El elemento no es válido."
+
+msgid "The knowledge base must start with a lowercase letter followed by 1 to 62 lowercase letters, digits, hyphens or underscores."
+msgstr "La base de conocimiento debe empezar por una letra minúscula seguida de 1 a 62 minúsculas, dígitos, guiones o guiones bajos."
+
+msgid "The knowledge base of the attached documents must be empty or start with a lowercase letter followed by 1 to 62 lowercase letters, digits, hyphens or underscores."
+msgstr "La base de conocimiento de los documentos adjuntos debe estar vacía o empezar por una letra minúscula seguida de 1 a 62 minúsculas, dígitos, guiones o guiones bajos."
+
+msgid "The machine name must start with a lowercase letter and contain only lowercase letters, digits and underscores."
+msgstr "El nombre de máquina debe empezar por una letra minúscula y contener solo minúsculas, dígitos y guiones bajos."
+
+msgid "The mapping version must be a positive integer."
+msgstr "La versión del mapeo debe ser un entero positivo."
+
+msgid "The metadata key %key is reserved."
+msgstr "La clave de metadatos %key está reservada."
+
+msgid "The metadata key %key is used by more than one field."
+msgstr "La clave de metadatos %key la usa más de un campo."
+
+msgid "The metadata key of %field must start with a lowercase letter and contain only lowercase letters, digits and underscores (up to 64 characters)."
+msgstr "La clave de metadatos de %field debe empezar por una letra minúscula y contener solo minúsculas, dígitos y guiones bajos (hasta 64 caracteres)."
+
+msgid "The normalizer does not support this entity type."
+msgstr "El normalizador no admite este tipo de entidad."
+
+msgid "The normalizer produced no document."
+msgstr "El normalizador no ha generado ningún documento."
+
+msgid "The outbox is processed by the queue %queue. Run cron from the system (or \"drush queue:run %queue\") instead of relying on Automated Cron."
+msgstr "La outbox la procesa la cola %queue. Ejecuta cron desde el sistema (o \"drush queue:run %queue\") en lugar de depender de Automated Cron."
+
+msgid "The parameter @name is not valid."
+msgstr "El parámetro @name no es válido."
+
+msgid "The parameter @name is required."
+msgstr "El parámetro @name es obligatorio."
+
+msgid "The parameter @name may contain at most @max items."
+msgstr "El parámetro @name admite como máximo @max elementos."
+
+msgid "The parameter @name must be a list."
+msgstr "El parámetro @name debe ser una lista."
+
+msgid "The parameter @name must be a text."
+msgstr "El parámetro @name debe ser un texto."
+
+msgid "The path %path requires a leading forward slash."
+msgstr "La ruta %path debe empezar por barra."
+
+msgid "The platform must download the file before the URL expires; the reconciliation sends expired failures again with a new URL. Default: 604800 (7 days)."
+msgstr "La plataforma debe descargar el fichero antes de que caduque la URL; la reconciliación reenvía los fallos por caducidad con una URL nueva. Por defecto: 604800 (7 días)."
+
+msgid "The prefix cannot change while documents are mapped."
+msgstr "El prefijo no puede cambiar mientras haya documentos asociados."
+
+msgid "The product cannot be purchased from the current store."
+msgstr "El producto no se puede comprar en la tienda actual."
+
+msgid "The product cannot be purchased from this site."
+msgstr "El producto no se puede comprar en este sitio."
+
+msgid "The product is not available."
+msgstr "El producto no está disponible."
+
+msgid "The product was removed from the cart."
+msgstr "Se ha quitado el producto del carrito."
+
+msgid "The public base URL must be an absolute http or https URL without credentials, query string or fragment."
+msgstr "La URL pública base debe ser absoluta (http o https) sin credenciales, query ni fragmento."
+
+msgid "The quantity must be between 0 and @max."
+msgstr "La cantidad debe estar entre 0 y @max."
+
+msgid "The quantity must be between 1 and @max."
+msgstr "La cantidad debe estar entre 1 y @max."
+
+msgid "The reconciliation of %kb continues in the background."
+msgstr "La reconciliación de %kb continúa en segundo plano."
+
+msgid "The reconciliation of %kb failed: @error"
+msgstr "La reconciliación de %kb ha fallado: @error"
+
+msgid "The reconciliation of %kb was scheduled."
+msgstr "Se ha programado la reconciliación de %kb."
+
+msgid "The reference depth must be 1 or 2."
+msgstr "La profundidad de referencias debe ser 1 o 2."
+
+msgid "The request is not valid."
+msgstr "La petición no es válida."
+
+msgid "The requested content was not found."
+msgstr "No se ha encontrado el contenido solicitado."
+
+msgid "The results container selector is not a valid CSS selector."
+msgstr "El selector del contenedor de resultados no es un selector CSS válido."
+
+msgid "The roles of this field had different settings: the first ones are kept."
+msgstr "Los roles de este campo tenían ajustes distintos: se conservan los primeros."
+
+msgid "The selected option of \"@product\" is not available."
+msgstr "La opción seleccionada de \"@product\" no está disponible."
+
+msgid "The source does not cover this item (entity type, bundle or normalizer)."
+msgstr "La fuente no cubre este elemento (tipo de entidad, bundle o normalizador)."
+
+msgid "The source is disabled. Preview its documents, then enable it to start the synchronization."
+msgstr "La fuente está desactivada. Previsualiza sus documentos y después actívala para empezar la sincronización."
+
+msgid "The start date must be before the end date."
+msgstr "La fecha de inicio debe ser anterior a la de fin."
+
+msgid "There are no enabled sources."
+msgstr "No hay fuentes activas."
+
+msgid "There are no sources yet. Add a source to send content to the WebAssistant platform."
+msgstr "Aún no hay fuentes. Añade una fuente para enviar contenido a la plataforma WebAssistant."
+
+msgid "There is no item with this ID."
+msgstr "No hay ningún elemento con este ID."
+
+msgid "There is no knowledge base to reconcile."
+msgstr "No hay ninguna base de conocimiento que reconciliar."
+
+msgid "These changes were not delivered. Review and retry them on the <a href=\":url\">status page</a>."
+msgstr "Estos cambios no se han entregado. Revísalos y reinténtalos en la <a href=\":url\">página de estado</a>."
+
+msgid "These fields may contain personal data and their values will be sent to the platform: %fields."
+msgstr "Estos campos pueden contener datos personales y sus valores se enviarán a la plataforma: %fields."
+
+msgid "This entity type has no field with attached documents."
+msgstr "Este tipo de entidad no tiene ningún campo con documentos adjuntos."
+
+msgid "This entity type has no fields that can be mapped."
+msgstr "Este tipo de entidad no tiene campos que se puedan asignar."
+
+msgid "This entity type has no file field nor reference to media items with a file."
+msgstr "Este tipo de entidad no tiene campos de fichero ni referencias a elementos media con fichero."
+
+msgid "This language is not indexed by the source."
+msgstr "La fuente no indexa este idioma."
+
+msgid "This product is no longer available. You can remove it from your cart."
+msgstr "Este producto ya no está disponible. Puedes quitarlo del carrito."
+
+msgid "This product is not in your cart."
+msgstr "Este producto no está en tu carrito."
+
+msgid "This source is disabled: its documents are only built for this preview."
+msgstr "Esta fuente está desactivada: sus documentos solo se construyen para esta previsualización."
+
+msgid "Title"
+msgstr "Título"
+
+msgid "To render the results container, the selector must be an ID selector such as %example."
+msgstr "Para mostrar el contenedor de resultados, el selector debe ser un selector de ID como %example."
+
+msgid "Token lifetime"
+msgstr "Duración del token"
+
+msgid "Token requests per user and minute"
+msgstr "Peticiones de token por usuario y minuto"
+
+msgid "Too many requests. Please try again later."
+msgstr "Demasiadas peticiones. Inténtalo más tarde."
+
+msgid "URL"
+msgstr "URL"
+
+msgid "URL from which browsers load the widget and call the API. Leave empty to use the server URL."
+msgstr "URL desde la que los navegadores cargan el widget y llaman a la API. Déjala vacía para usar la URL del servidor."
+
+msgid "URL that Drupal uses to call the WebAssistant API, for example %example. It may be an internal network address."
+msgstr "URL con la que Drupal llama a la API de WebAssistant, por ejemplo %example. Puede ser una dirección de red interna."
+
+msgid "URL with which the platform reaches this site, for example http://drupal on an internal network. Leave empty to use the public base URL of the synchronization settings."
+msgstr "URL con la que la plataforma llega a este sitio, por ejemplo http://drupal en una red interna. Déjala vacía para usar la URL pública base de los ajustes de sincronización."
+
+msgid "Undefined permissions"
+msgstr "Permisos no definidos"
+
+msgid "Unexpected parameter @name."
+msgstr "Parámetro inesperado @name."
+
+msgid "Update cart quantity"
+msgstr "Cambiar la cantidad en el carrito"
+
+msgid "Use WebAssistant analytics actions"
+msgstr "Usar las acciones de analítica de WebAssistant"
+
+msgid "Use WebAssistant cart actions"
+msgstr "Usar las acciones de carrito de WebAssistant"
+
+msgid "Use WebAssistant connector"
+msgstr "Usar el conector WebAssistant"
+
+msgid "Use WebAssistant content actions"
+msgstr "Usar las acciones de contenido de WebAssistant"
+
+msgid "Use WebAssistant profile actions"
+msgstr "Usar las acciones de perfil de WebAssistant"
+
+msgid "User profile"
+msgstr "Perfil de usuario"
+
+msgid "Users with the \"Use WebAssistant connector\" permission get a temporary token that carries an opaque user ID, their roles and the scopes below. Anonymous visitors always get an anonymous widget session."
+msgstr "Los usuarios con el permiso \"Usar el conector WebAssistant\" reciben un token temporal con un ID de usuario opaco, sus roles y los scopes de abajo. Los visitantes anónimos siempre reciben una sesión anónima del widget."
+
+msgid "Value"
+msgstr "Valor"
+
+msgid "Visibility of the global placement"
+msgstr "Visibilidad de la colocación global"
+
+msgid "Warnings"
+msgstr "Avisos"
+
+msgid "WebAssistant API URL"
+msgstr "URL de la API de WebAssistant"
+
+msgid "WebAssistant connector"
+msgstr "Conector WebAssistant"
+
+msgid "WebAssistant credentials"
+msgstr "Credenciales de WebAssistant"
+
+msgid "WebAssistant outbox dispatch"
+msgstr "Envío de la outbox de WebAssistant"
+
+msgid "WebAssistant reconciliation"
+msgstr "Reconciliación de WebAssistant"
+
+msgid "WebAssistant source"
+msgstr "Fuente de WebAssistant"
+
+msgid "WebAssistant source reindexing"
+msgstr "Reindexado de fuentes de WebAssistant"
+
+msgid "WebAssistant status"
+msgstr "Estado de WebAssistant"
+
+msgid "WebAssistant synchronization"
+msgstr "Sincronización de WebAssistant"
+
+msgid "WebAssistant synchronization backlog"
+msgstr "Atraso de la sincronización de WebAssistant"
+
+msgid "WebAssistant synchronization errors"
+msgstr "Errores de sincronización de WebAssistant"
+
+msgid "WebAssistant widget"
+msgstr "Widget WebAssistant"
+
+msgid "Weight"
+msgstr "Peso"
+
+msgid "Weight of @field"
+msgstr "Peso de @field"
+
+msgid "When disabled, changes are still recorded in the outbox and sent once synchronization is enabled again."
+msgstr "Si se desactiva, los cambios se siguen registrando en la outbox y se envían al reactivar la sincronización."
+
+msgid "When disabled, the widget is not shown, no tokens are issued and synchronization stops (changes are still recorded). Use it to roll back without uninstalling."
+msgstr "Si se desactiva, no se muestra el widget, no se emiten tokens y la sincronización se detiene (los cambios se siguen registrando). Úsalo para revertir sin desinstalar."
+
+msgid "Who can find the documents"
+msgstr "Quién puede encontrar los documentos"
+
+msgid "Widget"
+msgstr "Widget"
+
+msgid "Word (DOCX)"
+msgstr "Word (DOCX)"
+
+msgid "You are not allowed to create content."
+msgstr "No tienes permiso para crear contenido."
+
+msgid "You are not allowed to edit this content."
+msgstr "No tienes permiso para editar este contenido."
+
+msgid "You are not allowed to edit your profile."
+msgstr "No tienes permiso para editar tu perfil."
+
+msgid "You are not allowed to perform this action."
+msgstr "No tienes permiso para realizar esta acción."
+
+msgid "You are not allowed to view the order administration."
+msgstr "No tienes permiso para ver la administración de pedidos."
+
+msgid "You are not allowed to view this item."
+msgstr "No tienes permiso para ver este elemento."
+
+msgid "Your cart can hold at most @max units of \"@product\"."
+msgstr "Tu carrito admite como máximo @max unidades de \"@product\"."
+
+msgid "Your cart is being checked out and cannot be changed now."
+msgstr "Tu carrito está en proceso de pago y no se puede cambiar ahora."
+
+msgid "Your cart is empty."
+msgstr "Tu carrito está vacío."
+
+msgid "configuration"
+msgstr "configuración"
+
+msgid "default"
+msgstr "por defecto"
+
+msgid "disabled"
+msgstr "desactivado"
+
+msgid "disabled (changes are recorded but not sent)"
+msgstr "desactivada (los cambios se registran pero no se envían)"
+
+msgid "enabled"
+msgstr "activado"
+
+msgid "environment"
+msgstr "entorno"
+
+msgid "missing"
+msgstr "falta"
+
+msgid "n/a"
+msgstr "n/d"
+
+msgid "never"
+msgstr "nunca"
+
+msgid "seconds"
+msgstr "segundos"
+
+msgid "settings.php"
+msgstr "settings.php"
+
+msgid "source"
+msgstr "fuente"
+
+msgid "sources"
+msgstr "fuentes"
+
+msgid "1 event in the dead letter"
+msgid_plural "@count events in the dead letter"
+msgstr[0] "1 evento en la cola de descartados"
+msgstr[1] "@count eventos en la cola de descartados"
+
+msgid "1 event waiting for more than an hour"
+msgid_plural "@count events waiting for more than an hour"
+msgstr[0] "1 evento en espera desde hace más de una hora"
+msgstr[1] "@count eventos en espera desde hace más de una hora"
+
+msgid "1 event will be retried."
+msgid_plural "@count events will be retried."
+msgstr[0] "Se reintentará 1 evento."
+msgstr[1] "Se reintentarán @count eventos."
+
+msgid "1 more option."
+msgid_plural "@count more options."
+msgstr[0] "1 opción más."
+msgstr[1] "@count opciones más."
+
+msgid "1 product added to the cart."
+msgid_plural "@count products added to the cart."
+msgstr[0] "1 producto añadido al carrito."
+msgstr[1] "@count productos añadidos al carrito."
+
+msgid "1 product could not be added."
+msgid_plural "@count products could not be added."
+msgstr[0] "No se ha podido añadir 1 producto."
+msgstr[1] "No se han podido añadir @count productos."
+
+msgid "Added \"@title\" to the cart."
+msgid_plural "Added @count units of \"@title\" to the cart."
+msgstr[0] "Se ha añadido \"@title\" al carrito."
+msgstr[1] "Se han añadido @count unidades de \"@title\" al carrito."
+
+msgid "Quantity updated to 1."
+msgid_plural "Quantity updated to @count."
+msgstr[0] "Cantidad actualizada a 1."
+msgstr[1] "Cantidad actualizada a @count."

@@ -145,6 +145,8 @@ jobs:
           composer create-project drupal/recommended-project:^11.2 "$RUNNER_TEMP/drupal" --no-interaction
           cd "$RUNNER_TEMP/drupal"
           composer require --dev --no-interaction -W drupal/core-dev:^11.2 drush/drush:^13 phpstan/phpstan-deprecation-rules:^2
+      - name: Traducción al español completa y coherente
+        run: python3 integraciones/drupal/scripts/i18n.py check
       - name: phpcs, phpstan y PHPUnit (unit, kernel y functional)
         run: integraciones/drupal/scripts/check.sh all
         env:

@@ -56,6 +56,18 @@ La configuración exportable (`drush cex`) nunca contiene el secreto ni la clave
 `hash_salt` o la clave de firma cambia los identificadores opacos de usuario: los usuarios dejan de ver sus
 conversaciones anteriores.
 
+### 3.1 Traducción al español
+
+La interfaz del conector está en inglés con traducción completa al español en
+`webassistant_connector/translations/es.po` (declarada en los `.info.yml`). Con el módulo `locale` y el
+español activo, Drupal la importa al buscar actualizaciones de traducción, o a mano:
+
+```bash
+drush locale:import es web/modules/custom/webassistant_connector/translations/es.po --type=not-customized
+```
+
+Tras cambiar textos, `python3 integraciones/drupal/scripts/i18n.py check` lista las cadenas sin traducir.
+
 ## 4. Configurar
 
 *Configuración → Servicios web → WebAssistant connector* (`/admin/config/services/webassistant-connector`):
@@ -102,6 +114,37 @@ roles de campo:
 Las fuentes nuevas se crean desactivadas: previsualiza un contenido real, revisa los avisos de campos
 sensibles o sin acceso y actívala. Dos fuentes activas no pueden cubrir el mismo bundle e idioma en la
 misma base de conocimiento.
+
+### 4.3 Originales (extensión Documents)
+
+En el formulario de la fuente, *Documentos adjuntos*: activa la opción, elige los campos de fichero o de
+referencia a Media (con fichero), la base de conocimiento (p. ej. `portal_documentos`), los tipos permitidos
+(PDF, DOCX, HTML, texto, Markdown), el tamaño máximo (≤ 50 MB, el límite de la plataforma), la caducidad de
+las URL firmadas (7 días por defecto) y la **URL de descarga** con la que el worker de la plataforma llega a
+Drupal (si difiere de la pública, p. ej. una red interna).
+
+- Cada fichero es un documento `document` con `source_id = <id de la entidad>:file:<uuid>`; su ACL es la de
+  la entidad intersecada con el acceso al Media y la descarga del fichero (los ficheros privados se tratan
+  igual que los públicos: los sirve el conector).
+- Las citas enlazan la página que publica el fichero, nunca la URL firmada.
+- Sustituir, borrar o despublicar el fichero o la entidad retira el documento y revoca la URL.
+
+### 4.4 Catálogo y carrito (extensión Commerce)
+
+Crea una fuente de `commerce_product` con el normalizador **Producto de Commerce**, tipo de documento
+`product` (la plataforma lo trocea como un todo) y la base de conocimiento del catálogo. Roles recomendados:
+`title` → título, `body` → `main_content`, imagen → `image`, y campos con rol `metadata` y claves `category`,
+`brand`, `availability` (solo si hay datos reales de stock), `rating` o `badges`.
+
+- El normalizador añade las variaciones publicadas y accesibles (título, SKU, atributos y precio resuelto
+  por Commerce) y calcula `product_id`, `variation_id`, `sku`, `url`, `price`, `price_amount` y `currency`.
+- Guardar una variación reindexa su producto. Cambios de listas de precios o promociones programadas no
+  disparan reindexado: programa `drush wa-index <fuente> --process` si los usas.
+- Las acciones de carrito (`cart.*`) operan siempre sobre el carrito real del usuario (sesión anónima o
+  cuenta), vuelven a comprobar publicación, acceso, tienda y cantidad (1–99) y devuelven el carrito
+  recalculado; `cart.checkout` abre el checkout de Commerce si el usuario tiene acceso o, si no, el carrito.
+- En la plataforma, el site necesita la capacidad `cart` (y `analytics` para informes) y los scopes
+  `cart:read`/`cart:write` en `allowed_widget_scopes`.
 
 ## 5. Sincronización y cron
 
