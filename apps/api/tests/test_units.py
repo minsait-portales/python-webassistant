@@ -309,3 +309,10 @@ def test_control_characters_are_removed_from_extracted_text() -> None:
     assert "\x00" not in clean_whitespace(raw)
     for content_format in ("text", "markdown", "html"):
         assert "\x00" not in normalize_inline(raw, content_format).text
+
+
+def test_heading_anchors_keep_accented_letters() -> None:
+    from webassistant.rag.chunking import _slug
+
+    assert _slug("Garantía de los productos") == "garantia-de-los-productos"
+    assert _slug("¿Cómo pido cita previa?") == "como-pido-cita-previa"

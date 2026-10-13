@@ -9,6 +9,7 @@ derivados.
 from __future__ import annotations
 
 import hashlib
+import time
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Any
@@ -79,6 +80,18 @@ def _parse_dt(value: Any) -> datetime | None:
         return None
 
 
+def processing_job_id(document_id: str, content_hash: str) -> str:
+    """Identificador del trabajo de procesado de una transición a ``queued``.
+
+    arq descarta en silencio un ``_job_id`` que ya existe mientras conserva su resultado
+    (``keep_result``): con solo el documento y el hash, republicar un contenido sin cambios
+    tras borrarlo o reintentar uno fallido dejaba el documento en ``queued`` sin trabajo.
+    Cada transición lleva su propio sufijo temporal; las repeticiones de un mismo envío no
+    llegan aquí porque el documento ya está ``queued`` con el mismo contenido (``unchanged``).
+    """
+    return f"doc:{document_id}:{content_hash[:16]}:{time.time_ns():x}"
+
+
 class IngestionService:
     def __init__(
         self, db: Database, store: VectorStore, indexes: EmbeddingIndexManager, queue: JobQueue
@@ -126,7 +139,7 @@ class IngestionService:
         for document_id, content_hash, access_token in jobs:
             await self.queue.enqueue(
                 "process_document",
-                job_id=f"doc:{document_id}:{content_hash[:16]}",
+                job_id=processing_job_id(document_id, content_hash),
                 tenant_id=tenant_id,
                 document_id=document_id,
                 access_token=access_token,

@@ -242,3 +242,33 @@ async def test_widget_token_of_other_site_cannot_be_used(app, client: httpx.Asyn
     assert (
         await client.get(f"/v1/conversations/{conversation}", headers=auth(user))
     ).status_code == 404
+
+
+async def test_republished_document_is_processed_again(app, client: httpx.AsyncClient) -> None:  # type: ignore[no-untyped-def]
+    """Borrar y volver a publicar el mismo contenido encola un trabajo nuevo (arq deduplica ids)."""
+    services = app.state.services
+    job_ids: list[str | None] = []
+    original = services.queue.enqueue
+
+    async def capture(job: str, *, job_id: str | None = None, **kwargs):  # type: ignore[no-untyped-def]
+        job_ids.append(job_id)
+        return await original(job, job_id=job_id, **kwargs)
+
+    services.queue.enqueue = capture
+    token = await server_token(client)
+    document = {**SECRET_DOC, "source_id": "republicado", "acl": ["public"]}
+    first = await client.post(
+        "/v1/ingest/documents", json={"documents": [document]}, headers=auth(token)
+    )
+    assert first.json()["items"][0]["operation"] == "created"
+    await client.delete("/v1/ingest/documents/ayuda/republicado", headers=auth(token))
+    again = await client.post(
+        "/v1/ingest/documents", json={"documents": [document]}, headers=auth(token)
+    )
+    assert again.json()["items"][0]["operation"] == "updated"
+    status = (
+        await client.get("/v1/ingest/documents/ayuda/republicado", headers=auth(token))
+    ).json()
+    assert status["status"] == "ready"
+    processing = [job_id for job_id in job_ids if job_id and job_id.startswith("doc:")]
+    assert len(processing) == 2 and len(set(processing)) == 2

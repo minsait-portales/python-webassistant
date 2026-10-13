@@ -11,7 +11,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Any
 
-from webassistant.text import clean_whitespace, strip_html
+from webassistant.text import clean_whitespace, strip_accents, strip_html
 
 _MD_HEADING = re.compile(r"^(#{1,6})\s+(.+?)\s*#*\s*$")
 _HTML_HEADING = re.compile(r"(?is)<h([1-6])[^>]*?(?:id=[\"']([^\"']+)[\"'])?[^>]*>(.*?)</h\1>")
@@ -54,7 +54,8 @@ class ChunkDraft:
 
 
 def _slug(text: str) -> str:
-    return re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")[:80]
+    # "Garantía de los productos" → "garantia-de-los-productos" (sin perder letras acentuadas).
+    return re.sub(r"[^a-z0-9]+", "-", strip_accents(text).lower()).strip("-")[:80]
 
 
 def sections_from_markdown(text: str) -> list[Section]:
