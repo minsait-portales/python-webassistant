@@ -56,6 +56,8 @@ final class StatusPageTest extends BrowserTestBase {
    *
    * @return \Drupal\webassistant_connector\Sync\OutboxItem
    *   The row.
+   *
+   * @phpstan-impure
    */
   private function row(string $entityId): OutboxItem {
     $item = $this->container->get('webassistant_connector.outbox')->loadByKey('articles', 'node', $entityId, 'en');
