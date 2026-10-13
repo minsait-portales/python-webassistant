@@ -314,6 +314,7 @@ final class Indexer {
       $results['deleted'] += $report->getDeleted();
       $results['failed'] += $report->getFailed();
       $results['dead'] += $report->getDead();
+      $results['suspended'] = !empty($results['suspended']) || $report->isSuspended();
     }
     $context['results'] = $results;
     $sandbox['progress'] += $page['entities'];
@@ -356,6 +357,9 @@ final class Indexer {
         '@failed' => (int) $results['failed'],
         '@dead' => (int) $results['dead'],
       ]));
+    }
+    if (!empty($results['suspended'])) {
+      $messenger->addWarning(new TranslatableMarkup('Sending stopped: the platform is not available or the connector is not fully configured (credentials, public base URL). Cron sends the recorded events once the status page shows no errors.'));
     }
   }
 

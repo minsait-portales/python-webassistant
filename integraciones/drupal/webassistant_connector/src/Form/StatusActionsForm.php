@@ -21,6 +21,7 @@ use Drupal\webassistant_connector\Sync\SourceMatcher;
 use Drupal\webassistant_connector\Sync\SyncProcessor;
 use Drupal\webassistant_connector\Sync\SyncReport;
 use Drupal\webassistant_connector\Sync\SyncStatus;
+use Drupal\webassistant_connector\Sync\UrlResolver;
 
 /**
  * Buttons of the status page (design section 10).
@@ -65,6 +66,8 @@ final class StatusActionsForm extends FormBase {
    *   The entity type manager.
    * @param \Drupal\Core\Datetime\DateFormatterInterface $dateFormatter
    *   The date formatter.
+   * @param \Drupal\webassistant_connector\Sync\UrlResolver $urlResolver
+   *   The URL resolver.
    */
   public function __construct(
     protected SyncProcessor $syncProcessor,
@@ -76,6 +79,7 @@ final class StatusActionsForm extends FormBase {
     protected LegacyMigrator $legacyMigrator,
     protected EntityTypeManagerInterface $entityTypeManager,
     protected DateFormatterInterface $dateFormatter,
+    protected UrlResolver $urlResolver,
   ) {}
 
   /**
@@ -422,7 +426,10 @@ final class StatusActionsForm extends FormBase {
       '@failed' => $report->getFailed(),
       '@dead' => $report->getDead(),
     ]));
-    if ($report->isSuspended()) {
+    if ($report->isSuspended() && !$this->urlResolver->hasTrustedBaseUrl()) {
+      $this->messenger()->addError($this->t('Nothing is sent from the web until the public base URL (synchronization settings) or trusted_host_patterns in settings.php is set: document URLs would take the Host header of the request. Drush is not affected.'));
+    }
+    elseif ($report->isSuspended()) {
       $this->messenger()->addWarning($this->t('Processing stopped: the platform is not available or not configured. See the recent errors.'));
     }
   }

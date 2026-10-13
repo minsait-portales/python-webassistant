@@ -624,6 +624,9 @@ msgstr "Sin definir"
 msgid "Notes"
 msgstr "Notas"
 
+msgid "Nothing is sent from the web until the public base URL (synchronization settings) or trusted_host_patterns in settings.php is set: document URLs would take the Host header of the request. Drush is not affected."
+msgstr "No se envía nada desde la web hasta que se define la URL pública base (ajustes de sincronización) o trusted_host_patterns en settings.php: las URL de los documentos tomarían la cabecera Host de la petición. Drush no se ve afectado."
+
 msgid "OK"
 msgstr "Correcto"
 
@@ -932,6 +935,9 @@ msgstr "Enviar el idioma de la interfaz al widget"
 
 msgid "Send the user roles"
 msgstr "Enviar los roles del usuario"
+
+msgid "Sending stopped: the platform is not available or the connector is not fully configured (credentials, public base URL). Cron sends the recorded events once the status page shows no errors."
+msgstr "Envío detenido: la plataforma no está disponible o el conector no está configurado del todo (credenciales, URL pública base). Cron envía los eventos registrados cuando la página de estado no muestre errores."
 
 msgid "Sends the site ID of the connector settings: other sites of the tenant will not find these documents."
 msgstr "Envía el ID de site de los ajustes del conector: los demás sites del tenant no encontrarán estos documentos."

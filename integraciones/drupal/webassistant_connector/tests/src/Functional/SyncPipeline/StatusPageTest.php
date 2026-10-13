@@ -140,6 +140,13 @@ final class StatusPageTest extends BrowserTestBase {
     $assert->pageTextContains('1 event will be retried.');
     $this->assertSame(OutboxItem::STATUS_PENDING, $this->row('3')->status);
 
+    // Without a public base URL nor trusted hosts nothing is sent from the
+    // web: URLs would take the Host header of the request.
+    $this->submitForm([], 'Process now');
+    $assert->pageTextContains('Nothing is sent from the web until the public base URL');
+    $this->assertSame(OutboxItem::STATUS_PENDING, $this->row('3')->status);
+    $this->config('webassistant_connector.settings')->set('sync.public_base_url', 'https://www.example.com')->save();
+
     // Process now: the source does not exist, so the events are done.
     $this->submitForm([], 'Process now');
     $assert->pageTextContains('3 events processed');
@@ -214,6 +221,11 @@ final class StatusPageTest extends BrowserTestBase {
   public function testIndexSourceBatchAndReconcile(): void {
     $settings['settings']['webassistant_connector'] = (object) [
       'value' => ['client_id' => 'wa_portal', 'client_secret' => 'very-secret-value'],
+      'required' => TRUE,
+    ];
+    // Validated hosts: documents may take the host of the request.
+    $settings['settings']['trusted_host_patterns'] = (object) [
+      'value' => ['^' . preg_quote((string) parse_url($this->baseUrl, PHP_URL_HOST)) . '$'],
       'required' => TRUE,
     ];
     $this->writeSettings($settings);
