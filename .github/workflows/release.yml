@@ -62,7 +62,7 @@ jobs:
           VERSION="${GITHUB_REF_NAME#v}"
           awk -v v="$VERSION" '/^## \[/{p = index($0, "[" v "]") > 0; next} p' CHANGELOG.md > release-notes.md
           test -s release-notes.md || echo "Versión $VERSION" > release-notes.md
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         with:
           body_path: release-notes.md
           prerelease: ${{ contains(github.ref_name, '-') }}
