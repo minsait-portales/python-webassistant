@@ -1,0 +1,15 @@
+name: 'WebAssistant connector: commerce'
+type: module
+description: 'Indexes Drupal Commerce products (one document per product translation) and exposes the shopping cart host actions (cart.*, analytics.sales_report).'
+package: Minsait
+core_version_requirement: ^11.2
+php: 8.3
+dependencies:
+  - webassistant_connector:webassistant_connector
+  - commerce:commerce_product
+  - commerce:commerce_cart
+  - commerce:commerce_order
+  - commerce:commerce_store
+  - commerce:commerce_price
+'interface translation project': webassistant_connector
+'interface translation server pattern': modules/custom/webassistant_connector/translations/%language.po

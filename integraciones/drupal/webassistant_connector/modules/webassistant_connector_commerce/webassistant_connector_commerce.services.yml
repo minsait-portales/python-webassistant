@@ -1,0 +1,21 @@
+# Services of the Commerce extension (design section 12).
+#
+# Every service is autowired; Commerce services are injected by ID with
+# #[Autowire(service: ...)] because Commerce 2.x declares no autowire aliases.
+# Hook classes (src/Hook) and plugins are registered by core.
+services:
+  _defaults:
+    autowire: true
+
+  # Price resolution (chain price resolver) and formatting (currency
+  # formatter) shared by the product normalizer and the cart.
+  webassistant_connector_commerce.price_helper:
+    class: Drupal\webassistant_connector_commerce\Price\PriceHelper
+  Drupal\webassistant_connector_commerce\Price\PriceHelper: '@webassistant_connector_commerce.price_helper'
+
+  # Single source of truth of the cart host actions: resolves variations and
+  # stores, changes the cart through the Commerce cart manager and builds the
+  # recalculated cart view.
+  webassistant_connector_commerce.cart:
+    class: Drupal\webassistant_connector_commerce\Cart\CartService
+  Drupal\webassistant_connector_commerce\Cart\CartService: '@webassistant_connector_commerce.cart'

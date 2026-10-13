@@ -1,0 +1,7 @@
+use webassistant cart actions:
+  title: 'Use WebAssistant cart actions'
+  description: 'Grants the cart:read and cart:write scopes and the cart.get, cart.add, cart.add_many, cart.update, cart.remove and cart.checkout host actions on the own shopping cart. Drupal Commerce access checks still apply.'
+
+use webassistant analytics actions:
+  title: 'Use WebAssistant analytics actions'
+  description: 'Grants the analytics:read scope and the analytics.sales_report host action, which also requires "Use the commerce administration pages".'
